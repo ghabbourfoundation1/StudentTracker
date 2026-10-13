@@ -98,7 +98,7 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const AR={Dashboard:'لوحة المعلومات',Students:'الطلاب',Attendance:'الحضور',Quiz:'الكويزات','Live':'المتابعة المباشرة','Practical Skills':'المهارات العملية',Alerts:'التنبيهات',Settings:'الإعدادات'};
 const t=k=>D.set.lang==='ar'&&AR[k]||k;
 const tabs=['Dashboard','Students','Attendance','Quiz','Live','Practical Skills','Alerts','Settings'];
-let tab='Live',q='',pid=null,dTier=null;
+let tab='Attendance',q='',pid=null,dTier=null;
 const today=()=>new Date().toISOString().slice(0,10);
 // ---- calculations ----
 const act=()=>D.students.filter(s=>s.status==='Active'&&s.cls===D.curClass).sort((a,b)=>a.name.localeCompare(b.name,'ar'));

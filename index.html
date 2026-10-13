@@ -371,7 +371,7 @@ function analyzeSheet(sn,rows0){
   const nS=ne.filter(v=>{const t=stat(v,false);return t!==undefined&&t!==null}).length,nB=ne.filter(v=>{const t=nn(v);return t==='0'||t==='1'}).length,nN=ne.filter(v=>!isNaN(num(v))).length,L=ne.length;
   const attW=/حضور|غياب|attendance|absent|present|حاضر|غائب/i.test(hs),nums=ne.map(num).filter(x=>!isNaN(x));let kind=null;
   if(nS/L>=.6||((nS+nB)/L>=.8&&nS>0))kind='att';
-  else if(nB/L>=.9&&(pdate(hv)||attW||(sa&&!sq)))kind='att';
+  else if(nB===L)kind='att';
   else if(nN/L>=.7)kind=(!SKIPH.test(hs)&&Math.max(...nums)<1e5)?'quiz':'skip';
   if(!kind)continue;
   items.push(mkItem(sn,hs||'Column '+(j+1),pairsOf(j),kind,dh,maxRow?maxRow[j]:null))}}
@@ -382,6 +382,7 @@ function analyzeSheet(sn,rows0){
   const nC=cs.filter(x=>x.nu>=.7&&x!==dC&&x!==sC&&!SKIPH.test(String(hdrOf(x.j)||''))).sort((x,y)=>y.nu-x.nu)[0],tC=cs.filter(x=>x!==dC&&x!==sC&&x!==nC&&x.nu<.5&&x.dist<=.4)[0];
   if(nC&&(tC||dC)){const g={};rowsD.forEach(r=>{if(String(r[nC.j]??'').trim()==='')return;const k=tC?tidy(r[tC.j]):'Quiz '+(pdate(r[dC.j])||'');(g[k]=g[k]||[]).push([r[c],r[nC.j]])});Object.keys(g).forEach(k=>items.push(mkItem(sn,k,g[k],'quiz','')))}}
  return{items,names:rowsD.map(r=>tidy(r[c]))}}
+function smDel(i){impP.items.splice(i,1);go()}
 function smSet(i,k,v){const it=impP.items[i];if(k==='max')v=+v>0?+v:it.max;it[k]=v;go()}
 function impPrev(){const P=impP,have=new Set(D.students.filter(s=>s.cls===D.curClass).map(s=>normName(s.name))),nw=P.names.filter(n=>!have.has(normName(n)));
  const kinds=[['att','Attendance day'],['quiz','Quiz'],['skip','Ignore']];
@@ -391,7 +392,7 @@ function impPrev(){const P=impP,have=new Set(D.students.filter(s=>s.cls===D.curC
  return `<section><h2>SMART IMPORT — ${esc(P.file)}</h2>
  <p><b>${P.names.length}</b> students found · <b>${nw.length}</b> new${P.names.length-nw.length?` · ${P.names.length-nw.length} already in this class (matched by name)`:''}</p>
  <label class="row"><input type="checkbox" ${P.addNew?'checked':''} onchange="impP.addNew=this.checked;go()"> Add the new students (${nw.length})</label>
- ${P.items.length?`<p class="lb">Check what the app detected in each column and fix it if needed.</p><div class="wrap"><table><tr><th>SHEET</th><th>COLUMN</th><th>WHAT IS IT?</th><th>DETAILS</th><th>VALUES</th></tr>${P.items.map((it,i)=>`<tr><td>${esc(it.sheet)}</td><td>${esc(it.header)}</td><td><select aria-label="Type" onchange="smSet(${i},'kind',this.value)">${kinds.map(k=>`<option value="${k[0]}" ${it.kind===k[0]?'selected':''}>${k[1]}</option>`).join('')}</select></td><td>${flds(it,i)}</td><td class="lb">${esc(smp(it))}</td></tr>`).join('')}</table></div>`:'<p class="lb">No attendance or grade columns were found, only names.</p>'}
+ ${P.items.length?`<div class="row"><span class="lb">Columns with only 0 and 1 are read as attendance; other numbers as quiz grades. Fix any column, or remove it.</span>${P.items.some(x=>x.kind==='skip')?`<button class="btn" onclick="impP.items=impP.items.filter(x=>x.kind!=='skip');go()">Remove all ignored columns</button>`:''}</div><div class="wrap"><table><tr><th>SHEET</th><th>COLUMN</th><th>WHAT IS IT?</th><th>DETAILS</th><th>VALUES</th><th></th></tr>${P.items.map((it,i)=>`<tr><td>${esc(it.sheet)}</td><td>${esc(it.header)}</td><td><select aria-label="Type" onchange="smSet(${i},'kind',this.value)">${kinds.map(k=>`<option value="${k[0]}" ${it.kind===k[0]?'selected':''}>${k[1]}</option>`).join('')}</select></td><td>${flds(it,i)}</td><td class="lb">${esc(smp(it))}</td><td><button class="btn" onclick="smDel(${i})" aria-label="Remove this column">✕ Remove</button></td></tr>`).join('')}</table></div>`:'<p class="lb">No attendance or grade columns were found, only names.</p>'}
  <div class="row"><button class="btn pri" onclick="smCommit()">Import</button><button class="btn" onclick="impP=null;go()">Cancel</button></div></section>`}
 function smCommit(){const P=impP;let nS=0,nA=0,nQ=0,sk=0;const have=new Map(D.students.filter(s=>s.cls===D.curClass).map(s=>[normName(s.name),s]));
  if(P.addNew)P.names.forEach(n=>{const k=normName(n);if(!have.has(k)){const st={id:uid(),name:tidy(n),code:'S'+(D.students.length+1),cls:D.curClass,status:'Active'};D.students.push(st);have.set(k,st);nS++}});

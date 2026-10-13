@@ -73,7 +73,6 @@ window.addEventListener('error',function(e){var b=document.getElementById('app')
 try{new Function('a','return a??1;')}catch(e){document.addEventListener('DOMContentLoaded',function(){var b=document.getElementById('app');if(b)b.innerHTML='<section style="padding:16px">This browser is too old for the app. Please update iOS / Safari, or open the link in Chrome.</section>'})}
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head><body>
 <header><h1>Workshop Tracker</h1><select id="cls" aria-label="Class"></select><input id="newcls" data-enter="1" placeholder="New class name, then Enter" hidden style="width:210px"><span class="lb">AUTOMOTIVE ELECTRICAL · TRAINING RECORD</span><span id="save" class="lb"></span><button class="tb" id="bkBtn" onclick="bak()" title="Download a backup file">⬇ Backup</button><button class="tb" id="undoAll" disabled title="Undo the last change (Ctrl+Z)">↶ Undo</button><button class="tb" id="lang">عربي</button><nav id="nav"></nav></header>
 <div id="alertbar"></div>
@@ -150,7 +149,7 @@ V.Dashboard=()=>{const S=act(),rows=S.map(s=>({s,m:avg(results(s.id)),tr:trend(s
  const att=ss.map(s=>{const m=D.att[s.id]||{},p=S.filter(x=>m[x.id]==='Present').length,tt=S.filter(x=>m[x.id]).length;return tt?{l:s.date,v:100*p/tt,t:Math.round(100*p/tt)+'%'}:null}).filter(Boolean);
  const eng=ss.filter(s=>s.status==='Ended').slice(-8).map(s=>{const v=S.reduce((a,x)=>a+sessScore(s.id,x.id),0);return{l:s.date,v,t:v}});
  const li=a=>a.map((x,i)=>`<div class="li"><span class="mono mut">${i+1}</span><span class="n">${nm(x.s)}</span><b>${x.m.toFixed(1)}%</b></div>`).join('')||'<span class="mut">No graded students yet.</span>';
- return `<div class="row"><button class="btn" onclick="clsReport()">Class report</button><span style="display:inline-flex;flex-direction:column;gap:6px;align-items:flex-start"><button class="btn" onclick="exportXlsx()">Export Excel (names, attendance, quiz grades)</button><button class="btn" onclick="exportDash()">Export class dashboard</button></span><span class="lb">Opens as a file — print it or save as PDF</span></div><div class="stats"><div><div class="lb">ACTIVE STUDENTS</div><div class="big">${S.length}</div></div><div><div class="lb">CLASS AVERAGE</div><div class="big">${all.length?(all.reduce((a,b)=>a+b,0)/all.length).toFixed(0)+'%':'—'}</div></div><div><div class="lb">ATTENDANCE</div><div class="big">${ats.length?(ats.reduce((a,b)=>a+b,0)/ats.length).toFixed(0)+'%':'—'}</div></div><div><div class="lb">OPEN ALERTS</div><div class="big">${alerts().filter(a=>a.k!=='pos'&&a.st!=='resolved').length}</div></div></div>
+ return `<div class="row"><button class="btn" onclick="clsReport()">Class report</button><button class="btn" onclick="exportXlsx()">Export Excel</button><span class="lb">Opens as a file — print it or save as PDF</span></div><div class="stats"><div><div class="lb">ACTIVE STUDENTS</div><div class="big">${S.length}</div></div><div><div class="lb">CLASS AVERAGE</div><div class="big">${all.length?(all.reduce((a,b)=>a+b,0)/all.length).toFixed(0)+'%':'—'}</div></div><div><div class="lb">ATTENDANCE</div><div class="big">${ats.length?(ats.reduce((a,b)=>a+b,0)/ats.length).toFixed(0)+'%':'—'}</div></div><div><div class="lb">OPEN ALERTS</div><div class="big">${alerts().filter(a=>a.k!=='pos'&&a.st!=='resolved').length}</div></div></div>
  <div class="ch"><section><h2>Performance levels</h2>${donut([{l:'High',col:'#2c5a47'},{l:'Medium',col:'#b8f200'},{l:'Low',col:'#111111'}].map(x=>({...x,v:tiers[x.l].length,c:`dTier='${x.l}';go()`})))}
  <p class="lb">High ≥ ${D.set.hi}% · Medium ≥ ${D.set.mid}% · Low below. Click a slice for names.</p></section>
  <section><h2>Quiz average over time (%)</h2>${line(qa)}</section>
@@ -183,7 +182,7 @@ let attSid=null,attMon=null,qOpen=null,stuSort='name',bkHide=false,impP=null,lvS
 V.Attendance=()=>{const ss=D.sessions.filter(x=>x.cls===D.curClass).sort((a,b)=>b.date.localeCompare(a.date));const ok=id=>id&&D.sessions.find(x=>x.id===id&&x.cls===D.curClass);const sid=ok(attSid)?attSid:ok(D.cur)?D.cur:(ss[0]||{}).id;const cs=D.sessions.find(x=>x.id===sid);const m=D.att[sid]||{};
  const cb=(s,v)=>`<td style="text-align:center"><input type="checkbox" aria-label="${v} ${esc(s.name)}" ${m[s.id]===v||(v==='Present'&&m[s.id]==='Late')?'checked':''} onchange="setAtt(this,'${sid}','${s.id}','${v}')"></td>`;
  return `<section><h2>NEW SESSION</h2><div class="row"><input type="date" id="sd" value="${today()}"><input id="st" data-enter="1" placeholder="Topic (optional)" onkeydown="if(event.key==='Enter')newSess()"><button class="btn pri" onclick="newSess()">New session</button></div></section>
- ${cs?`<section><div class="row"><h2 style="margin:0;flex:1">Attendance — ${cs.date} ${esc(cs.topic||'')}</h2><button class="btn" onclick="allP('${sid}')">Mark everyone present</button><button class="btn" onclick="del('session','${sid}',this)">Delete day</button>${DA('emptydays','Delete empty days')}${DA('allsessions','Delete all days')}</div>
+ ${cs?`<section><div class="row"><h2 style="margin:0;flex:1">Attendance — ${cs.date} ${esc(cs.topic||'')}</h2><button class="btn" onclick="allP('${sid}')">Mark everyone present</button><button class="btn" onclick="del('session','${sid}',this)">Delete day</button>${DA('allsessions','Delete all days')}</div>
  <div class="wrap"><table style="max-width:560px"><tr><th>Name</th><th style="text-align:center">Absent</th><th style="text-align:center">Present</th></tr>${act().map(s=>`<tr><td>${esc(s.name)}</td>${cb(s,'Absent')}${cb(s,'Present')}</tr>`).join('')||'<tr><td class="mut" colspan="3">Add students first.</td></tr>'}</table></div></section>
  <section><h2>Other days</h2>${(()=>{const mons=[...new Set(ss.map(x=>x.date.slice(0,7)))],mo=attMon&&mons.includes(attMon)?attMon:cs.date.slice(0,7);return `<div class="row"><select aria-label="Month" onchange="attMon=this.value;go()">${mons.map(m=>`<option ${m===mo?'selected':''}>${m}</option>`).join('')}</select><span class="lb">${ss.filter(x=>x.date.slice(0,7)===mo).length} days</span></div><div class="row" style="flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px">${ss.filter(x=>x.id!==sid&&x.date.slice(0,7)===mo).map(x=>`<button class="btn" style="flex:none" onclick="attSid='${x.id}';go()">${x.date.slice(8)} ${esc(x.topic||'')}</button>`).join('')||'<span class="mut">No other days this month.</span>'}</div>`})()}</section>`:'<section class="mut">Create a session to take attendance.</section>'}`};
 V.Quiz=()=>`<section><div class="row"><h2 style="margin:0;flex:1">NEW QUIZ</h2>${DA('allquiz','Delete all quizzes')}</div><div class="row"><input id="at" placeholder="Title"><input type="date" id="ad" value="${today()}"><input id="am" type="number" placeholder="Max score" style="width:110px" data-enter="1" onkeydown="if(event.key==='Enter')addAs()"><button class="btn pri" onclick="addAs()">Create</button></div></section>
@@ -226,7 +225,7 @@ V.Settings=()=>{const f=(k,l,h)=>`<label class="row"><span style="width:250px">$
  <section><h2>CLASSES</h2>${D.classes.map(c=>`<div class="li"><input value="${esc(c.name)}" style="flex:1" aria-label="Class name" onchange="renCls('${c.id}',this.value)">${D.classes.length>1?`<button class="btn" onclick="del('class','${c.id}',this)">Delete</button>`:''}</div>`).join('')}</section>
  <section><h2>RULES</h2>${f('hi','High level from (%)','80 and above')}${f('mid','Medium level from (%)','also the pass mark')}${f('drop','Sudden-drop (points)','latest vs previous 3')}${f('low','Persistent-low (%)','average below this')}${f('minN','Minimum quizzes','for trend and alerts')}${f('bonus','Bonus value','per +')}${f('pen','Penalty value','per −, negative')}${f('absN','Consecutive absences','alert at')}${f('lowEng','Low engagement net avg','last 3 sessions')}</section>
  <section><h2>DATA PROTECTION</h2><p>Storage status: <b>${PERSIST===true?'Protected (the browser promised not to clear it)':'Not guaranteed by the browser'}</b></p><p class="lb">Your data is saved twice on this device, in two separate browser stores. Safari on iPhone can still erase a website's data after about a week without opening it. To avoid that, add this page to the Home Screen and open it from there, or open the app at least once a week. Chrome and Edge keep the data unless the device is very low on space.</p><div class="row"><button class="btn" onclick="protectStorage().then(()=>go())">Request protection</button></div></section>
- <section><h2>EXCEL</h2><div class="row"><button class="btn pri" onclick="exportXlsx()">Export to Excel now</button><label class="btn">Update my existing file<input type="file" accept=".xlsx" hidden onchange="mergeXlsx(this)"></label><button class="btn" onclick="linkFile()">Link a file (auto-save, Chrome/Edge on a laptop)</button></div><div class="row"><button class="btn" onclick="exportDash()">Export class dashboard</button></div><label class="row"><input type="checkbox" ${D.set.autoXls!==false?'checked':''} onchange="D.set.autoXls=this.checked;save()"> Also download the Excel file automatically when I end a session or a quiz</label><p class="lb">The class file has one sheet, "Class data": each student with attendance and every quiz grade in its own column (no averages). "Export class dashboard" downloads the class totals as a separate file. For one student, open the profile and press Export Excel. "Update my existing file" refreshes only the "Class data" sheet inside your own workbook and keeps your other sheets.</p></section>
+ <section><h2>EXCEL</h2><div class="row"><button class="btn pri" onclick="exportXlsx()">Export to Excel now</button><label class="btn">Update my existing file<input type="file" accept=".xlsx" hidden onchange="mergeXlsx(this)"></label><button class="btn" onclick="linkFile()">Link a file (auto-save, Chrome/Edge on a laptop)</button></div><label class="row"><input type="checkbox" ${D.set.autoXls!==false?'checked':''} onchange="D.set.autoXls=this.checked;save()"> Also download the Excel file automatically when I end a session or a quiz</label><p class="lb">The class file has two sheets: "Class data" (each student with attendance and quiz grades) and "Dashboard" (class totals). For one student, open the profile and press Export Excel. "Update my existing file" refreshes only these two sheets inside your own workbook and keeps any other sheets you added.</p></section>
  <section><h2>BACKUP</h2><div class="row"><button class="btn" onclick="bak()">Download backup (JSON)</button><label class="lb">RESTORE <input type="file" accept=".json" onchange="rest(this)"></label><button class="btn" onclick="demo()">Load demo data</button><button class="btn" onclick="rmDemo()">Remove demo data</button></div><p class="lb">Data lives in this browser only. Download backups regularly.</p></section>`};
 // ---- actions ----
 const busy={};
@@ -275,60 +274,23 @@ const wbBlob=wb=>new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:
 const xlsxBlob=()=>wbBlob(buildXlsx());
 const pc=v=>v==null?'':Math.round(v*10)/10,slab=x=>x.date+(x.topic?' '+x.topic:''),cname=id=>(D.classes.find(c=>c.id===id)||{}).name||'',okv=v=>v!==undefined&&v!==''&&v!==null;
 const addSheet=(wb,n,rows,w)=>{const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=w||Array.from({length:Math.max(1,...rows.map(r=>r.length))},(_,i)=>({wch:i===1?26:14}));XLSX.utils.book_append_sheet(wb,ws,n)};
-function buildXlsx(){const wb=XLSX.utils.book_new(),S=act(),ss=D.sessions.filter(x=>x.cls===D.curClass).sort((a,b)=>a.date.localeCompare(b.date)),Q=D.assess.filter(a=>a.cls===D.curClass).sort((a,b)=>a.date.localeCompare(b.date));
- const head=['#','Name'].concat(ss.map(slab),['Present','Absent','Attendance %'],Q.map(a=>a.title+' (/'+a.max+')'));
- addSheet(wb,'Class data',[head].concat(S.map((s,i)=>{const m=ss.map(x=>{const v=(D.att[x.id]||{})[s.id]||'';return v==='Late'?'Present':v==='Excused'?'':v}),a=attStats(s.id);
-  return[i+1,s.name].concat(m,[m.filter(v=>v==='Present').length,m.filter(v=>v==='Absent').length,a.pct==null?'':Math.round(a.pct)],Q.map(q=>okv(q.scores[s.id])?q.scores[s.id]:''))})));return wb}
-let DASHCH=[];
-function buildDashXlsx(){const wb=XLSX.utils.book_new(),S=act(),ss=D.sessions.filter(x=>x.cls===D.curClass).sort((a,b)=>a.date.localeCompare(b.date)),Q=D.assess.filter(a=>a.cls===D.curClass).sort((a,b)=>a.date.localeCompare(b.date)),R=liveRows('all');
+function buildXlsx(){const wb=XLSX.utils.book_new(),S=act(),ss=D.sessions.filter(x=>x.cls===D.curClass).sort((a,b)=>a.date.localeCompare(b.date)),Q=D.assess.filter(a=>a.cls===D.curClass).sort((a,b)=>a.date.localeCompare(b.date)),R=liveRows('all');
+ const head=['#','Name'].concat(ss.map(slab),['Present','Absent','Attendance %'],Q.map(a=>a.title+' (/'+a.max+')'),['Quiz avg %','Live points']);
+ addSheet(wb,'Class data',[head].concat(S.map((s,i)=>{const m=ss.map(x=>{const v=(D.att[x.id]||{})[s.id]||'';return v==='Late'?'Present':v==='Excused'?'':v}),a=attStats(s.id),r=R.find(x=>x.s.id===s.id)||{net:0};
+  return[i+1,s.name].concat(m,[m.filter(v=>v==='Present').length,m.filter(v=>v==='Absent').length,a.pct==null?'':Math.round(a.pct)],Q.map(q=>okv(q.scores[s.id])?q.scores[s.id]:''),[pc(avg(results(s.id))),r.net])})));
  const W=S.map(s=>({s,m:avg(results(s.id))})),G=W.filter(x=>x.m!=null).sort((a,b)=>b.m-a.m),all=Q.flatMap(q=>S.map(s=>q.scores[s.id]).filter(okv).map(v=>100*v/q.max)),at=S.map(s=>attStats(s.id).pct).filter(x=>x!=null),tc={High:0,Medium:0,Low:0};G.forEach(x=>tc[tier(x.m)[0]]++);
- const rows=[],P=(...r)=>rows.push(r),B=()=>rows.push(['']),rg=(a,b,c)=>`Dashboard!$${c}$${a}:$${c}$${b}`,ch=[],GR='2C5A47';
+ const rows=[],P=(...r)=>rows.push(r),B=()=>rows.push(['']);
  P('CLASS DASHBOARD');P('Class',cname(D.curClass));P('Date',today());B();P('Students',S.length);P('Quizzes',Q.length);P('Sessions',ss.length);P('Class quiz average %',all.length?pc(all.reduce((a,b)=>a+b,0)/all.length):'');P('Attendance %',at.length?Math.round(at.reduce((a,b)=>a+b,0)/at.length):'');B();
- P('PERFORMANCE LEVELS');P('Level','Students');const t0=rows.length+1;P('High',tc.High);P('Medium',tc.Medium);P('Low',tc.Low);const t1=rows.length;P('Not graded',S.length-G.length);B();
- if(G.length)ch.push({type:'doughnut',title:'Performance levels',cat:{ref:rg(t0,t1,'A'),vals:['High','Medium','Low']},val:{ref:rg(t0,t1,'B'),vals:[tc.High,tc.Medium,tc.Low]},colors:[GR,'B8F200','111111']});
- P('QUIZZES');P('Quiz','Date','Max','Graded','Average %','Highest %','Lowest %','Pass rate %');const q0=rows.length+1,qa=[];
- Q.forEach(q=>{const p=S.map(s=>q.scores[s.id]).filter(okv).map(v=>100*v/q.max),av=p.length?pc(p.reduce((a,b)=>a+b,0)/p.length):'';qa.push(av);P(q.title,q.date,q.max,p.length,av,p.length?pc(Math.max(...p)):'',p.length?pc(Math.min(...p)):'',p.length?Math.round(100*p.filter(x=>x>=D.set.mid).length/p.length):'')});const q1=rows.length;B();
- if(Q.length)ch.push({type:'line',title:'Quiz average over time (%)',cat:{ref:rg(q0,q1,'A'),vals:Q.map(q=>q.title)},val:{ref:rg(q0,q1,'E'),vals:qa},color:GR,max:100,min:0});
- P('ATTENDANCE PER DAY');P('Day','Present','Absent','Not recorded','Present %');const a0=rows.length+1,pa=[];
- ss.forEach(x=>{const m=D.att[x.id]||{},p=S.filter(s=>m[s.id]==='Present'||m[s.id]==='Late').length,ab=S.filter(s=>m[s.id]==='Absent').length,pp=p+ab?Math.round(100*p/(p+ab)):'';pa.push(pp);P(slab(x),p,ab,S.length-p-ab,pp)});const a1=rows.length;B();
- if(ss.length)ch.push({type:'col',title:'Attendance per session (%)',cat:{ref:rg(a0,a1,'A'),vals:ss.map(slab)},val:{ref:rg(a0,a1,'E'),vals:pa},color:GR,max:100,min:0});
+ P('PERFORMANCE LEVELS');P('Level','Students');P('High',tc.High);P('Medium',tc.Medium);P('Low',tc.Low);P('Not graded',S.length-G.length);B();
+ P('QUIZZES');P('Quiz','Date','Max','Graded','Average %','Highest %','Lowest %','Pass rate %');
+ Q.forEach(q=>{const p=S.map(s=>q.scores[s.id]).filter(okv).map(v=>100*v/q.max);P(q.title,q.date,q.max,p.length,p.length?pc(p.reduce((a,b)=>a+b,0)/p.length):'',p.length?pc(Math.max(...p)):'',p.length?pc(Math.min(...p)):'',p.length?Math.round(100*p.filter(x=>x>=D.set.mid).length/p.length):'')});B();
+ P('ATTENDANCE PER DAY');P('Day','Present','Absent','Not recorded','Present %');
+ ss.forEach(x=>{const m=D.att[x.id]||{},p=S.filter(s=>m[s.id]==='Present'||m[s.id]==='Late').length,ab=S.filter(s=>m[s.id]==='Absent').length;P(slab(x),p,ab,S.length-p-ab,p+ab?Math.round(100*p/(p+ab)):'')});B();
  P('TOP 5 (quiz average)');P('#','Name','Average %');G.slice(0,5).forEach((x,i)=>P(i+1,x.s.name,pc(x.m)));B();
  P('BOTTOM 5 (quiz average)');P('#','Name','Average %');G.slice(-5).reverse().forEach((x,i)=>P(i+1,x.s.name,pc(x.m)));B();
  P('NEEDS ATTENTION');alerts().filter(a=>a.k!=='pos'&&a.st!=='resolved').forEach(a=>P(a.s.name,a.m));B();
- const L=R.filter(r=>r.n>0).sort((a,b)=>b.net-a.net).slice(0,10);P('LIVE POINTS - TOP 10 (separate from quiz scores)');P('#','Name','Bonus','Penalty','Net');const l0=rows.length+1;L.forEach((r,i)=>P(i+1,r.s.name,r.b,r.p,r.net));const l1=rows.length;P('No interaction',R.filter(r=>r.n===0).map(r=>r.s.name).join(', '));B();
- if(L.length)ch.push({type:'bar',title:'Live points: top 10',cat:{ref:rg(l0,l1,'B'),vals:L.map(r=>r.s.name)},val:{ref:rg(l0,l1,'E'),vals:L.map(r=>r.net)},color:GR,min:Math.min(0,...L.map(r=>r.net))});
- const ls=ss.filter(x=>live().some(e=>e.sess===x.id)).slice(-8);P('LIVE POINTS PER SESSION');P('Day','Class net points');const s0=rows.length+1,sv=[];ls.forEach(x=>{const v=S.reduce((a,s)=>a+sessScore(x.id,s.id),0);sv.push(v);P(slab(x),v)});const s1=rows.length;
- if(ls.length)ch.push({type:'col',title:'Class live points per session',cat:{ref:rg(s0,s1,'A'),vals:ls.map(slab)},val:{ref:rg(s0,s1,'B'),vals:sv},color:GR,min:Math.min(0,...sv)});
- DASHCH=ch;addSheet(wb,'Dashboard',rows,[{wch:30},{wch:16},{wch:12},{wch:12},{wch:12},{wch:12},{wch:12},{wch:12}]);return wb}
-const xe=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-const NS_C='http://schemas.openxmlformats.org/drawingml/2006/chart',NS_A='http://schemas.openxmlformats.org/drawingml/2006/main',NS_R='http://schemas.openxmlformats.org/officeDocument/2006/relationships',XH='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-const c_srf=(r,v)=>`<c:strRef><c:f>${r}</c:f><c:strCache><c:ptCount val="${v.length}"/>${v.map((x,i)=>`<c:pt idx="${i}"><c:v>${xe(x)}</c:v></c:pt>`).join('')}</c:strCache></c:strRef>`;
-const c_nrf=(r,v)=>`<c:numRef><c:f>${r}</c:f><c:numCache><c:formatCode>General</c:formatCode><c:ptCount val="${v.length}"/>${v.map((x,i)=>x===''||x==null?'':`<c:pt idx="${i}"><c:v>${x}</c:v></c:pt>`).join('')}</c:numCache></c:numRef>`;
-const c_fill=c=>`<a:solidFill><a:srgbClr val="${c}"/></a:solidFill>`;
-const c_lbl=pos=>`<c:dLbls><c:spPr><a:noFill/><a:ln><a:noFill/></a:ln></c:spPr><c:txPr><a:bodyPr/><a:lstStyle/><a:p><a:pPr><a:defRPr sz="900" b="1"/></a:pPr><a:endParaRPr lang="en-US"/></a:p></c:txPr>${pos?`<c:dLblPos val="${pos}"/>`:''}<c:showLegendKey val="0"/><c:showVal val="1"/><c:showCatName val="0"/><c:showSerName val="0"/><c:showPercent val="0"/><c:showBubbleSize val="0"/></c:dLbls>`;
-const c_axes=(h,max,min)=>`<c:catAx><c:axId val="5001"/><c:scaling><c:orientation val="${h?'maxMin':'minMax'}"/></c:scaling><c:delete val="0"/><c:axPos val="${h?'l':'b'}"/><c:numFmt formatCode="General" sourceLinked="0"/><c:majorTickMark val="none"/><c:minorTickMark val="none"/><c:tickLblPos val="low"/><c:txPr><a:bodyPr/><a:lstStyle/><a:p><a:pPr><a:defRPr sz="900"/></a:pPr><a:endParaRPr lang="en-US"/></a:p></c:txPr><c:crossAx val="5002"/><c:crosses val="autoZero"/><c:auto val="1"/><c:lblAlgn val="ctr"/><c:lblOffset val="100"/><c:noMultiLvlLbl val="0"/></c:catAx><c:valAx><c:axId val="5002"/><c:scaling><c:orientation val="minMax"/>${max!=null?`<c:max val="${max}"/>`:''}${min!=null?`<c:min val="${min}"/>`:''}</c:scaling><c:delete val="0"/><c:axPos val="${h?'b':'l'}"/><c:majorGridlines><c:spPr><a:ln w="6350"><a:solidFill><a:srgbClr val="DCDCDC"/></a:solidFill></a:ln></c:spPr></c:majorGridlines><c:numFmt formatCode="General" sourceLinked="0"/><c:majorTickMark val="none"/><c:minorTickMark val="none"/><c:tickLblPos val="nextTo"/><c:crossAx val="5001"/><c:crosses val="${h?'max':'autoZero'}"/><c:crossBetween val="between"/></c:valAx>`;
-function chartXml(ch){const t=`<c:title><c:tx><c:rich><a:bodyPr/><a:lstStyle/><a:p><a:pPr><a:defRPr sz="1200" b="1"/></a:pPr><a:r><a:rPr lang="en-US" sz="1200" b="1"/><a:t>${xe(ch.title)}</a:t></a:r></a:p></c:rich></c:tx><c:overlay val="0"/></c:title><c:autoTitleDeleted val="0"/>`;
- const cat=`<c:cat>${c_srf(ch.cat.ref,ch.cat.vals)}</c:cat>`,val=`<c:val>${c_nrf(ch.val.ref,ch.val.vals)}</c:val>`,tx=`<c:tx><c:v>${xe(ch.title)}</c:v></c:tx>`;let plot,legend='';
- if(ch.type==='doughnut'){plot=`<c:doughnutChart><c:varyColors val="1"/><c:ser><c:idx val="0"/><c:order val="0"/>${tx}${ch.colors.map((c,i)=>`<c:dPt><c:idx val="${i}"/><c:bubble3D val="0"/><c:spPr>${c_fill(c)}<a:ln w="19050"><a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill></a:ln></c:spPr></c:dPt>`).join('')}${c_lbl()}${cat}${val}</c:ser><c:firstSliceAng val="0"/><c:holeSize val="55"/></c:doughnutChart>`;legend='<c:legend><c:legendPos val="r"/><c:overlay val="0"/></c:legend>'}
- else if(ch.type==='line'){plot=`<c:lineChart><c:grouping val="standard"/><c:varyColors val="0"/><c:ser><c:idx val="0"/><c:order val="0"/>${tx}<c:spPr><a:ln w="28575" cap="rnd">${c_fill(ch.color)}<a:round/></a:ln></c:spPr><c:marker><c:symbol val="circle"/><c:size val="7"/><c:spPr>${c_fill(ch.color)}</c:spPr></c:marker>${c_lbl('t')}${cat}${val}<c:smooth val="0"/></c:ser><c:marker val="1"/><c:axId val="5001"/><c:axId val="5002"/></c:lineChart>${c_axes(false,ch.max,ch.min)}`}
- else{const h=ch.type==='bar';plot=`<c:barChart><c:barDir val="${h?'bar':'col'}"/><c:grouping val="clustered"/><c:varyColors val="0"/><c:ser><c:idx val="0"/><c:order val="0"/>${tx}<c:spPr>${c_fill(ch.color)}</c:spPr><c:invertIfNegative val="0"/>${ch.val.vals.map((v,i)=>v<0?`<c:dPt><c:idx val="${i}"/><c:invertIfNegative val="0"/><c:bubble3D val="0"/><c:spPr>${c_fill('D92D20')}</c:spPr></c:dPt>`:'').join('')}${c_lbl('outEnd')}${cat}${val}</c:ser><c:gapWidth val="60"/><c:axId val="5001"/><c:axId val="5002"/></c:barChart>${c_axes(h,ch.max,ch.min)}`}
- return `${XH}<c:chartSpace xmlns:c="${NS_C}" xmlns:a="${NS_A}" xmlns:r="${NS_R}"><c:roundedCorners val="0"/><c:chart>${t}<c:plotArea><c:layout/>${plot}</c:plotArea>${legend}<c:plotVisOnly val="1"/><c:dispBlanksAs val="gap"/></c:chart><c:spPr><a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill><a:ln w="9525"><a:solidFill><a:srgbClr val="DCDCDC"/></a:solidFill></a:ln></c:spPr></c:chartSpace>`}
-async function addCharts(buf,charts){const z=await JSZip.loadAsync(buf),sp='xl/worksheets/sheet1.xml';let sh=await z.file(sp).async('string');
- if(!/xmlns:r=/.test(sh))sh=sh.replace(/<worksheet /,`<worksheet xmlns:r="${NS_R}" `);
- sh=sh.replace('</worksheet>','<drawing r:id="rId1"/></worksheet>');z.file(sp,sh);
- z.file('xl/worksheets/_rels/sheet1.xml.rels',`${XH}<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="${NS_R}/drawing" Target="../drawings/drawing1.xml"/></Relationships>`);
- const an=charts.map((c,i)=>{const c1=9+(i%2)*9,r1=Math.floor(i/2)*18;return `<xdr:twoCellAnchor><xdr:from><xdr:col>${c1}</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>${r1}</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from><xdr:to><xdr:col>${c1+8}</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>${r1+17}</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:to><xdr:graphicFrame macro=""><xdr:nvGraphicFramePr><xdr:cNvPr id="${i+2}" name="Chart ${i+1}"/><xdr:cNvGraphicFramePr/></xdr:nvGraphicFramePr><xdr:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/></xdr:xfrm><a:graphic><a:graphicData uri="${NS_C}"><c:chart xmlns:c="${NS_C}" r:id="rId${i+1}"/></a:graphicData></a:graphic></xdr:graphicFrame><xdr:clientData/></xdr:twoCellAnchor>`}).join('');
- z.file('xl/drawings/drawing1.xml',`${XH}<xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="${NS_A}" xmlns:r="${NS_R}">${an}</xdr:wsDr>`);
- z.file('xl/drawings/_rels/drawing1.xml.rels',`${XH}<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${charts.map((c,i)=>`<Relationship Id="rId${i+1}" Type="${NS_R}/chart" Target="../charts/chart${i+1}.xml"/>`).join('')}</Relationships>`);
- charts.forEach((c,i)=>z.file(`xl/charts/chart${i+1}.xml`,chartXml(c)));
- let ct=await z.file('[Content_Types].xml').async('string');
- ct=ct.replace('</Types>',`<Override PartName="/xl/drawings/drawing1.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>${charts.map((c,i)=>`<Override PartName="/xl/charts/chart${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.drawingml.chart+xml"/>`).join('')}</Types>`);z.file('[Content_Types].xml',ct);
- return z.generateAsync({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})}
-
-async function exportDash(){if(!window.XLSX){alert('The Excel library did not load. Check your connection and try again.');return}const c=D.classes.find(x=>x.id===D.curClass),nm=c?c.name.replace(/[^\w\u0600-\u06FF]+/g,'_'):'class',wb=buildDashXlsx();let blob;
- try{if(!window.JSZip||!DASHCH.length)throw 0;blob=await addCharts(XLSX.write(wb,{bookType:'xlsx',type:'array'}),DASHCH)}catch(e){blob=wbBlob(wb)}
- dl('workshop-'+nm+'-dashboard.xlsx',blob,'')}
-
+ const L=R.filter(r=>r.n>0).sort((a,b)=>b.net-a.net);P('LIVE POINTS (separate from quiz scores)');P('#','Name','Bonus','Penalty','Net');L.slice(0,5).forEach((r,i)=>P(i+1,r.s.name,r.b,r.p,r.net));P('No interaction',R.filter(r=>r.n===0).map(r=>r.s.name).join(', '));
+ addSheet(wb,'Dashboard',rows,[{wch:30},{wch:16},{wch:12},{wch:12},{wch:12},{wch:12},{wch:12},{wch:12}]);return wb}
 function buildStuXlsx(id){const wb=XLSX.utils.book_new(),s=D.students.find(x=>x.id===id),ss=D.sessions.filter(x=>x.cls===s.cls).sort((a,b)=>a.date.localeCompare(b.date)),Q=D.assess.filter(a=>a.cls===s.cls).sort((a,b)=>a.date.localeCompare(b.date)),
  r=results(id),m=avg(r),tr=trend(id),a=attStats(id),sk=skillLatest(id),R=liveRows('all'),me=R.find(x=>x.s.id===id)||{b:0,p:0,net:0,n:0},
  G=act().map(x=>({x,m:avg(results(x.id))})).filter(x=>x.m!=null).sort((p,q)=>q.m-p.m),rk=G.filter(x=>x.m>(m??-1)).length+1,lr=R.filter(x=>x.net>me.net).length+1;
@@ -367,7 +329,6 @@ function del(k,id,b){if(!b.dataset.sure){b.dataset.sure=1;const o=b.textContent;
  const rmSess=i=>{D.sessions=D.sessions.filter(x=>x.id!==i);delete D.att[i];D.events=D.events.filter(e=>e.sess!==i);if(D.cur===i)D.cur=null;if(attSid===i)attSid=null};
  const rmStu=i=>{D.students=D.students.filter(x=>x.id!==i);D.events=D.events.filter(e=>e.stu!==i);Object.values(D.att).forEach(m=>delete m[i]);D.assess.forEach(a=>delete a.scores[i]);D.skillAssess=D.skillAssess.filter(x=>x.stu!==i);D.plans=D.plans.filter(x=>x.stu!==i);if(pid===i)pid=null};
  const rmSk=c=>{const ids=D.skills.filter(x=>x.cls===c).map(x=>x.id);D.skills=D.skills.filter(x=>x.cls!==c);D.skillAssess=D.skillAssess.filter(x=>!ids.includes(x.skill))};
- if(k==='emptydays')D.sessions.filter(x=>x.cls===D.curClass&&!Object.keys(D.att[x.id]||{}).length&&!D.events.some(e=>e.sess===x.id)).forEach(x=>rmSess(x.id));
  if(k==='allsessions')D.sessions.filter(x=>x.cls===D.curClass).forEach(x=>rmSess(x.id));
  if(k==='allstudents')D.students.filter(x=>x.cls===D.curClass).forEach(x=>rmStu(x.id));
  if(k==='allquiz')D.assess=D.assess.filter(a=>a.cls!==D.curClass);
@@ -390,15 +351,13 @@ const HDR2=/(^|\s)(name|names|student|students|اسم|الاسم|اسماء|أس
 const isNm=v=>typeof v==='string'&&/[A-Za-z\u0600-\u06FF]/.test(v)&&!/^[\d\s\/\-.:]+$/.test(v)&&v.trim().length>=2&&v.trim().length<=60;
 const AD=s=>String(s??'').replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
 const nn=v=>AD(v==null||v instanceof Date?'':v).trim().toLowerCase();
-const normName=s=>nn(s).replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/\s+/g,' ');
-const tidy=s=>String(s).replace(/\s+/g,' ').trim();
 const COL=new Intl.Collator(['ar','en'],{numeric:true,sensitivity:'base'});
 const FEMS='فاطمة مريم ماريا سارة ساره منة منى مي مها ميار ميرنا مروة مرفت مروى ملك ملاك منار منال مديحة ميادة نادين نادية نجلاء ندى نهى نهال نورهان نوران نيرة نسمة نعمة نجوى هاجر هبة هدى هدير هديل هالة هنا هناء هند هيام هنادي وفاء ولاء وعد ورد وردة يارا ياسمين ياسمينا يسرا يمنى يقين أسماء اسماء آية ايه اية أميرة اميرة أماني اماني ابتسام إسراء اسراء ألاء الاء إلهام الهام إيمان ايمان بسمة بسملة بسنت بيسان تسنيم تقوى جنة جنى جميلة جيهان حبيبة حنان حنين حياة خلود خديجة داليا دينا دانيا دعاء ديما رانيا رنا رنيم رهف رودينا روان ريم ريهام ريتال رحمة رضوى رقية رجاء زينب زهراء زينة سلمى سلوى سمر سمية سناء سهى سهير سالي سلسبيل شيماء شهد شروق شيرين صفاء صفية صابرين ضحى عائشة عايدة عبير علياء عفاف عزة غادة غدير فرح فريدة فيروز كوثر كريمان لبنى ليلى لمياء لينا ليان لمى لجين لانا ماجدة نبيلة نيللي نورا نجاة هيفاء رشا رباب ريما رزان تالا تاليا جودي جوري mary sara sarah mona fatma mariam mai nada hana salma yara rana';
 let _F=null;const fem=n=>(_F||(_F=new Set(FEMS.split(' ').map(x=>normName(x)))),_F.has(normName(String(n).trim().split(/\s+/)[0])));
 function stuCmp(a,b){const ao=a.ord!=null,bo=b.ord!=null;if(ao&&bo)return a.ord-b.ord;if(ao!==bo)return ao?-1:1;const fa=fem(a.name),fb=fem(b.name);if(fa!==fb)return fa?1:-1;return COL.compare(normName(a.name),normName(b.name))}
 const byName=(a,b)=>COL.compare(normName(a.name),normName(b.name));
-
-const cleanName=s=>tidy(String(s==null||s instanceof Date?'':s).replace(/[\u200b-\u200f\u202a-\u202e\u0640]/g,'').replace(/^\s*[\d\u0660-\u0669]+\s*[-.)\u060c:]*\s*/,'').replace(/[\s\-.,\u060c:]+$/,''));
+const normName=s=>nn(s).replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/\s+/g,' ');
+const tidy=s=>String(s).replace(/\s+/g,' ').trim();
 const META=/^(total|totals|average|avg|mean|sum|max(imum)?( score| marks?)?|min(imum)?|out of|full marks?|date|المجموع|الاجمالي|المتوسط|الدرجه النهايه|النهايه العظمي|الدرجه العظمي|التاريخ|تاريخ|الحد الاقصي)\s*[:：]?$/i;
 const NONAME1=/^(ال)?(محاضر\S*|غياب\S*|حضور\S*|حصص|اسبوع|ترم|فصل|مجموعه|اجمالي|مجموع|نسبه|ملاحظ\S*|ملحوظ\S*|مواد|ماده|ورشه|عملي|نظري|section|lecture\S*|attendance|absent\S*|present|week|semester|term|group|class|notes?|total\S*|summary|remarks?|comment\S*|sheet\S*)(\s|\d|$)/i,NONAME2=/^(حصه|يوم|day|session|جلسه|week|lecture)\s*\d+/i;
 const notName=v=>{const t=normName(v);return META.test(t)||NONAME1.test(t)||NONAME2.test(t)};
@@ -422,112 +381,74 @@ const tr=R=>{const W=Math.max(0,...R.map(r=>r.length));return Array.from({length
 function detectCol(rows){const W=Math.max(0,...rows.map(r=>r.length));let best=0,bs=-1;
  for(let c=0;c<W;c++){const set=new Set();let hdr=false;rows.forEach((r,i)=>{const v=r[c];if(isNm(v)&&!HDR.test(v)&&!notName(v))set.add(normName(v));if(i<6&&typeof v==='string'&&HDR.test(v))hdr=true});
   const sc=set.size+(hdr?1000:0);if(sc>bs){bs=sc;best=c}}return best}
-function mkItem(sn,hs,pairs,kind,date,mrv){let good=0,bad=0,exc=0,np=0,na=0;
- if(kind==='att')pairs.forEach(p=>{const t=stat(p[1],true);if(t==='Present'){good++;np++}else if(t==='Absent'){good++;na++}else if(t==='Excused')exc++;else if(t===undefined)bad++});
- else pairs.forEach(p=>{if(String(p[1]??'').trim()==='')return;if(isNaN(num(p[1])))bad++;else good++});
- const vals=pairs.map(p=>num(p[1])).filter(x=>!isNaN(x));
+function mkItem(sn,hs,pairs,kind,date,mrv){const vals=pairs.map(p=>num(p[1])).filter(x=>!isNaN(x));
  const m=hs.match(/(?:\/|out of|من|max\.?)\s*(\d+(?:\.\d+)?)/i)||hs.match(/\(\s*(\d+(?:\.\d+)?)\s*\)\s*$/);let mx=m?+m[1]:null;
  if(!mx&&mrv!=null&&num(mrv)>0)mx=num(mrv);if(!mx)mx=vals.length?niceMax(Math.max(...vals)):10;
  let title=hs.replace(/\s*[\(\[]?\s*(?:\/|out of|من|max\.?)\s*\d+(?:\.\d+)?\s*[\)\]]?\s*$/i,'').replace(/\s*\(\s*\d+(?:\.\d+)?\s*\)\s*$/,'').trim()||hs;if(/^\d+$/.test(title))title='Quiz '+title;
- if(!hs||/^Column \d+$/.test(hs)||pdate(hs))title=date?'Quiz '+date:'Quiz';
- const ci=kind==='att'&&np>0&&na===0&&exc===0&&bad===0;
- return{sheet:sn,header:hs,kind,date:date||'',label:hs,name:date||(/^Column \d+$/.test(hs)?'':hs),title,max:mx,pairs,good,bad,exc,canInfer:ci,inferAbsent:ci&&np>=Math.max(1,Math.round(pairs.length*.25))}}
-function analyzeSheet(sn,rows0,opt){
+ return{sheet:sn,header:hs,kind,date:date||'',label:hs,title,max:mx,pairs}}
+function analyzeSheet(sn,rows0){
  const clean=R=>R.filter(r=>r&&r.some(v=>String(v??'').trim()!==''));
  const isH=v=>typeof v==='string'&&(HDR.test(v)||(v.trim().length<=28&&HDR2.test(nn(v))));
  const okName=v=>isNm(v)&&!isH(v)&&!notName(v);
  const score=R=>{const c=detectCol(R),s=new Set();R.forEach(r=>{if(okName(r[c]))s.add(normName(r[c]))});return{c,n:s.size,h:R.slice(0,6).some(r=>typeof r[c]==='string'&&HDR.test(r[c]))}};
- const R0=clean(rows0);if(R0.length<2)return null;let R=R0,c,ori=false;
- if(opt&&opt.ori!==undefined){ori=!!opt.ori;if(ori)R=clean(tr(R0));c=opt.c!=null?opt.c:detectCol(R);if(c>=Math.max(...R.map(r=>r.length)))return null}
- else{const a=score(R0);c=a.c;const T=clean(tr(R0)),b=T.length>1?score(T):{n:0,c:0,h:false};
-  if(a.h&&a.n>=2){}else if((b.h&&b.n>=2)||(b.n>a.n*1.5&&b.n>=2)){R=T;c=b.c;ori=true}else if(a.n<2)return null}
+ let R=clean(rows0);if(R.length<2)return null;
+ const a=score(R);let c=a.c;const T=clean(tr(R)),b=T.length>1?score(T):{n:0,c:0,h:false};
+ if(a.h&&a.n>=2){}else if((b.h&&b.n>=2)||(b.n>a.n*1.5&&b.n>=2)){R=T;c=b.c}else if(a.n<2)return null;
  const fd=R.findIndex(r=>okName(r[c]));if(fd<0)return null;
  let hi=-1;for(let i=fd-1;i>=0;i--){if(notName(R[i][c]))continue;if(R[i].filter(v=>String(v??'').trim()!=='').length>=2){hi=i;break}}
- const rowsD=R.slice(fd).filter(r=>okName(r[c])),nmOf=r=>cleanName(r[c]);let maxRow=null,dateRow=null;
+ const rowsD=R.slice(fd).filter(r=>okName(r[c]));let maxRow=null,dateRow=null;
  R.forEach(r=>{const k=normName(r[c]);if(MAXR.test(k))maxRow=r;if(/^(date|التاريخ|تاريخ)\s*[:：]?$/.test(k))dateRow=r});
- const W=Math.max(...R.map(r=>r.length)),pairsOf=j=>rowsD.map(r=>[nmOf(r),r[j]]),hdrOf=j=>hi>=0?R[hi][j]:'';
- const cols=Array.from({length:W},(_,j)=>{let h=hdrOf(j);if(String(h??'').trim()===''){for(let i=0;i<Math.min(R.length,fd+1);i++){if(String(R[i][j]??'').trim()!==''){h=R[i][j];break}}}return 'Column '+(j+1)+(String(h??'').trim()!==''&&!(h instanceof Date)?' — '+String(h).trim().slice(0,22):'')});
+ const W=Math.max(...R.map(r=>r.length)),pairsOf=j=>rowsD.map(r=>[r[c],r[j]]),hdrOf=j=>hi>=0?R[hi][j]:'';
  const dateAbove=j=>{for(let i=0;i<fd;i++){if(i===hi)continue;if(notName(R[i][c]))continue;const d=pdate(R[i][j]);if(d)return d}return dateRow?pdate(dateRow[j]):null};
- const items=[],uniq=new Set(rowsD.map(r=>normName(nmOf(r)))),longF=rowsD.length>=6&&uniq.size<rowsD.length*.6;
- const sa=/attendance|حضور|غياب/i.test(sn),push=it=>{if(it.good>0)items.push(it)};
+ const items=[],longF=rowsD.length>=6&&new Set(rowsD.map(r=>normName(r[c]))).size<rowsD.length*.6;
+ const sa=/attendance|حضور|غياب/i.test(sn),sq=/quiz|grade|mark|score|درج|امتحان|اختبار|كويز/i.test(sn);
  if(!longF){for(let j=0;j<W;j++){if(j===c)continue;const hv=hdrOf(j),hs=String(hv instanceof Date?'':hv??'').trim(),dh=pdate(hv)||dateAbove(j);
-  const ne=rowsD.map(r=>r[j]).filter(v=>String(v??'').trim()!=='');if(!ne.length)continue;
+  const ne=rowsD.map(r=>r[j]).filter(v=>String(v??'').trim()!=='');if(ne.length<Math.max(1,Math.ceil(rowsD.length*.2)))continue;
   const nS=ne.filter(v=>{const t=stat(v,false);return t!==undefined&&t!==null}).length,nB=ne.filter(v=>{const t=nn(v);return t==='0'||t==='1'}).length,nN=ne.filter(v=>!isNaN(num(v))).length,L=ne.length;
-  const nums=ne.map(num).filter(x=>!isNaN(x));let kind=null;
+  const attW=/حضور|غياب|attendance|absent|present|حاضر|غائب/i.test(hs),nums=ne.map(num).filter(x=>!isNaN(x));let kind=null;
   if(nS/L>=.6||((nS+nB)/L>=.8&&nS>0))kind='att';
   else if(nB===L)kind='att';
   else if(nN/L>=.7)kind=(!SKIPH.test(hs)&&Math.max(...nums)<1e5)?'quiz':'skip';
   if(!kind)continue;
-  push(mkItem(sn,hs||'Column '+(j+1),pairsOf(j),kind,dh,maxRow?maxRow[j]:null))}}
+  items.push(mkItem(sn,hs||'Column '+(j+1),pairsOf(j),kind,dh,maxRow?maxRow[j]:null))}}
  else{const cs=[];for(let j=0;j<W;j++){if(j===c)continue;const ne=rowsD.map(r=>r[j]).filter(v=>String(v??'').trim()!=='');if(!ne.length)continue;
    cs.push({j,dt:ne.filter(v=>pdate(v)).length/ne.length,st:ne.filter(v=>{const t=stat(v,true);return t!==undefined&&t!==null}).length/ne.length,nu:ne.filter(v=>!isNaN(num(v))).length/ne.length,dist:new Set(ne.map(nn)).size/ne.length})}
   const dC=cs.filter(x=>x.dt>=.7).sort((x,y)=>y.dt-x.dt)[0],sC=cs.filter(x=>x.st>=.7&&x!==dC).sort((x,y)=>y.st-x.st)[0];
-  if(dC&&sC){const g={};rowsD.forEach(r=>{const d=pdate(r[dC.j]);if(d)(g[d]=g[d]||[]).push([nmOf(r),r[sC.j]])});Object.keys(g).sort().forEach(d=>push(mkItem(sn,d,g[d],'att',d)))}
+  if(dC&&sC){const g={};rowsD.forEach(r=>{const d=pdate(r[dC.j]);if(d)(g[d]=g[d]||[]).push([r[c],r[sC.j]])});Object.keys(g).sort().forEach(d=>items.push(mkItem(sn,d,g[d],'att',d)))}
   const nC=cs.filter(x=>x.nu>=.7&&x!==dC&&x!==sC&&!SKIPH.test(String(hdrOf(x.j)||''))).sort((x,y)=>y.nu-x.nu)[0],tC=cs.filter(x=>x!==dC&&x!==sC&&x!==nC&&x.nu<.5&&x.dist<=.4)[0];
-  if(nC&&(tC||dC)){const g={};rowsD.forEach(r=>{if(String(r[nC.j]??'').trim()==='')return;const k=tC?tidy(r[tC.j]):'Quiz '+(pdate(r[dC.j])||'');(g[k]=g[k]||[]).push([nmOf(r),r[nC.j]])});Object.keys(g).forEach(k=>push(mkItem(sn,k,g[k],'quiz','')))}}
- return{items,names:rowsD.map(nmOf).filter(Boolean),ori,c,cols,dups:rowsD.length-uniq.size}}
-function rebuildNames(){const m=new Map();impP.sheets.forEach(sh=>sh.names.forEach(n=>{const k=normName(n);if(k&&!m.has(k))m.set(k,n)}));impP.names=[...m.values()]}
-function applySheet(si,a){const sh=impP.sheets[si];sh.info={ori:a.ori,c:a.c,cols:a.cols,dups:a.dups};sh.names=a.names;impP.items=impP.items.filter(it=>it.sheet!==sh.n).concat(a.items);rebuildNames();go()}
-function smCol(si,v){const sh=impP.sheets[si],a=analyzeSheet(sh.n,sh.rows,{ori:sh.info.ori,c:+v});if(!a){alert('This column does not look like a list of names.');go();return}applySheet(si,a)}
-function smOri(si){const sh=impP.sheets[si],a=analyzeSheet(sh.n,sh.rows,{ori:!sh.info.ori});if(!a){alert('No names were found when the sheet is turned.');go();return}applySheet(si,a)}
-function findStu(dn,have){const k=normName(dn);let st=have.get(k);if(st)return st;const t=k.split(' ').filter(Boolean);if(t.length<2)return null;const c=[];
- have.forEach((s2,k2)=>{const u=k2.split(' ').filter(Boolean);if(u.length<2)return;const [a,b]=t.length<=u.length?[t,u]:[u,t];if(a.every(x=>b.includes(x)))c.push(s2)});return c.length===1?c[0]:null}
-function smFill(){const d0=document.getElementById('fd0').value,st=+document.getElementById('fdn').value||7;if(!d0){alert('Pick the first date.');return}let d=new Date(d0+'T12:00:00');
- impP.items.forEach(it=>{if(it.kind==='att'&&!it.date){it.date=d.toISOString().slice(0,10);if(!it.name||/^Column \d+$/.test(it.name))it.name=it.date;d=new Date(d.getTime()+st*864e5)}});go()}
-function smSet(i,k,v){const it=impP.items[i];if(k==='max')v=+v>0?+v:it.max;if(k==='date'&&it.kind==='att'&&(!it.name||it.name===it.date))it.name=v;if(k==='kind'&&v==='quiz'&&!it.title)it.title='Quiz';it[k]=v;go()}
+  if(nC&&(tC||dC)){const g={};rowsD.forEach(r=>{if(String(r[nC.j]??'').trim()==='')return;const k=tC?tidy(r[tC.j]):'Quiz '+(pdate(r[dC.j])||'');(g[k]=g[k]||[]).push([r[c],r[nC.j]])});Object.keys(g).forEach(k=>items.push(mkItem(sn,k,g[k],'quiz','')))}}
+ return{items,names:rowsD.map(r=>tidy(r[c]))}}
 function smDel(i){impP.items.splice(i,1);go()}
-function smRen(i,v){const k=normName(impP.names[i]);impP.ren=impP.ren||{};v=cleanName(v);if(v&&normName(v)!==k)impP.ren[k]=v;else delete impP.ren[k];go()}
-function smDrop(i){const k=normName(impP.names[i]);impP.drop=impP.drop||{};if(impP.drop[k])delete impP.drop[k];else impP.drop[k]=true;go()}
-function impPrev(){const P=impP,ren=P.ren||{},drop=P.drop||{},disp=n=>ren[normName(n)]||n,haveM=new Map(D.students.filter(s=>s.cls===D.curClass).map(s=>[normName(s.name),s])),live_=P.names.filter(n=>!drop[normName(n)]),mt=n=>findStu(disp(n),haveM),nw=live_.filter(n=>!mt(n)),ap=live_.filter(n=>{const x=mt(n);return x&&normName(x.name)!==normName(disp(n))});
+function smSet(i,k,v){const it=impP.items[i];if(k==='max')v=+v>0?+v:it.max;it[k]=v;go()}
+function impPrev(){const P=impP,have=new Set(D.students.filter(s=>s.cls===D.curClass).map(s=>normName(s.name))),nw=P.names.filter(n=>!have.has(normName(n)));
  const kinds=[['att','Attendance day'],['quiz','Quiz'],['skip','Ignore']],vis=P.items.map((it,i)=>[it,i]).filter(([it])=>P.mode==='all'||it.kind==='att');
- const dcount={};vis.forEach(([it])=>{if(it.kind==='att'&&it.date)dcount[it.date]=(dcount[it.date]||0)+1});
- const warn=it=>{const w=[];if(it.kind==='att'){if(it.bad)w.push(it.bad+' values not understood (ignored)');if(it.exc)w.push(it.exc+' excused (ignored)');if(it.date&&dcount[it.date]>1)w.push('another column has the same date')}
-  if(it.kind==='quiz'){const bad=it.pairs.filter(p=>{const x=num(p[1]);return !isNaN(x)&&(x>it.max||x<0)}).length;if(bad)w.push(bad+' values above the max (skipped)');if(it.bad)w.push(it.bad+' non-numeric (ignored)')}
-  return w.length?`<div class="lb" style="color:var(--bad)">${esc(w.join(' · '))}</div>`:''};
- const flds=(it,i)=>it.kind==='att'?`<input value="${esc(it.name||'')}" aria-label="Day name" placeholder="Name" style="width:140px" onchange="smSet(${i},'name',this.value)"> <input type="date" value="${it.date||''}" aria-label="Date" onchange="smSet(${i},'date',this.value)">${it.date?'':'<div class="lb" style="color:var(--bad)">set a date</div>'}${it.canInfer?`<label class="lb"><input type="checkbox" ${it.inferAbsent?'checked':''} onchange="smSet(${i},'inferAbsent',this.checked)"> blank = absent</label>`:''}${warn(it)}`
-  :it.kind==='quiz'?`<input value="${esc(it.title)}" aria-label="Quiz name" placeholder="Name" style="width:150px" onchange="smSet(${i},'title',this.value)"> <input type="number" value="${it.max}" style="width:70px" aria-label="Max score" onchange="smSet(${i},'max',this.value)"> <input type="date" value="${it.date||''}" aria-label="Date" onchange="smSet(${i},'date',this.value)">${warn(it)}`:'';
- const nA=vis.filter(([it])=>it.kind==='att').length,nQ=P.mode==='all'?vis.filter(([it])=>it.kind==='quiz').length:0;
+ const smp=it=>{const v=it.pairs.map(p=>p[1]).filter(x=>String(x??'').trim()!=='');return v.length+' values · e.g. '+v.slice(0,3).map(x=>x instanceof Date?'date':String(x)).join(', ')};
+ const flds=(it,i)=>it.kind==='att'?`<input type="date" value="${it.date||''}" aria-label="Date" onchange="smSet(${i},'date',this.value)">${it.date?'':'<div class="lb">no date found, today will be used</div>'}`
+  :it.kind==='quiz'?`<input value="${esc(it.title)}" aria-label="Quiz title" style="width:150px" onchange="smSet(${i},'title',this.value)"> <input type="number" value="${it.max}" style="width:70px" aria-label="Max score" onchange="smSet(${i},'max',this.value)"> <input type="date" value="${it.date||''}" aria-label="Date" onchange="smSet(${i},'date',this.value)">${(()=>{const bad=it.pairs.filter(p=>{const x=num(p[1]);return !isNaN(x)&&(x>it.max||x<0)}).length;return bad?`<div class="lb" style="color:var(--bad)">${bad} values above the max will be skipped</div>`:''})()}`:'';
  return `<section><h2>SMART IMPORT — ${esc(P.file)}</h2>
- ${P.sheets.map((sh,si)=>`<div class="row"><b>${esc(sh.n)}</b><span class="lb">Names column:</span><select aria-label="Names column" onchange="smCol(${si},this.value)">${sh.info.cols.map((l,j)=>`<option value="${j}" ${j===sh.info.c?'selected':''}>${esc(l)}</option>`).join('')}</select><label class="lb"><input type="checkbox" ${sh.info.ori?'checked':''} onchange="smOri(${si})"> names are in a row</label><span class="lb">${sh.names.length} names${sh.info.dups?' · '+sh.info.dups+' repeated':''}</span></div>`).join('')}
- <p><b>${live_.length}</b> students in the file · <b>${nw.length}</b> new${live_.length-nw.length?` · ${live_.length-nw.length} already in this class`:''}</p>
- ${ap.length?`<details><summary class="lb" style="cursor:pointer">${ap.length} names matched approximately to existing students</summary>${ap.map(n=>`<div class="lb">${esc(disp(n))} → ${esc(mt(n).name)}</div>`).join('')}</details>`:''}
+ <p><b>${P.names.length}</b> students found · <b>${nw.length}</b> new${P.names.length-nw.length?` · ${P.names.length-nw.length} already in this class (matched by name)`:''}</p>
+ <div class="row"><span class="lb">Import:</span><select aria-label="What to import" onchange="impP.mode=this.value;go()"><option value="att" ${P.mode!=='all'?'selected':''}>Names + attendance only</option><option value="all" ${P.mode==='all'?'selected':''}>Names + attendance + quiz grades</option></select>${P.mode!=='all'&&P.items.length>vis.length?`<span class="lb">${P.items.length-vis.length} other columns in the file are ignored</span>`:''}</div>
  <label class="row"><input type="checkbox" ${P.addNew?'checked':''} onchange="impP.addNew=this.checked;go()"> Add the new students (${nw.length})</label>
- <details><summary class="lb" style="cursor:pointer">Edit or remove student names (${P.names.length})</summary><div class="list">${P.names.map((n,i)=>`<div class="li"><input value="${esc(disp(n))}" aria-label="Student name" style="flex:1;${drop[normName(n)]?'text-decoration:line-through;opacity:.5':''}" onchange="smRen(${i},this.value)"><button class="btn" onclick="smDrop(${i})">${drop[normName(n)]?'Restore':'✕'}</button></div>`).join('')}</div></details>
- <details><summary class="lb" style="cursor:pointer">What the app read from the file (first rows)</summary>${P.sheets.map(sh=>`<div class="lb"><b>${esc(sh.n)}</b></div><div class="wrap"><table>${sh.rows.filter(r=>r.some(v=>String(v??'').trim()!=='')).slice(0,7).map(r=>`<tr>${r.slice(0,12).map(v=>`<td class="lb">${esc(v instanceof Date?(pdate(v)||''):String(v??'').slice(0,18))}</td>`).join('')}</tr>`).join('')}</table></div>`).join('')}</details>
- <div class="row" style="margin-top:8px"><span class="lb">Import:</span><select aria-label="What to import" onchange="impP.mode=this.value;go()"><option value="att" ${P.mode!=='all'?'selected':''}>Names + attendance only</option><option value="all" ${P.mode==='all'?'selected':''}>Names + attendance + quiz grades</option></select>${P.mode!=='all'&&P.items.length>vis.length?`<span class="lb">${P.items.length-vis.length} other columns are ignored</span>`:''}</div>
- ${vis.filter(([it])=>it.kind==='att'&&!it.date).length?`<div class="row"><span class="lb" style="color:var(--bad)">${vis.filter(([it])=>it.kind==='att'&&!it.date).length} days have no date. Type them, or fill them in order:</span><input type="date" id="fd0" aria-label="First date"><span class="lb">every</span><input type="number" id="fdn" value="7" style="width:60px" aria-label="Days apart"><span class="lb">days</span><button class="btn" onclick="smFill()">Fill dates</button></div>`:''}
- ${vis.length?`<div class="row"><span class="lb">Empty columns are never imported. The name of each day defaults to its date, and you can change it.</span>${P.mode==='all'&&P.items.some(x=>x.kind==='skip')?`<button class="btn" onclick="impP.items=impP.items.filter(x=>x.kind!=='skip');go()">Remove all ignored columns</button>`:''}</div><div class="wrap"><table><tr><th>SHEET</th><th>COLUMN</th><th>WHAT IS IT?</th><th>NAME / DATE</th><th>VALUES</th><th></th></tr>${vis.map(([it,i])=>`<tr><td>${esc(it.sheet)}</td><td>${esc(it.header)}</td><td><select aria-label="Type" onchange="smSet(${i},'kind',this.value)">${kinds.map(k=>`<option value="${k[0]}" ${it.kind===k[0]?'selected':''}>${k[1]}</option>`).join('')}</select></td><td>${flds(it,i)}</td><td class="lb">${it.good} values</td><td><button class="btn" onclick="smDel(${i})" aria-label="Remove this column">✕ Remove</button></td></tr>`).join('')}</table></div>`:'<p class="lb">No attendance columns with data were found, only the names will be imported.</p>'}
- <div class="row"><button class="btn pri" onclick="smCommit()">Import ${nA?nA+' day'+(nA>1?'s':'')+(nQ?' + '+nQ+' quiz'+(nQ>1?'zes':''):'')+' and ':''}${nw.length&&P.addNew?nw.length+' new students':'students'}</button><button class="btn" onclick="impP=null;go()">Cancel</button></div></section>`}
-function smCommit(){const P=impP,ren=P.ren||{},drop=P.drop||{};let nS=0,nA=0,nQ=0,sk=0,miss=0;
- const want=P.items.filter(it=>it.kind==='att'||(P.mode==='all'&&it.kind==='quiz'));
- const und=want.filter(it=>it.kind==='att'&&it.good>0&&!it.date).length;
- if(und){alert(und+' attendance days have no date. Type the dates, or use "Fill dates", then import again.');return}
- const have=new Map(D.students.filter(s=>s.cls===D.curClass).map(s=>[normName(s.name),s]));
- let oc=Math.max(0,...D.students.filter(s=>s.cls===D.curClass&&s.ord!=null).map(s=>s.ord));const byKey=new Map();
- P.names.forEach(n=>{const k=normName(n);if(drop[k])return;const dn=ren[k]||n;let st=findStu(dn,have);
-  if(!st){if(!P.addNew)return;st={id:uid(),name:tidy(dn),code:'S'+(D.students.length+1),cls:D.curClass,status:'Active'};D.students.push(st);have.set(normName(st.name),st);nS++}
-  if(st.ord==null)st.ord=++oc;byKey.set(k,st)});
- want.forEach(it=>{
-  if(it.kind==='att'){if(!it.good)return;const marks=[];
-   it.pairs.forEach(([n,v])=>{const st=byKey.get(normName(n));let m=stat(v,true);if(m===null&&it.inferAbsent&&String(v??'').trim()==='')m='Absent';if(m!=='Present'&&m!=='Absent')return;if(!st){miss++;return}marks.push([st,m])});
-   if(!marks.length)return;const nm=tidy(it.name||''),topic=nm&&nm!==it.date&&!/^Column \d+$/.test(nm)?nm:'';
-   let ses=D.sessions.find(x=>x.cls===D.curClass&&x.date===it.date&&(!topic||!x.topic||x.topic===topic));
-   if(!ses){ses={id:uid(),date:it.date,topic,status:'Ended',cls:D.curClass};D.sessions.push(ses)}else if(topic&&!ses.topic)ses.topic=topic;
-   D.att[ses.id]=D.att[ses.id]||{};marks.forEach(([st,m])=>{D.att[ses.id][st.id]=m});nA++}
-  else if(it.kind==='quiz'){if(!it.good)return;const dt=it.date||today(),title=tidy(it.title)||'Quiz';const rec=[];
-   it.pairs.forEach(([n,v])=>{const st=byKey.get(normName(n)),x=num(v);if(isNaN(x))return;if(!st){miss++;return}if(x<0||x>it.max){sk++;return}rec.push([st,x])});
-   if(!rec.length)return;let q=D.assess.find(a=>a.cls===D.curClass&&a.title===title&&a.date===dt);
-   if(!q){q={id:uid(),title,date:dt,max:it.max||10,scores:{},cls:D.curClass};D.assess.push(q)}else if(it.max>q.max)q.max=it.max;
-   rec.forEach(([st,x])=>{q.scores[st.id]=x});nQ++}});
- impP=null;save();go();alert('Imported: '+nS+' new students, '+nA+' attendance days, '+nQ+' quizzes'+(sk?' ('+sk+' values above the max were skipped)':'')+(miss?'. '+miss+' values belonged to removed or unmatched students':'')+'. You can undo this with the Undo button.')}
+ ${vis.length?`<div class="row"><span class="lb">Columns with only 0 and 1 are read as attendance; other numbers as quiz grades. Fix any column, or remove it.</span>${P.mode==='all'&&P.items.some(x=>x.kind==='skip')?`<button class="btn" onclick="impP.items=impP.items.filter(x=>x.kind!=='skip');go()">Remove all ignored columns</button>`:''}</div><div class="wrap"><table><tr><th>SHEET</th><th>COLUMN</th><th>WHAT IS IT?</th><th>DETAILS</th><th>VALUES</th><th></th></tr>${vis.map(([it,i])=>`<tr><td>${esc(it.sheet)}</td><td>${esc(it.header)}</td><td><select aria-label="Type" onchange="smSet(${i},'kind',this.value)">${kinds.map(k=>`<option value="${k[0]}" ${it.kind===k[0]?'selected':''}>${k[1]}</option>`).join('')}</select></td><td>${flds(it,i)}</td><td class="lb">${esc(smp(it))}</td><td><button class="btn" onclick="smDel(${i})" aria-label="Remove this column">✕ Remove</button></td></tr>`).join('')}</table></div>`:'<p class="lb">No attendance columns were found, only the names will be imported.</p>'}
+ <div class="row"><button class="btn pri" onclick="smCommit()">Import</button><button class="btn" onclick="impP=null;go()">Cancel</button></div></section>`}
+function smCommit(){const P=impP;let nS=0,nA=0,nQ=0,sk=0;const have=new Map(D.students.filter(s=>s.cls===D.curClass).map(s=>[normName(s.name),s]));
+ let oc=Math.max(0,...D.students.filter(s=>s.cls===D.curClass&&s.ord!=null).map(s=>s.ord));
+ P.names.forEach(n=>{const k=normName(n);let st=have.get(k);if(!st){if(!P.addNew)return;st={id:uid(),name:tidy(n),code:'S'+(D.students.length+1),cls:D.curClass,status:'Active'};D.students.push(st);have.set(k,st);nS++}if(st.ord==null)st.ord=++oc});
+ P.items.forEach(it=>{if(P.mode!=='all'&&it.kind!=='att')return;if(it.kind==='att'){let ses=it.date?D.sessions.find(x=>x.cls===D.curClass&&x.date===it.date):null;
+   if(!ses){ses={id:uid(),date:it.date||today(),topic:it.date?'':it.label,status:'Ended',cls:D.curClass};D.sessions.push(ses)}
+   D.att[ses.id]=D.att[ses.id]||{};it.pairs.forEach(([n,v])=>{const st=have.get(normName(n)),m=stat(v,true);if(st&&(m==='Present'||m==='Absent'))D.att[ses.id][st.id]=m});nA++}
+  else if(it.kind==='quiz'){const dt=it.date||today();let q=D.assess.find(a=>a.cls===D.curClass&&a.title===it.title&&a.date===dt);
+   if(!q){q={id:uid(),title:it.title||'Quiz',date:dt,max:it.max||10,scores:{},cls:D.curClass};D.assess.push(q)}else if(it.max>q.max)q.max=it.max;
+   it.pairs.forEach(([n,v])=>{const st=have.get(normName(n)),x=num(v);if(!st||isNaN(x))return;if(x<0||x>q.max){sk++;return}q.scores[st.id]=x});nQ++}});
+ impP=null;save();go();alert('Imported: '+nS+' new students, '+nA+' attendance days, '+nQ+' quizzes'+(sk?' ('+sk+' values skipped because they were above the max)':''))}
 async function imp(el){const f=el.files[0];if(!f)return;let sheets=[];
  try{if(/\.xlsx?$/i.test(f.name)){if(!window.XLSX){alert('The Excel reader could not load. Check your connection, or save the sheet as CSV.');return}
    const wb=XLSX.read(await f.arrayBuffer(),{type:'array',cellDates:true});sheets=wb.SheetNames.map(n=>({n,rows:XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:true,defval:''})}))}
   else{const t=(await f.text()).replace(/^\ufeff/,''),d=t.includes('\t')?'\t':(t.split(';').length>t.split(',').length?';':',');sheets=[{n:f.name,rows:t.split(/\r?\n/).map(l=>l.split(d).map(x=>x.replace(/^"|"$/g,'').trim()))}]}}
  catch(e){alert('Could not read this file');return}
- const used=[],items=[];sheets.forEach(s=>{const a=analyzeSheet(s.n,s.rows);if(!a)return;a.items.forEach(x=>items.push(x));used.push({n:s.n,rows:s.rows,info:{ori:a.ori,c:a.c,cols:a.cols,dups:a.dups},names:a.names})});
- if(!used.length){alert('No student names could be found in this file.');return}
- impP={file:f.name,sheets:used,items,names:[],addNew:true,mode:'att',ren:{},drop:{}};rebuildNames();tab='Students';pid=null;go()}
+ const items=[],names=new Map();sheets.forEach(s=>{const a=analyzeSheet(s.n,s.rows);if(!a)return;a.items.forEach(x=>items.push(x));a.names.forEach(n=>{const k=normName(n);if(k&&!names.has(k))names.set(k,n)})});
+ if(!names.size){alert('No student names could be found in this file.');return}
+ impP={file:f.name,items,names:[...names.values()],addNew:true,mode:'att'};tab='Students';pid=null;go()}
 function bak(){D.lastBackup=Date.now();dl('backup-'+today()+'.json',JSON.stringify(D),'application/json');save();go()}
 function rest(el){el.files[0].text().then(x=>{try{D=Object.assign({},DEF,JSON.parse(x.replace(/^\ufeff/,'')));fixData();save();go()}catch(e){alert('Invalid backup file')}})}
 function demo(){if(!confirm('Add fictional DEMO students?'))return;['One','Two','Three','Four'].forEach(n=>D.students.push({id:uid(),name:'[DEMO] '+n,code:'D'+n,cls:D.curClass,status:'Active',demo:true}));save();go()}

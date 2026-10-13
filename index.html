@@ -101,7 +101,7 @@ const tabs=['Dashboard','Students','Attendance','Quiz','Live','Practical Skills'
 let tab='Attendance',q='',pid=null,dTier=null;
 const today=()=>new Date().toISOString().slice(0,10);
 // ---- calculations ----
-const act=()=>D.students.filter(s=>s.status==='Active'&&s.cls===D.curClass).sort((a,b)=>byName(a,b));
+const act=()=>D.students.filter(s=>s.status==='Active'&&s.cls===D.curClass).sort((a,b)=>stuCmp(a,b));
 const live=()=>D.events.filter(e=>!e.reversed);
 const sessScore=(sid,stid)=>live().filter(e=>e.sess===sid&&e.stu===stid).reduce((a,e)=>a+e.pts,0);
 function results(stid){return D.assess.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(a=>{const v=a.scores[stid];return v==null||v===''?null:{date:a.date,p:100*v/a.max,t:a.title,v,max:a.max}}).filter(Boolean)}
@@ -173,7 +173,7 @@ function profile(id){const s=D.students.find(x=>x.id===id);if(!s){pid=null;retur
  <section><h2>DEVELOPMENT PLANS — only when needed</h2>${P.map(p=>`<div class="al"><b>${esc(p.title)}</b> <span class="lb">${esc(p.status)} · due ${esc(p.due||'—')}</span><br>${esc(p.problem||'')}<br><span class="mut">Target: ${esc(p.target||'—')}</span>
  <div class="row" style="margin-top:6px"><select onchange="plan('${p.id}','status',this.value)">${['Active','Completed','Closed'].map(o=>`<option ${p.status===o?'selected':''}>${o}</option>`).join('')}</select><input placeholder="Progress note" value="${esc(p.note||'')}" onchange="plan('${p.id}','note',this.value)"><button class="btn" onclick="del('plan','${p.id}',this)">Delete</button></div></div>`).join('')||'<p class="mut">No plan for this student.</p>'}
  <div class="row"><input id="pt" placeholder="Plan title"><input id="pp" placeholder="Problem"><input id="pg" placeholder="Measurable target"><input id="pd" type="date"><button class="btn pri" onclick="addPlan('${id}')">Add plan</button></div></section>`}
-V.Students=()=>{if(pid)return profile(pid);const val=s=>stuSort==='avg'?avg(results(s.id)):stuSort==='att'?attStats(s.id).pct:null;const S=D.students.filter(s=>s.cls===D.curClass&&s.name.toLowerCase().includes(q.toLowerCase())).sort((a,b)=>{if(stuSort==='name')return byName(a,b);return (val(b)??-1)-(val(a)??-1)});
+V.Students=()=>{if(pid)return profile(pid);const val=s=>stuSort==='avg'?avg(results(s.id)):stuSort==='att'?attStats(s.id).pct:null;const S=D.students.filter(s=>s.cls===D.curClass&&s.name.toLowerCase().includes(q.toLowerCase())).sort((a,b)=>{if(stuSort==='name')return stuCmp(a,b);return (val(b)??-1)-(val(a)??-1)});
  return `${impP?impPrev():''}<section><h2>ADD STUDENT — type a name, press Enter</h2><div class="row"><input id="sn" data-enter="1" placeholder="Student name" onkeydown="if(event.key==='Enter'){event.preventDefault();addStu()}"><button class="btn pri" onclick="addStu()">Add</button></div>
  <div class="row"><label class="lb">SMART IMPORT (Excel / CSV: names, attendance, quiz grades) <input type="file" accept=".xlsx,.xls,.csv,.txt" onchange="imp(this)"></label><button class="btn" onclick="expStu()">Export CSV</button>${DA('allstudents','Delete all students')}</div></section>
  <section><h2>STUDENTS (${S.length})</h2><div class="row"><input data-enter="1" placeholder="Search" value="${esc(q)}" oninput="q=this.value;go(true)"><select aria-label="Sort" onchange="stuSort=this.value;go()">${[['name','Sort: name'],['avg','Sort: quiz average'],['att','Sort: attendance']].map(o=>`<option value="${o[0]}" ${stuSort===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select></div><div class="wrap"><table><tr><th>NAME</th><th>AVG</th><th>TREND</th><th>ATT.</th><th></th></tr>
@@ -325,10 +325,15 @@ const isNm=v=>typeof v==='string'&&/[A-Za-z\u0600-\u06FF]/.test(v)&&!/^[\d\s\/\-
 const AD=s=>String(s??'').replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
 const nn=v=>AD(v==null||v instanceof Date?'':v).trim().toLowerCase();
 const COL=new Intl.Collator(['ar','en'],{numeric:true,sensitivity:'base'});
+const FEMS='فاطمة مريم ماريا سارة ساره منة منى مي مها ميار ميرنا مروة مرفت مروى ملك ملاك منار منال مديحة ميادة نادين نادية نجلاء ندى نهى نهال نورهان نوران نيرة نسمة نعمة نجوى هاجر هبة هدى هدير هديل هالة هنا هناء هند هيام هنادي وفاء ولاء وعد ورد وردة يارا ياسمين ياسمينا يسرا يمنى يقين أسماء اسماء آية ايه اية أميرة اميرة أماني اماني ابتسام إسراء اسراء ألاء الاء إلهام الهام إيمان ايمان بسمة بسملة بسنت بيسان تسنيم تقوى جنة جنى جميلة جيهان حبيبة حنان حنين حياة خلود خديجة داليا دينا دانيا دعاء ديما رانيا رنا رنيم رهف رودينا روان ريم ريهام ريتال رحمة رضوى رقية رجاء زينب زهراء زينة سلمى سلوى سمر سمية سناء سهى سهير سالي سلسبيل شيماء شهد شروق شيرين صفاء صفية صابرين ضحى عائشة عايدة عبير علياء عفاف عزة غادة غدير فرح فريدة فيروز كوثر كريمان لبنى ليلى لمياء لينا ليان لمى لجين لانا ماجدة نبيلة نيللي نورا نجاة هيفاء رشا رباب ريما رزان تالا تاليا جودي جوري mary sara sarah mona fatma mariam mai nada hana salma yara rana';
+let _F=null;const fem=n=>(_F||(_F=new Set(FEMS.split(' ').map(x=>normName(x)))),_F.has(normName(String(n).trim().split(/\s+/)[0])));
+function stuCmp(a,b){const ao=a.ord!=null,bo=b.ord!=null;if(ao&&bo)return a.ord-b.ord;if(ao!==bo)return ao?-1:1;const fa=fem(a.name),fb=fem(b.name);if(fa!==fb)return fa?1:-1;return COL.compare(normName(a.name),normName(b.name))}
 const byName=(a,b)=>COL.compare(normName(a.name),normName(b.name));
 const normName=s=>nn(s).replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/\s+/g,' ');
 const tidy=s=>String(s).replace(/\s+/g,' ').trim();
 const META=/^(total|totals|average|avg|mean|sum|max(imum)?( score| marks?)?|min(imum)?|out of|full marks?|date|المجموع|الاجمالي|المتوسط|الدرجه النهايه|النهايه العظمي|الدرجه العظمي|التاريخ|تاريخ|الحد الاقصي)\s*[:：]?$/i;
+const NONAME1=/^(ال)?(محاضر\S*|غياب\S*|حضور\S*|حصص|اسبوع|ترم|فصل|مجموعه|اجمالي|مجموع|نسبه|ملاحظ\S*|ملحوظ\S*|مواد|ماده|ورشه|عملي|نظري|section|lecture\S*|attendance|absent\S*|present|week|semester|term|group|class|notes?|total\S*|summary|remarks?|comment\S*|sheet\S*)(\s|\d|$)/i,NONAME2=/^(حصه|يوم|day|session|جلسه|week|lecture)\s*\d+/i;
+const notName=v=>{const t=normName(v);return META.test(t)||NONAME1.test(t)||NONAME2.test(t)};
 const MAXR=/^(max(imum)?( score| marks?)?|out of|full marks?|الدرجه النهايه|النهايه العظمي|الدرجه العظمي|الحد الاقصي)\s*[:：]?$/i;
 const SKIPH=/total|sum|avg|average|mean|rank|%|percent|المجموع|مجموع|المتوسط|النسبه|النسبة|الترتيب|التقدير|^م\.?$|serial|^id$|phone|mobile|tel|تليفون|هاتف|موبايل|رقم|كود|code|فصل|class|group|مجموعه|مجموعة|notes?|ملاحظ|comment/i;
 const PRES=/^(p|present|pres|حاضر|حاضره|حاضرة|حضور|حضر|ح|✓|✔|✅|yes|y|true|نعم|late|متاخر|متأخر|تاخير|تأخير)$/;
@@ -347,7 +352,7 @@ function pdate(v){if(v instanceof Date)return isNaN(v)?null:new Date(v.getTime()
 const niceMax=m=>[5,10,15,20,25,30,40,50,60,100].find(x=>x>=m)||Math.ceil(m/10)*10;
 const tr=R=>{const W=Math.max(0,...R.map(r=>r.length));return Array.from({length:W},(_,c)=>R.map(r=>r[c]??''))};
 function detectCol(rows){const W=Math.max(0,...rows.map(r=>r.length));let best=0,bs=-1;
- for(let c=0;c<W;c++){const set=new Set();let hdr=false;rows.forEach((r,i)=>{const v=r[c];if(isNm(v)&&!HDR.test(v)&&!META.test(normName(v)))set.add(normName(v));if(i<6&&typeof v==='string'&&HDR.test(v))hdr=true});
+ for(let c=0;c<W;c++){const set=new Set();let hdr=false;rows.forEach((r,i)=>{const v=r[c];if(isNm(v)&&!HDR.test(v)&&!notName(v))set.add(normName(v));if(i<6&&typeof v==='string'&&HDR.test(v))hdr=true});
   const sc=set.size+(hdr?1000:0);if(sc>bs){bs=sc;best=c}}return best}
 function mkItem(sn,hs,pairs,kind,date,mrv){const vals=pairs.map(p=>num(p[1])).filter(x=>!isNaN(x));
  const m=hs.match(/(?:\/|out of|من|max\.?)\s*(\d+(?:\.\d+)?)/i)||hs.match(/\(\s*(\d+(?:\.\d+)?)\s*\)\s*$/);let mx=m?+m[1]:null;
@@ -357,17 +362,17 @@ function mkItem(sn,hs,pairs,kind,date,mrv){const vals=pairs.map(p=>num(p[1])).fi
 function analyzeSheet(sn,rows0){
  const clean=R=>R.filter(r=>r&&r.some(v=>String(v??'').trim()!==''));
  const isH=v=>typeof v==='string'&&(HDR.test(v)||(v.trim().length<=28&&HDR2.test(nn(v))));
- const okName=v=>isNm(v)&&!isH(v)&&!META.test(normName(v));
+ const okName=v=>isNm(v)&&!isH(v)&&!notName(v);
  const score=R=>{const c=detectCol(R),s=new Set();R.forEach(r=>{if(okName(r[c]))s.add(normName(r[c]))});return{c,n:s.size,h:R.slice(0,6).some(r=>typeof r[c]==='string'&&HDR.test(r[c]))}};
  let R=clean(rows0);if(R.length<2)return null;
  const a=score(R);let c=a.c;const T=clean(tr(R)),b=T.length>1?score(T):{n:0,c:0,h:false};
  if(a.h&&a.n>=2){}else if((b.h&&b.n>=2)||(b.n>a.n*1.5&&b.n>=2)){R=T;c=b.c}else if(a.n<2)return null;
  const fd=R.findIndex(r=>okName(r[c]));if(fd<0)return null;
- let hi=-1;for(let i=fd-1;i>=0;i--){if(META.test(normName(R[i][c])))continue;if(R[i].filter(v=>String(v??'').trim()!=='').length>=2){hi=i;break}}
+ let hi=-1;for(let i=fd-1;i>=0;i--){if(notName(R[i][c]))continue;if(R[i].filter(v=>String(v??'').trim()!=='').length>=2){hi=i;break}}
  const rowsD=R.slice(fd).filter(r=>okName(r[c]));let maxRow=null,dateRow=null;
  R.forEach(r=>{const k=normName(r[c]);if(MAXR.test(k))maxRow=r;if(/^(date|التاريخ|تاريخ)\s*[:：]?$/.test(k))dateRow=r});
  const W=Math.max(...R.map(r=>r.length)),pairsOf=j=>rowsD.map(r=>[r[c],r[j]]),hdrOf=j=>hi>=0?R[hi][j]:'';
- const dateAbove=j=>{for(let i=0;i<fd;i++){if(i===hi)continue;if(META.test(normName(R[i][c])))continue;const d=pdate(R[i][j]);if(d)return d}return dateRow?pdate(dateRow[j]):null};
+ const dateAbove=j=>{for(let i=0;i<fd;i++){if(i===hi)continue;if(notName(R[i][c]))continue;const d=pdate(R[i][j]);if(d)return d}return dateRow?pdate(dateRow[j]):null};
  const items=[],longF=rowsD.length>=6&&new Set(rowsD.map(r=>normName(r[c]))).size<rowsD.length*.6;
  const sa=/attendance|حضور|غياب/i.test(sn),sq=/quiz|grade|mark|score|درج|امتحان|اختبار|كويز/i.test(sn);
  if(!longF){for(let j=0;j<W;j++){if(j===c)continue;const hv=hdrOf(j),hs=String(hv instanceof Date?'':hv??'').trim(),dh=pdate(hv)||dateAbove(j);
@@ -400,7 +405,8 @@ function impPrev(){const P=impP,have=new Set(D.students.filter(s=>s.cls===D.curC
  ${vis.length?`<div class="row"><span class="lb">Columns with only 0 and 1 are read as attendance; other numbers as quiz grades. Fix any column, or remove it.</span>${P.mode==='all'&&P.items.some(x=>x.kind==='skip')?`<button class="btn" onclick="impP.items=impP.items.filter(x=>x.kind!=='skip');go()">Remove all ignored columns</button>`:''}</div><div class="wrap"><table><tr><th>SHEET</th><th>COLUMN</th><th>WHAT IS IT?</th><th>DETAILS</th><th>VALUES</th><th></th></tr>${vis.map(([it,i])=>`<tr><td>${esc(it.sheet)}</td><td>${esc(it.header)}</td><td><select aria-label="Type" onchange="smSet(${i},'kind',this.value)">${kinds.map(k=>`<option value="${k[0]}" ${it.kind===k[0]?'selected':''}>${k[1]}</option>`).join('')}</select></td><td>${flds(it,i)}</td><td class="lb">${esc(smp(it))}</td><td><button class="btn" onclick="smDel(${i})" aria-label="Remove this column">✕ Remove</button></td></tr>`).join('')}</table></div>`:'<p class="lb">No attendance columns were found, only the names will be imported.</p>'}
  <div class="row"><button class="btn pri" onclick="smCommit()">Import</button><button class="btn" onclick="impP=null;go()">Cancel</button></div></section>`}
 function smCommit(){const P=impP;let nS=0,nA=0,nQ=0,sk=0;const have=new Map(D.students.filter(s=>s.cls===D.curClass).map(s=>[normName(s.name),s]));
- if(P.addNew)P.names.forEach(n=>{const k=normName(n);if(!have.has(k)){const st={id:uid(),name:tidy(n),code:'S'+(D.students.length+1),cls:D.curClass,status:'Active'};D.students.push(st);have.set(k,st);nS++}});
+ let oc=Math.max(0,...D.students.filter(s=>s.cls===D.curClass&&s.ord!=null).map(s=>s.ord));
+ P.names.forEach(n=>{const k=normName(n);let st=have.get(k);if(!st){if(!P.addNew)return;st={id:uid(),name:tidy(n),code:'S'+(D.students.length+1),cls:D.curClass,status:'Active'};D.students.push(st);have.set(k,st);nS++}if(st.ord==null)st.ord=++oc});
  P.items.forEach(it=>{if(P.mode!=='all'&&it.kind!=='att')return;if(it.kind==='att'){let ses=it.date?D.sessions.find(x=>x.cls===D.curClass&&x.date===it.date):null;
    if(!ses){ses={id:uid(),date:it.date||today(),topic:it.date?'':it.label,status:'Ended',cls:D.curClass};D.sessions.push(ses)}
    D.att[ses.id]=D.att[ses.id]||{};it.pairs.forEach(([n,v])=>{const st=have.get(normName(n)),m=stat(v,true);if(st&&(m==='Present'||m==='Absent'))D.att[ses.id][st.id]=m});nA++}

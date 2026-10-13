@@ -101,7 +101,7 @@ const tabs=['Dashboard','Students','Attendance','Quiz','Live','Practical Skills'
 let tab='Attendance',q='',pid=null,dTier=null;
 const today=()=>new Date().toISOString().slice(0,10);
 // ---- calculations ----
-const act=()=>D.students.filter(s=>s.status==='Active'&&s.cls===D.curClass).sort((a,b)=>a.name.localeCompare(b.name,'ar'));
+const act=()=>D.students.filter(s=>s.status==='Active'&&s.cls===D.curClass).sort((a,b)=>byName(a,b));
 const live=()=>D.events.filter(e=>!e.reversed);
 const sessScore=(sid,stid)=>live().filter(e=>e.sess===sid&&e.stu===stid).reduce((a,e)=>a+e.pts,0);
 function results(stid){return D.assess.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(a=>{const v=a.scores[stid];return v==null||v===''?null:{date:a.date,p:100*v/a.max,t:a.title,v,max:a.max}}).filter(Boolean)}
@@ -173,7 +173,7 @@ function profile(id){const s=D.students.find(x=>x.id===id);if(!s){pid=null;retur
  <section><h2>DEVELOPMENT PLANS — only when needed</h2>${P.map(p=>`<div class="al"><b>${esc(p.title)}</b> <span class="lb">${esc(p.status)} · due ${esc(p.due||'—')}</span><br>${esc(p.problem||'')}<br><span class="mut">Target: ${esc(p.target||'—')}</span>
  <div class="row" style="margin-top:6px"><select onchange="plan('${p.id}','status',this.value)">${['Active','Completed','Closed'].map(o=>`<option ${p.status===o?'selected':''}>${o}</option>`).join('')}</select><input placeholder="Progress note" value="${esc(p.note||'')}" onchange="plan('${p.id}','note',this.value)"><button class="btn" onclick="del('plan','${p.id}',this)">Delete</button></div></div>`).join('')||'<p class="mut">No plan for this student.</p>'}
  <div class="row"><input id="pt" placeholder="Plan title"><input id="pp" placeholder="Problem"><input id="pg" placeholder="Measurable target"><input id="pd" type="date"><button class="btn pri" onclick="addPlan('${id}')">Add plan</button></div></section>`}
-V.Students=()=>{if(pid)return profile(pid);const val=s=>stuSort==='avg'?avg(results(s.id)):stuSort==='att'?attStats(s.id).pct:null;const S=D.students.filter(s=>s.cls===D.curClass&&s.name.toLowerCase().includes(q.toLowerCase())).sort((a,b)=>{if(stuSort==='name')return a.name.localeCompare(b.name,'ar');return (val(b)??-1)-(val(a)??-1)});
+V.Students=()=>{if(pid)return profile(pid);const val=s=>stuSort==='avg'?avg(results(s.id)):stuSort==='att'?attStats(s.id).pct:null;const S=D.students.filter(s=>s.cls===D.curClass&&s.name.toLowerCase().includes(q.toLowerCase())).sort((a,b)=>{if(stuSort==='name')return byName(a,b);return (val(b)??-1)-(val(a)??-1)});
  return `${impP?impPrev():''}<section><h2>ADD STUDENT — type a name, press Enter</h2><div class="row"><input id="sn" data-enter="1" placeholder="Student name" onkeydown="if(event.key==='Enter'){event.preventDefault();addStu()}"><button class="btn pri" onclick="addStu()">Add</button></div>
  <div class="row"><label class="lb">SMART IMPORT (Excel / CSV: names, attendance, quiz grades) <input type="file" accept=".xlsx,.xls,.csv,.txt" onchange="imp(this)"></label><button class="btn" onclick="expStu()">Export CSV</button>${DA('allstudents','Delete all students')}</div></section>
  <section><h2>STUDENTS (${S.length})</h2><div class="row"><input data-enter="1" placeholder="Search" value="${esc(q)}" oninput="q=this.value;go(true)"><select aria-label="Sort" onchange="stuSort=this.value;go()">${[['name','Sort: name'],['avg','Sort: quiz average'],['att','Sort: attendance']].map(o=>`<option value="${o[0]}" ${stuSort===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select></div><div class="wrap"><table><tr><th>NAME</th><th>AVG</th><th>TREND</th><th>ATT.</th><th></th></tr>
@@ -215,9 +215,11 @@ function liveBoard(){const ss=D.sessions.filter(x=>x.cls===D.curClass).sort((a,b
  <section><h2>Class points per session</h2>${cols(asc,Math.min(0,...asc.map(e=>e.v)),Math.max(1,...asc.map(e=>e.v)))}</section>
  <section><h2>Full ranking</h2><div class="wrap"><table><tr><th>#</th><th>NAME</th><th>BONUS</th><th>PENALTY</th><th>NET</th></tr>${R.map(r=>`<tr><td>${r.n?r.rk:'—'}</td><td>${nm(r.s)}</td><td>${r.b}</td><td>${r.p}</td><td><b>${r.net}</b></td></tr>`).join('')||'<tr><td class="mut">No students.</td></tr>'}</table></div></section>`}
 V.Alerts=()=>{const A=alerts();window.alv=A;const I=A.map((a,i)=>[a,i]);
- const row=([a,i])=>`<div class="al ${a.k}"><div class="row" style="margin:0 0 4px"><b>${nm(a.s)}</b> <span class="tg">${a.sev}</span>${a.st==='ack'?'<span class="tg">Acknowledged</span>':''}${a.st==='resolved'?'<span class="tg">Resolved</span>':''}<span style="flex:1"></span>${a.st==='new'?`<button class="btn" onclick="setAl(${i},'ack')">Acknowledge</button>`:''}${a.st==='resolved'?`<button class="btn" onclick="setAl(${i},'')">Reopen</button>`:`<button class="btn" onclick="setAl(${i},'resolved')">Resolve</button>`}</div>${esc(a.m)}</div>`;
- const ac=I.filter(x=>x[0].st!=='resolved'),rs=I.filter(x=>x[0].st==='resolved');
- return `<section><h2>ALERTS</h2>${ac.map(row).join('')||'<span class="mut">No alerts.</span>'}</section>${rs.length?`<section><h2>RESOLVED</h2>${rs.map(row).join('')}</section>`:''}`};
+ const row=([a,i])=>`<div class="al ${a.k}"><div class="row" style="margin:0 0 4px"><b>${nm(a.s)}</b> <span class="tg">${a.sev}</span>${a.st==='ack'?'<span class="tg">Acknowledged</span>':''}${a.st==='resolved'?'<span class="tg">Resolved</span>':''}<span style="flex:1"></span>${a.st==='new'?`<button class="btn" onclick="setAl(${i},'ack')">Acknowledge</button>`:''}${a.st==='resolved'?`<button class="btn" onclick="setAl(${i},'')">Reopen</button>`:`<button class="btn" onclick="setAl(${i},'resolved')">${a.k==='pos'?'Dismiss':'Resolve'}</button>`}</div>${esc(a.m)}</div>`;
+ const live_=x=>x[0].st!=='resolved',so={High:0,Medium:1},
+ pr=I.filter(x=>live_(x)&&x[0].k!=='pos').sort((x,y)=>(so[x[0].sev]??1)-(so[y[0].sev]??1)),im=I.filter(x=>live_(x)&&x[0].k==='pos'),rs=I.filter(x=>x[0].st==='resolved');
+ return `<section style="border-inline-start:8px solid var(--bad)"><h2>NEEDS ATTENTION (${pr.length})</h2>${pr.map(row).join('')||'<span class="mut">No problems right now.</span>'}</section>
+ <section style="border-inline-start:8px solid var(--good)"><h2>IMPROVEMENT (${im.length})</h2>${im.map(row).join('')||'<span class="mut">No improvements detected yet.</span>'}</section>${rs.length?`<section><h2>RESOLVED</h2>${rs.map(row).join('')}</section>`:''}`};
 V.Settings=()=>{const f=(k,l,h)=>`<label class="row"><span style="width:250px">${l}</span><input type="number" value="${D.set[k]}" onchange="D.set.${k}=+this.value;save()"><span class="lb">${h}</span></label>`;
  return `<section><h2>ACCOUNT &amp; SYNC</h2>${SY.uid?`<p>Status: <b>${esc(syncLabel())}</b></p><p>Engineer code: <b class="mono">${engCode()}</b></p><div class="row"><button class="btn" onclick="syncNow()">Sync now</button></div><p class="lb">Open this page signed in on any phone or laptop and you get the same data. Each engineer who opens it with their own account has a separate private workspace.</p><p class="lb"><b>Add an engineer:</b> open this page's Share menu and invite their email as <b>Contributor</b>. Don't turn on a public link if they should sync. They sign in to claude.ai with that email on any phone or laptop and open the same link.</p>`:(STANDALONE?'<p>This version works without any account. Your data is stored on this device only. To move it to another phone or laptop, use ⬇ Backup here, then Restore on the other device.</p>':'<p>Sync is off. Open this page while signed in to claude.ai to keep your data on every device. Right now it is stored on this device only.</p>')}</section>
  <section><h2>CLASSES</h2>${D.classes.map(c=>`<div class="li"><input value="${esc(c.name)}" style="flex:1" aria-label="Class name" onchange="renCls('${c.id}',this.value)">${D.classes.length>1?`<button class="btn" onclick="del('class','${c.id}',this)">Delete</button>`:''}</div>`).join('')}</section>
@@ -322,6 +324,8 @@ const HDR2=/(^|\s)(name|names|student|students|اسم|الاسم|اسماء|أس
 const isNm=v=>typeof v==='string'&&/[A-Za-z\u0600-\u06FF]/.test(v)&&!/^[\d\s\/\-.:]+$/.test(v)&&v.trim().length>=2&&v.trim().length<=60;
 const AD=s=>String(s??'').replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
 const nn=v=>AD(v==null||v instanceof Date?'':v).trim().toLowerCase();
+const COL=new Intl.Collator(['ar','en'],{numeric:true,sensitivity:'base'});
+const byName=(a,b)=>COL.compare(normName(a.name),normName(b.name));
 const normName=s=>nn(s).replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/\s+/g,' ');
 const tidy=s=>String(s).replace(/\s+/g,' ').trim();
 const META=/^(total|totals|average|avg|mean|sum|max(imum)?( score| marks?)?|min(imum)?|out of|full marks?|date|المجموع|الاجمالي|المتوسط|الدرجه النهايه|النهايه العظمي|الدرجه العظمي|التاريخ|تاريخ|الحد الاقصي)\s*[:：]?$/i;
@@ -354,10 +358,10 @@ function analyzeSheet(sn,rows0){
  const clean=R=>R.filter(r=>r&&r.some(v=>String(v??'').trim()!==''));
  const isH=v=>typeof v==='string'&&(HDR.test(v)||(v.trim().length<=28&&HDR2.test(nn(v))));
  const okName=v=>isNm(v)&&!isH(v)&&!META.test(normName(v));
- const score=R=>{const c=detectCol(R),s=new Set();R.forEach(r=>{if(okName(r[c]))s.add(normName(r[c]))});return{c,n:s.size}};
+ const score=R=>{const c=detectCol(R),s=new Set();R.forEach(r=>{if(okName(r[c]))s.add(normName(r[c]))});return{c,n:s.size,h:R.slice(0,6).some(r=>typeof r[c]==='string'&&HDR.test(r[c]))}};
  let R=clean(rows0);if(R.length<2)return null;
- const a=score(R);let c=a.c;const T=clean(tr(R)),b=T.length>1?score(T):{n:0,c:0};
- if(b.n>a.n*1.5&&b.n>=2){R=T;c=b.c}else if(a.n<2)return null;
+ const a=score(R);let c=a.c;const T=clean(tr(R)),b=T.length>1?score(T):{n:0,c:0,h:false};
+ if(a.h&&a.n>=2){}else if((b.h&&b.n>=2)||(b.n>a.n*1.5&&b.n>=2)){R=T;c=b.c}else if(a.n<2)return null;
  const fd=R.findIndex(r=>okName(r[c]));if(fd<0)return null;
  let hi=-1;for(let i=fd-1;i>=0;i--){if(META.test(normName(R[i][c])))continue;if(R[i].filter(v=>String(v??'').trim()!=='').length>=2){hi=i;break}}
  const rowsD=R.slice(fd).filter(r=>okName(r[c]));let maxRow=null,dateRow=null;
@@ -385,18 +389,19 @@ function analyzeSheet(sn,rows0){
 function smDel(i){impP.items.splice(i,1);go()}
 function smSet(i,k,v){const it=impP.items[i];if(k==='max')v=+v>0?+v:it.max;it[k]=v;go()}
 function impPrev(){const P=impP,have=new Set(D.students.filter(s=>s.cls===D.curClass).map(s=>normName(s.name))),nw=P.names.filter(n=>!have.has(normName(n)));
- const kinds=[['att','Attendance day'],['quiz','Quiz'],['skip','Ignore']];
+ const kinds=[['att','Attendance day'],['quiz','Quiz'],['skip','Ignore']],vis=P.items.map((it,i)=>[it,i]).filter(([it])=>P.mode==='all'||it.kind==='att');
  const smp=it=>{const v=it.pairs.map(p=>p[1]).filter(x=>String(x??'').trim()!=='');return v.length+' values · e.g. '+v.slice(0,3).map(x=>x instanceof Date?'date':String(x)).join(', ')};
  const flds=(it,i)=>it.kind==='att'?`<input type="date" value="${it.date||''}" aria-label="Date" onchange="smSet(${i},'date',this.value)">${it.date?'':'<div class="lb">no date found, today will be used</div>'}`
   :it.kind==='quiz'?`<input value="${esc(it.title)}" aria-label="Quiz title" style="width:150px" onchange="smSet(${i},'title',this.value)"> <input type="number" value="${it.max}" style="width:70px" aria-label="Max score" onchange="smSet(${i},'max',this.value)"> <input type="date" value="${it.date||''}" aria-label="Date" onchange="smSet(${i},'date',this.value)">${(()=>{const bad=it.pairs.filter(p=>{const x=num(p[1]);return !isNaN(x)&&(x>it.max||x<0)}).length;return bad?`<div class="lb" style="color:var(--bad)">${bad} values above the max will be skipped</div>`:''})()}`:'';
  return `<section><h2>SMART IMPORT — ${esc(P.file)}</h2>
  <p><b>${P.names.length}</b> students found · <b>${nw.length}</b> new${P.names.length-nw.length?` · ${P.names.length-nw.length} already in this class (matched by name)`:''}</p>
+ <div class="row"><span class="lb">Import:</span><select aria-label="What to import" onchange="impP.mode=this.value;go()"><option value="att" ${P.mode!=='all'?'selected':''}>Names + attendance only</option><option value="all" ${P.mode==='all'?'selected':''}>Names + attendance + quiz grades</option></select>${P.mode!=='all'&&P.items.length>vis.length?`<span class="lb">${P.items.length-vis.length} other columns in the file are ignored</span>`:''}</div>
  <label class="row"><input type="checkbox" ${P.addNew?'checked':''} onchange="impP.addNew=this.checked;go()"> Add the new students (${nw.length})</label>
- ${P.items.length?`<div class="row"><span class="lb">Columns with only 0 and 1 are read as attendance; other numbers as quiz grades. Fix any column, or remove it.</span>${P.items.some(x=>x.kind==='skip')?`<button class="btn" onclick="impP.items=impP.items.filter(x=>x.kind!=='skip');go()">Remove all ignored columns</button>`:''}</div><div class="wrap"><table><tr><th>SHEET</th><th>COLUMN</th><th>WHAT IS IT?</th><th>DETAILS</th><th>VALUES</th><th></th></tr>${P.items.map((it,i)=>`<tr><td>${esc(it.sheet)}</td><td>${esc(it.header)}</td><td><select aria-label="Type" onchange="smSet(${i},'kind',this.value)">${kinds.map(k=>`<option value="${k[0]}" ${it.kind===k[0]?'selected':''}>${k[1]}</option>`).join('')}</select></td><td>${flds(it,i)}</td><td class="lb">${esc(smp(it))}</td><td><button class="btn" onclick="smDel(${i})" aria-label="Remove this column">✕ Remove</button></td></tr>`).join('')}</table></div>`:'<p class="lb">No attendance or grade columns were found, only names.</p>'}
+ ${vis.length?`<div class="row"><span class="lb">Columns with only 0 and 1 are read as attendance; other numbers as quiz grades. Fix any column, or remove it.</span>${P.mode==='all'&&P.items.some(x=>x.kind==='skip')?`<button class="btn" onclick="impP.items=impP.items.filter(x=>x.kind!=='skip');go()">Remove all ignored columns</button>`:''}</div><div class="wrap"><table><tr><th>SHEET</th><th>COLUMN</th><th>WHAT IS IT?</th><th>DETAILS</th><th>VALUES</th><th></th></tr>${vis.map(([it,i])=>`<tr><td>${esc(it.sheet)}</td><td>${esc(it.header)}</td><td><select aria-label="Type" onchange="smSet(${i},'kind',this.value)">${kinds.map(k=>`<option value="${k[0]}" ${it.kind===k[0]?'selected':''}>${k[1]}</option>`).join('')}</select></td><td>${flds(it,i)}</td><td class="lb">${esc(smp(it))}</td><td><button class="btn" onclick="smDel(${i})" aria-label="Remove this column">✕ Remove</button></td></tr>`).join('')}</table></div>`:'<p class="lb">No attendance columns were found, only the names will be imported.</p>'}
  <div class="row"><button class="btn pri" onclick="smCommit()">Import</button><button class="btn" onclick="impP=null;go()">Cancel</button></div></section>`}
 function smCommit(){const P=impP;let nS=0,nA=0,nQ=0,sk=0;const have=new Map(D.students.filter(s=>s.cls===D.curClass).map(s=>[normName(s.name),s]));
  if(P.addNew)P.names.forEach(n=>{const k=normName(n);if(!have.has(k)){const st={id:uid(),name:tidy(n),code:'S'+(D.students.length+1),cls:D.curClass,status:'Active'};D.students.push(st);have.set(k,st);nS++}});
- P.items.forEach(it=>{if(it.kind==='att'){let ses=it.date?D.sessions.find(x=>x.cls===D.curClass&&x.date===it.date):null;
+ P.items.forEach(it=>{if(P.mode!=='all'&&it.kind!=='att')return;if(it.kind==='att'){let ses=it.date?D.sessions.find(x=>x.cls===D.curClass&&x.date===it.date):null;
    if(!ses){ses={id:uid(),date:it.date||today(),topic:it.date?'':it.label,status:'Ended',cls:D.curClass};D.sessions.push(ses)}
    D.att[ses.id]=D.att[ses.id]||{};it.pairs.forEach(([n,v])=>{const st=have.get(normName(n)),m=stat(v,true);if(st&&(m==='Present'||m==='Absent'))D.att[ses.id][st.id]=m});nA++}
   else if(it.kind==='quiz'){const dt=it.date||today();let q=D.assess.find(a=>a.cls===D.curClass&&a.title===it.title&&a.date===dt);
@@ -410,7 +415,7 @@ async function imp(el){const f=el.files[0];if(!f)return;let sheets=[];
  catch(e){alert('Could not read this file');return}
  const items=[],names=new Map();sheets.forEach(s=>{const a=analyzeSheet(s.n,s.rows);if(!a)return;a.items.forEach(x=>items.push(x));a.names.forEach(n=>{const k=normName(n);if(k&&!names.has(k))names.set(k,n)})});
  if(!names.size){alert('No student names could be found in this file.');return}
- impP={file:f.name,items,names:[...names.values()],addNew:true};tab='Students';pid=null;go()}
+ impP={file:f.name,items,names:[...names.values()],addNew:true,mode:'att'};tab='Students';pid=null;go()}
 function bak(){D.lastBackup=Date.now();dl('backup-'+today()+'.json',JSON.stringify(D),'application/json');save();go()}
 function rest(el){el.files[0].text().then(x=>{try{D=Object.assign({},DEF,JSON.parse(x.replace(/^\ufeff/,'')));fixData();save();go()}catch(e){alert('Invalid backup file')}})}
 function demo(){if(!confirm('Add fictional DEMO students?'))return;['One','Two','Three','Four'].forEach(n=>D.students.push({id:uid(),name:'[DEMO] '+n,code:'D'+n,cls:D.curClass,status:'Active',demo:true}));save();go()}

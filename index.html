@@ -183,7 +183,7 @@ let attSid=null,attMon=null,qOpen=null,stuSort='name',bkHide=false,impP=null,lvS
 V.Attendance=()=>{const ss=D.sessions.filter(x=>x.cls===D.curClass).sort((a,b)=>b.date.localeCompare(a.date));const ok=id=>id&&D.sessions.find(x=>x.id===id&&x.cls===D.curClass);const sid=ok(attSid)?attSid:ok(D.cur)?D.cur:(ss[0]||{}).id;const cs=D.sessions.find(x=>x.id===sid);const m=D.att[sid]||{};
  const cb=(s,v)=>`<td style="text-align:center"><input type="checkbox" aria-label="${v} ${esc(s.name)}" ${m[s.id]===v||(v==='Present'&&m[s.id]==='Late')?'checked':''} onchange="setAtt(this,'${sid}','${s.id}','${v}')"></td>`;
  return `<section><h2>NEW SESSION</h2><div class="row"><input type="date" id="sd" value="${today()}"><input id="st" data-enter="1" placeholder="Topic (optional)" onkeydown="if(event.key==='Enter')newSess()"><button class="btn pri" onclick="newSess()">New session</button></div></section>
- ${cs?`<section><div class="row"><h2 style="margin:0;flex:1">Attendance — ${cs.date} ${esc(cs.topic||'')}</h2><button class="btn" onclick="allP('${sid}')">Mark everyone present</button><button class="btn" onclick="del('session','${sid}',this)">Delete day</button>${DA('allsessions','Delete all days')}</div>
+ ${cs?`<section><div class="row"><h2 style="margin:0;flex:1">Attendance — ${cs.date} ${esc(cs.topic||'')}</h2><button class="btn" onclick="allP('${sid}')">Mark everyone present</button><button class="btn" onclick="del('session','${sid}',this)">Delete day</button>${DA('emptydays','Delete empty days')}${DA('allsessions','Delete all days')}</div>
  <div class="wrap"><table style="max-width:560px"><tr><th>Name</th><th style="text-align:center">Absent</th><th style="text-align:center">Present</th></tr>${act().map(s=>`<tr><td>${esc(s.name)}</td>${cb(s,'Absent')}${cb(s,'Present')}</tr>`).join('')||'<tr><td class="mut" colspan="3">Add students first.</td></tr>'}</table></div></section>
  <section><h2>Other days</h2>${(()=>{const mons=[...new Set(ss.map(x=>x.date.slice(0,7)))],mo=attMon&&mons.includes(attMon)?attMon:cs.date.slice(0,7);return `<div class="row"><select aria-label="Month" onchange="attMon=this.value;go()">${mons.map(m=>`<option ${m===mo?'selected':''}>${m}</option>`).join('')}</select><span class="lb">${ss.filter(x=>x.date.slice(0,7)===mo).length} days</span></div><div class="row" style="flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px">${ss.filter(x=>x.id!==sid&&x.date.slice(0,7)===mo).map(x=>`<button class="btn" style="flex:none" onclick="attSid='${x.id}';go()">${x.date.slice(8)} ${esc(x.topic||'')}</button>`).join('')||'<span class="mut">No other days this month.</span>'}</div>`})()}</section>`:'<section class="mut">Create a session to take attendance.</section>'}`};
 V.Quiz=()=>`<section><div class="row"><h2 style="margin:0;flex:1">NEW QUIZ</h2>${DA('allquiz','Delete all quizzes')}</div><div class="row"><input id="at" placeholder="Title"><input type="date" id="ad" value="${today()}"><input id="am" type="number" placeholder="Max score" style="width:110px" data-enter="1" onkeydown="if(event.key==='Enter')addAs()"><button class="btn pri" onclick="addAs()">Create</button></div></section>
@@ -367,6 +367,7 @@ function del(k,id,b){if(!b.dataset.sure){b.dataset.sure=1;const o=b.textContent;
  const rmSess=i=>{D.sessions=D.sessions.filter(x=>x.id!==i);delete D.att[i];D.events=D.events.filter(e=>e.sess!==i);if(D.cur===i)D.cur=null;if(attSid===i)attSid=null};
  const rmStu=i=>{D.students=D.students.filter(x=>x.id!==i);D.events=D.events.filter(e=>e.stu!==i);Object.values(D.att).forEach(m=>delete m[i]);D.assess.forEach(a=>delete a.scores[i]);D.skillAssess=D.skillAssess.filter(x=>x.stu!==i);D.plans=D.plans.filter(x=>x.stu!==i);if(pid===i)pid=null};
  const rmSk=c=>{const ids=D.skills.filter(x=>x.cls===c).map(x=>x.id);D.skills=D.skills.filter(x=>x.cls!==c);D.skillAssess=D.skillAssess.filter(x=>!ids.includes(x.skill))};
+ if(k==='emptydays')D.sessions.filter(x=>x.cls===D.curClass&&!Object.keys(D.att[x.id]||{}).length&&!D.events.some(e=>e.sess===x.id)).forEach(x=>rmSess(x.id));
  if(k==='allsessions')D.sessions.filter(x=>x.cls===D.curClass).forEach(x=>rmSess(x.id));
  if(k==='allstudents')D.students.filter(x=>x.cls===D.curClass).forEach(x=>rmStu(x.id));
  if(k==='allquiz')D.assess=D.assess.filter(a=>a.cls!==D.curClass);
@@ -421,15 +422,16 @@ const tr=R=>{const W=Math.max(0,...R.map(r=>r.length));return Array.from({length
 function detectCol(rows){const W=Math.max(0,...rows.map(r=>r.length));let best=0,bs=-1;
  for(let c=0;c<W;c++){const set=new Set();let hdr=false;rows.forEach((r,i)=>{const v=r[c];if(isNm(v)&&!HDR.test(v)&&!notName(v))set.add(normName(v));if(i<6&&typeof v==='string'&&HDR.test(v))hdr=true});
   const sc=set.size+(hdr?1000:0);if(sc>bs){bs=sc;best=c}}return best}
-function mkItem(sn,hs,pairs,kind,date,mrv){let good=0,bad=0,exc=0;
- if(kind==='att')pairs.forEach(p=>{const t=stat(p[1],true);if(t==='Present'||t==='Absent')good++;else if(t==='Excused')exc++;else if(t===undefined)bad++});
+function mkItem(sn,hs,pairs,kind,date,mrv){let good=0,bad=0,exc=0,np=0,na=0;
+ if(kind==='att')pairs.forEach(p=>{const t=stat(p[1],true);if(t==='Present'){good++;np++}else if(t==='Absent'){good++;na++}else if(t==='Excused')exc++;else if(t===undefined)bad++});
  else pairs.forEach(p=>{if(String(p[1]??'').trim()==='')return;if(isNaN(num(p[1])))bad++;else good++});
  const vals=pairs.map(p=>num(p[1])).filter(x=>!isNaN(x));
  const m=hs.match(/(?:\/|out of|من|max\.?)\s*(\d+(?:\.\d+)?)/i)||hs.match(/\(\s*(\d+(?:\.\d+)?)\s*\)\s*$/);let mx=m?+m[1]:null;
  if(!mx&&mrv!=null&&num(mrv)>0)mx=num(mrv);if(!mx)mx=vals.length?niceMax(Math.max(...vals)):10;
  let title=hs.replace(/\s*[\(\[]?\s*(?:\/|out of|من|max\.?)\s*\d+(?:\.\d+)?\s*[\)\]]?\s*$/i,'').replace(/\s*\(\s*\d+(?:\.\d+)?\s*\)\s*$/,'').trim()||hs;if(/^\d+$/.test(title))title='Quiz '+title;
  if(!hs||/^Column \d+$/.test(hs)||pdate(hs))title=date?'Quiz '+date:'Quiz';
- return{sheet:sn,header:hs,kind,date:date||'',label:hs,name:date||hs,title,max:mx,pairs,good,bad,exc}}
+ const ci=kind==='att'&&np>0&&na===0&&exc===0&&bad===0;
+ return{sheet:sn,header:hs,kind,date:date||'',label:hs,name:date||(/^Column \d+$/.test(hs)?'':hs),title,max:mx,pairs,good,bad,exc,canInfer:ci,inferAbsent:ci&&np>=Math.max(1,Math.round(pairs.length*.25))}}
 function analyzeSheet(sn,rows0,opt){
  const clean=R=>R.filter(r=>r&&r.some(v=>String(v??'').trim()!==''));
  const isH=v=>typeof v==='string'&&(HDR.test(v)||(v.trim().length<=28&&HDR2.test(nn(v))));
@@ -468,43 +470,56 @@ function rebuildNames(){const m=new Map();impP.sheets.forEach(sh=>sh.names.forEa
 function applySheet(si,a){const sh=impP.sheets[si];sh.info={ori:a.ori,c:a.c,cols:a.cols,dups:a.dups};sh.names=a.names;impP.items=impP.items.filter(it=>it.sheet!==sh.n).concat(a.items);rebuildNames();go()}
 function smCol(si,v){const sh=impP.sheets[si],a=analyzeSheet(sh.n,sh.rows,{ori:sh.info.ori,c:+v});if(!a){alert('This column does not look like a list of names.');go();return}applySheet(si,a)}
 function smOri(si){const sh=impP.sheets[si],a=analyzeSheet(sh.n,sh.rows,{ori:!sh.info.ori});if(!a){alert('No names were found when the sheet is turned.');go();return}applySheet(si,a)}
+function findStu(dn,have){const k=normName(dn);let st=have.get(k);if(st)return st;const t=k.split(' ').filter(Boolean);if(t.length<2)return null;const c=[];
+ have.forEach((s2,k2)=>{const u=k2.split(' ').filter(Boolean);if(u.length<2)return;const [a,b]=t.length<=u.length?[t,u]:[u,t];if(a.every(x=>b.includes(x)))c.push(s2)});return c.length===1?c[0]:null}
+function smFill(){const d0=document.getElementById('fd0').value,st=+document.getElementById('fdn').value||7;if(!d0){alert('Pick the first date.');return}let d=new Date(d0+'T12:00:00');
+ impP.items.forEach(it=>{if(it.kind==='att'&&!it.date){it.date=d.toISOString().slice(0,10);if(!it.name||/^Column \d+$/.test(it.name))it.name=it.date;d=new Date(d.getTime()+st*864e5)}});go()}
 function smSet(i,k,v){const it=impP.items[i];if(k==='max')v=+v>0?+v:it.max;if(k==='date'&&it.kind==='att'&&(!it.name||it.name===it.date))it.name=v;if(k==='kind'&&v==='quiz'&&!it.title)it.title='Quiz';it[k]=v;go()}
 function smDel(i){impP.items.splice(i,1);go()}
 function smRen(i,v){const k=normName(impP.names[i]);impP.ren=impP.ren||{};v=cleanName(v);if(v&&normName(v)!==k)impP.ren[k]=v;else delete impP.ren[k];go()}
 function smDrop(i){const k=normName(impP.names[i]);impP.drop=impP.drop||{};if(impP.drop[k])delete impP.drop[k];else impP.drop[k]=true;go()}
-function impPrev(){const P=impP,ren=P.ren||{},drop=P.drop||{},disp=n=>ren[normName(n)]||n,have=new Set(D.students.filter(s=>s.cls===D.curClass).map(s=>normName(s.name))),live_=P.names.filter(n=>!drop[normName(n)]),nw=live_.filter(n=>!have.has(normName(disp(n))));
+function impPrev(){const P=impP,ren=P.ren||{},drop=P.drop||{},disp=n=>ren[normName(n)]||n,haveM=new Map(D.students.filter(s=>s.cls===D.curClass).map(s=>[normName(s.name),s])),live_=P.names.filter(n=>!drop[normName(n)]),mt=n=>findStu(disp(n),haveM),nw=live_.filter(n=>!mt(n)),ap=live_.filter(n=>{const x=mt(n);return x&&normName(x.name)!==normName(disp(n))});
  const kinds=[['att','Attendance day'],['quiz','Quiz'],['skip','Ignore']],vis=P.items.map((it,i)=>[it,i]).filter(([it])=>P.mode==='all'||it.kind==='att');
  const dcount={};vis.forEach(([it])=>{if(it.kind==='att'&&it.date)dcount[it.date]=(dcount[it.date]||0)+1});
  const warn=it=>{const w=[];if(it.kind==='att'){if(it.bad)w.push(it.bad+' values not understood (ignored)');if(it.exc)w.push(it.exc+' excused (ignored)');if(it.date&&dcount[it.date]>1)w.push('another column has the same date')}
   if(it.kind==='quiz'){const bad=it.pairs.filter(p=>{const x=num(p[1]);return !isNaN(x)&&(x>it.max||x<0)}).length;if(bad)w.push(bad+' values above the max (skipped)');if(it.bad)w.push(it.bad+' non-numeric (ignored)')}
   return w.length?`<div class="lb" style="color:var(--bad)">${esc(w.join(' · '))}</div>`:''};
- const flds=(it,i)=>it.kind==='att'?`<input value="${esc(it.name||'')}" aria-label="Day name" placeholder="Name" style="width:140px" onchange="smSet(${i},'name',this.value)"> <input type="date" value="${it.date||''}" aria-label="Date" onchange="smSet(${i},'date',this.value)">${it.date?'':'<div class="lb">no date found, today will be used</div>'}${warn(it)}`
+ const flds=(it,i)=>it.kind==='att'?`<input value="${esc(it.name||'')}" aria-label="Day name" placeholder="Name" style="width:140px" onchange="smSet(${i},'name',this.value)"> <input type="date" value="${it.date||''}" aria-label="Date" onchange="smSet(${i},'date',this.value)">${it.date?'':'<div class="lb" style="color:var(--bad)">set a date</div>'}${it.canInfer?`<label class="lb"><input type="checkbox" ${it.inferAbsent?'checked':''} onchange="smSet(${i},'inferAbsent',this.checked)"> blank = absent</label>`:''}${warn(it)}`
   :it.kind==='quiz'?`<input value="${esc(it.title)}" aria-label="Quiz name" placeholder="Name" style="width:150px" onchange="smSet(${i},'title',this.value)"> <input type="number" value="${it.max}" style="width:70px" aria-label="Max score" onchange="smSet(${i},'max',this.value)"> <input type="date" value="${it.date||''}" aria-label="Date" onchange="smSet(${i},'date',this.value)">${warn(it)}`:'';
  const nA=vis.filter(([it])=>it.kind==='att').length,nQ=P.mode==='all'?vis.filter(([it])=>it.kind==='quiz').length:0;
  return `<section><h2>SMART IMPORT — ${esc(P.file)}</h2>
  ${P.sheets.map((sh,si)=>`<div class="row"><b>${esc(sh.n)}</b><span class="lb">Names column:</span><select aria-label="Names column" onchange="smCol(${si},this.value)">${sh.info.cols.map((l,j)=>`<option value="${j}" ${j===sh.info.c?'selected':''}>${esc(l)}</option>`).join('')}</select><label class="lb"><input type="checkbox" ${sh.info.ori?'checked':''} onchange="smOri(${si})"> names are in a row</label><span class="lb">${sh.names.length} names${sh.info.dups?' · '+sh.info.dups+' repeated':''}</span></div>`).join('')}
- <p><b>${live_.length}</b> students in the file · <b>${nw.length}</b> new${live_.length-nw.length?` · ${live_.length-nw.length} already in this class (matched by name)`:''}</p>
+ <p><b>${live_.length}</b> students in the file · <b>${nw.length}</b> new${live_.length-nw.length?` · ${live_.length-nw.length} already in this class`:''}</p>
+ ${ap.length?`<details><summary class="lb" style="cursor:pointer">${ap.length} names matched approximately to existing students</summary>${ap.map(n=>`<div class="lb">${esc(disp(n))} → ${esc(mt(n).name)}</div>`).join('')}</details>`:''}
  <label class="row"><input type="checkbox" ${P.addNew?'checked':''} onchange="impP.addNew=this.checked;go()"> Add the new students (${nw.length})</label>
  <details><summary class="lb" style="cursor:pointer">Edit or remove student names (${P.names.length})</summary><div class="list">${P.names.map((n,i)=>`<div class="li"><input value="${esc(disp(n))}" aria-label="Student name" style="flex:1;${drop[normName(n)]?'text-decoration:line-through;opacity:.5':''}" onchange="smRen(${i},this.value)"><button class="btn" onclick="smDrop(${i})">${drop[normName(n)]?'Restore':'✕'}</button></div>`).join('')}</div></details>
+ <details><summary class="lb" style="cursor:pointer">What the app read from the file (first rows)</summary>${P.sheets.map(sh=>`<div class="lb"><b>${esc(sh.n)}</b></div><div class="wrap"><table>${sh.rows.filter(r=>r.some(v=>String(v??'').trim()!=='')).slice(0,7).map(r=>`<tr>${r.slice(0,12).map(v=>`<td class="lb">${esc(v instanceof Date?(pdate(v)||''):String(v??'').slice(0,18))}</td>`).join('')}</tr>`).join('')}</table></div>`).join('')}</details>
  <div class="row" style="margin-top:8px"><span class="lb">Import:</span><select aria-label="What to import" onchange="impP.mode=this.value;go()"><option value="att" ${P.mode!=='all'?'selected':''}>Names + attendance only</option><option value="all" ${P.mode==='all'?'selected':''}>Names + attendance + quiz grades</option></select>${P.mode!=='all'&&P.items.length>vis.length?`<span class="lb">${P.items.length-vis.length} other columns are ignored</span>`:''}</div>
+ ${vis.filter(([it])=>it.kind==='att'&&!it.date).length?`<div class="row"><span class="lb" style="color:var(--bad)">${vis.filter(([it])=>it.kind==='att'&&!it.date).length} days have no date. Type them, or fill them in order:</span><input type="date" id="fd0" aria-label="First date"><span class="lb">every</span><input type="number" id="fdn" value="7" style="width:60px" aria-label="Days apart"><span class="lb">days</span><button class="btn" onclick="smFill()">Fill dates</button></div>`:''}
  ${vis.length?`<div class="row"><span class="lb">Empty columns are never imported. The name of each day defaults to its date, and you can change it.</span>${P.mode==='all'&&P.items.some(x=>x.kind==='skip')?`<button class="btn" onclick="impP.items=impP.items.filter(x=>x.kind!=='skip');go()">Remove all ignored columns</button>`:''}</div><div class="wrap"><table><tr><th>SHEET</th><th>COLUMN</th><th>WHAT IS IT?</th><th>NAME / DATE</th><th>VALUES</th><th></th></tr>${vis.map(([it,i])=>`<tr><td>${esc(it.sheet)}</td><td>${esc(it.header)}</td><td><select aria-label="Type" onchange="smSet(${i},'kind',this.value)">${kinds.map(k=>`<option value="${k[0]}" ${it.kind===k[0]?'selected':''}>${k[1]}</option>`).join('')}</select></td><td>${flds(it,i)}</td><td class="lb">${it.good} values</td><td><button class="btn" onclick="smDel(${i})" aria-label="Remove this column">✕ Remove</button></td></tr>`).join('')}</table></div>`:'<p class="lb">No attendance columns with data were found, only the names will be imported.</p>'}
  <div class="row"><button class="btn pri" onclick="smCommit()">Import ${nA?nA+' day'+(nA>1?'s':'')+(nQ?' + '+nQ+' quiz'+(nQ>1?'zes':''):'')+' and ':''}${nw.length&&P.addNew?nw.length+' new students':'students'}</button><button class="btn" onclick="impP=null;go()">Cancel</button></div></section>`}
-function smCommit(){const P=impP,ren=P.ren||{},drop=P.drop||{};let nS=0,nA=0,nQ=0,sk=0,fresh=false;
+function smCommit(){const P=impP,ren=P.ren||{},drop=P.drop||{};let nS=0,nA=0,nQ=0,sk=0,miss=0;
+ const want=P.items.filter(it=>it.kind==='att'||(P.mode==='all'&&it.kind==='quiz'));
+ const und=want.filter(it=>it.kind==='att'&&it.good>0&&!it.date).length;
+ if(und){alert(und+' attendance days have no date. Type the dates, or use "Fill dates", then import again.');return}
  const have=new Map(D.students.filter(s=>s.cls===D.curClass).map(s=>[normName(s.name),s]));
- let oc=Math.max(0,...D.students.filter(s=>s.cls===D.curClass&&s.ord!=null).map(s=>s.ord));
- const byKey=new Map();
- P.names.forEach(n=>{const k=normName(n);if(drop[k])return;const dn=ren[k]||n,dk=normName(dn);let st=have.get(dk);
-  if(!st){if(!P.addNew)return;st={id:uid(),name:tidy(dn),code:'S'+(D.students.length+1),cls:D.curClass,status:'Active'};D.students.push(st);have.set(dk,st);nS++}
+ let oc=Math.max(0,...D.students.filter(s=>s.cls===D.curClass&&s.ord!=null).map(s=>s.ord));const byKey=new Map();
+ P.names.forEach(n=>{const k=normName(n);if(drop[k])return;const dn=ren[k]||n;let st=findStu(dn,have);
+  if(!st){if(!P.addNew)return;st={id:uid(),name:tidy(dn),code:'S'+(D.students.length+1),cls:D.curClass,status:'Active'};D.students.push(st);have.set(normName(st.name),st);nS++}
   if(st.ord==null)st.ord=++oc;byKey.set(k,st)});
- P.items.forEach(it=>{if(P.mode!=='all'&&it.kind!=='att')return;
-  if(it.kind==='att'){if(!it.good)return;const nm=tidy(it.name||''),topic=nm&&nm!==it.date?nm:'';
-   let ses=it.date?D.sessions.find(x=>x.cls===D.curClass&&x.date===it.date):D.sessions.find(x=>x.cls===D.curClass&&x.date===today()&&x.topic===topic);
-   if(!ses){ses={id:uid(),date:it.date||today(),topic,status:'Ended',cls:D.curClass};D.sessions.push(ses)}else if(topic&&!ses.topic)ses.topic=topic;
-   D.att[ses.id]=D.att[ses.id]||{};let c=0;it.pairs.forEach(([n,v])=>{const st=byKey.get(normName(n)),m=stat(v,true);if(st&&(m==='Present'||m==='Absent')){D.att[ses.id][st.id]=m;c++}});if(c)nA++;}
-  else if(it.kind==='quiz'){if(!it.good)return;const dt=it.date||today(),title=tidy(it.title)||'Quiz';let q=D.assess.find(a=>a.cls===D.curClass&&a.title===title&&a.date===dt);
+ want.forEach(it=>{
+  if(it.kind==='att'){if(!it.good)return;const marks=[];
+   it.pairs.forEach(([n,v])=>{const st=byKey.get(normName(n));let m=stat(v,true);if(m===null&&it.inferAbsent&&String(v??'').trim()==='')m='Absent';if(m!=='Present'&&m!=='Absent')return;if(!st){miss++;return}marks.push([st,m])});
+   if(!marks.length)return;const nm=tidy(it.name||''),topic=nm&&nm!==it.date&&!/^Column \d+$/.test(nm)?nm:'';
+   let ses=D.sessions.find(x=>x.cls===D.curClass&&x.date===it.date&&(!topic||!x.topic||x.topic===topic));
+   if(!ses){ses={id:uid(),date:it.date,topic,status:'Ended',cls:D.curClass};D.sessions.push(ses)}else if(topic&&!ses.topic)ses.topic=topic;
+   D.att[ses.id]=D.att[ses.id]||{};marks.forEach(([st,m])=>{D.att[ses.id][st.id]=m});nA++}
+  else if(it.kind==='quiz'){if(!it.good)return;const dt=it.date||today(),title=tidy(it.title)||'Quiz';const rec=[];
+   it.pairs.forEach(([n,v])=>{const st=byKey.get(normName(n)),x=num(v);if(isNaN(x))return;if(!st){miss++;return}if(x<0||x>it.max){sk++;return}rec.push([st,x])});
+   if(!rec.length)return;let q=D.assess.find(a=>a.cls===D.curClass&&a.title===title&&a.date===dt);
    if(!q){q={id:uid(),title,date:dt,max:it.max||10,scores:{},cls:D.curClass};D.assess.push(q)}else if(it.max>q.max)q.max=it.max;
-   let c=0;it.pairs.forEach(([n,v])=>{const st=byKey.get(normName(n)),x=num(v);if(!st||isNaN(x))return;if(x<0||x>q.max){sk++;return}q.scores[st.id]=x;c++});if(c)nQ++}});
- impP=null;save();go();alert('Imported: '+nS+' new students, '+nA+' attendance days, '+nQ+' quizzes'+(sk?' ('+sk+' values skipped because they were above the max)':'')+'. You can undo this with the Undo button.')}
+   rec.forEach(([st,x])=>{q.scores[st.id]=x});nQ++}});
+ impP=null;save();go();alert('Imported: '+nS+' new students, '+nA+' attendance days, '+nQ+' quizzes'+(sk?' ('+sk+' values above the max were skipped)':'')+(miss?'. '+miss+' values belonged to removed or unmatched students':'')+'. You can undo this with the Undo button.')}
 async function imp(el){const f=el.files[0];if(!f)return;let sheets=[];
  try{if(/\.xlsx?$/i.test(f.name)){if(!window.XLSX){alert('The Excel reader could not load. Check your connection, or save the sheet as CSV.');return}
    const wb=XLSX.read(await f.arrayBuffer(),{type:'array',cellDates:true});sheets=wb.SheetNames.map(n=>({n,rows:XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:true,defval:''})}))}

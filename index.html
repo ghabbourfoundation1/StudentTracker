@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Workshop Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Archivo+Black&family=Noto+Sans+Arabic:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#193129;--lime:#b8f200;--bg:#f3f3f3;--paper:#f3f3f3;--ink:#0d0d0d;--olive:#2c5a47;--tan:#e1e1e1;--line:#dcdcdc;--mut:#505050;--bad:#d92d20;--good:#16803c;--warn:#8a5a00;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;color:var(--ink);font:500 16px/1.45 "Archivo","Noto Sans Arabic",Tahoma,sans-serif;background-color:var(--blue);background-image:linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.07) 1px,transparent 1px);background-size:44px 44px;min-height:100vh}
+.hv,h1,h2,.big,.sc,.ht,nav button,th{font-family:"Archivo Black","Noto Sans Arabic",Impact,sans-serif;font-weight:900}
+.mono{font-family:Consolas,monospace}.lb{font-size:13px;color:var(--mut)}
+header{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;padding:12px 18px;background:var(--blue);color:#fff;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+header h1{font-size:14px;margin:0 8px 0 0;background:#fff;color:#000;border:2px solid var(--lime);border-radius:999px;padding:5px 14px;text-transform:uppercase}
+header>.lb:not(#save){display:none}
+nav{display:flex;gap:6px;flex-wrap:wrap;width:100%;order:9}
+nav button{border:1.5px solid rgba(255,255,255,.75);background:none;color:#fff;padding:6px 14px;border-radius:999px;cursor:pointer;font-size:12.5px}
+nav button[aria-current=true]{background:var(--lime);border-color:var(--lime);color:#000}
+#save{margin-inline-start:auto;color:#eae4d6;font-size:12px}
+header .tb,header select,header input{border:1.5px solid rgba(255,255,255,.75);background:none;color:#fff;padding:6px 14px;border-radius:999px;cursor:pointer;font:600 14px "Archivo","Noto Sans Arabic",sans-serif}
+header select option{color:#000}header input{cursor:text}header input::placeholder{color:#eae4d6}
+.tb:disabled{opacity:.4;cursor:default}
+#hero{max-width:1100px;margin:6px auto 0;padding:6px 18px 18px;color:#fff}
+.hw{display:flex;align-items:center;gap:14px}
+.ht{font-size:clamp(36px,7.5vw,88px);line-height:.95;text-transform:uppercase;letter-spacing:-.02em;overflow-wrap:anywhere}
+.sq{width:clamp(50px,8vw,100px);flex:none}
+.gl{display:inline-flex;gap:8px;align-items:baseline;margin-top:12px;padding:8px 16px;border-radius:20px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-size:14px}
+.gl b{font:900 20px "Archivo Black",sans-serif}
+main{padding:18px;max-width:1100px;margin:0 auto 24px;background:#fff;border-radius:32px}
+@media(max-width:700px){main{border-radius:24px;padding:12px;margin-inline:8px}}
+section{background:var(--paper);border-radius:22px;padding:16px;margin-bottom:12px}
+h2{font-size:15px;margin:0 0 10px;text-transform:uppercase;letter-spacing:.01em}
+input,select,textarea{font:inherit;padding:7px 12px;border:2px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);max-width:100%}
+input:disabled{background:#ececec;color:#777}
+.btn{border:2px solid var(--ink);background:#fff;color:var(--ink);padding:6px 16px;border-radius:999px;cursor:pointer;font:700 14px "Archivo","Noto Sans Arabic",sans-serif}
+.btn.pri{background:var(--lime);border-color:var(--lime)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+table{width:100%;border-collapse:collapse}th{text-align:start;padding:6px 8px;border-bottom:2px solid var(--ink);color:var(--ink);font-size:12px;text-transform:uppercase}
+td{padding:7px 8px;border-bottom:1px solid var(--line)}
+.wrap{overflow-x:auto}
+.big{font-size:34px;line-height:1.05}
+.stats{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.stats>div{flex:1 1 140px;padding:14px 16px;background:var(--paper);border-radius:22px}
+.stats>div:nth-child(1){background:var(--blue);color:#fff}.stats>div:nth-child(1) .lb{color:#eae4d6}
+.stats>div:nth-child(3){background:var(--lime)}.stats>div:nth-child(3) .lb{color:#2c3a00}
+.list{max-width:560px}
+.li{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line)}
+.li .n{flex:1;min-width:0;font-weight:700}
+.pm{width:46px;height:46px;border-radius:50%;border:2px solid #000;font-size:24px;font-weight:900;cursor:pointer;line-height:1}
+.plus{background:var(--lime);color:#000}.minus{background:#000;color:#fff}
+.sc{min-width:48px;text-align:center;font-size:24px}
+.flash{background:color-mix(in srgb,var(--lime) 55%,transparent)}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--olive);outline-offset:2px}
+header button:focus-visible,header select:focus-visible,header input:focus-visible{outline-color:var(--lime)}
+a.nm{color:var(--olive);text-decoration:none;cursor:pointer;font-weight:700}
+.tg{display:inline-block;padding:0 9px;border-radius:999px;font-size:12px;font-weight:700;border:1.5px solid currentColor}
+.hi{color:var(--good)}.md{color:var(--warn)}.lo{color:var(--bad)}.mut{color:var(--mut)}
+.bar{display:flex;align-items:center;gap:8px;margin:5px 0;cursor:pointer}.bar i{display:block;height:18px;background:var(--olive);border-radius:9px}
+.al{border-inline-start:6px solid var(--warn);padding:8px 12px;margin-bottom:8px;background:#fff;border-radius:12px}
+.al.neg{border-color:var(--bad)}.al.pos{border-color:var(--good)}
+.ch{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+svg text{font:11px "Archivo",sans-serif;fill:var(--ink)}
+input[type=checkbox]{width:22px;height:22px;accent-color:var(--olive)}
+.abar{display:flex;gap:8px;align-items:flex-start;background:#fff;border:5px solid #ff1f0f;color:#000;font-weight:600;border-radius:18px;padding:10px 16px;margin:4px 18px 10px}
+footer{text-align:center;font-size:12px;color:#eae4d6;padding:0 0 18px}
+.lg{display:grid;gap:0 24px}
+.qt{flex:1;min-width:200px;background:none;border:0;text-align:start;font:900 15px "Archivo Black","Noto Sans Arabic",sans-serif;color:var(--ink);cursor:pointer;padding:4px 0}
+.qt .lb{font:500 13px "Archivo",sans-serif}
+.abar.bk{border:3px solid #193129}
+#alertbar{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 12px);width:min(560px,calc(100% - 24px));z-index:50}
+#alertbar .abar{margin:0;box-shadow:0 10px 32px rgba(0,0,0,.4)}
+</style><script>
+window.addEventListener('error',function(e){var b=document.getElementById('app');if(b&&!b.getAttribute('data-ok')){b.innerHTML='<section style="padding:16px"><b>The page hit an error:</b><br>'+String(e.message).replace(/</g,'&lt;')+' (line '+e.lineno+')<br><br>Please send this message to the developer.</section>'}});
+try{new Function('a','return a??1;')}catch(e){document.addEventListener('DOMContentLoaded',function(){var b=document.getElementById('app');if(b)b.innerHTML='<section style="padding:16px">This browser is too old for the app. Please update iOS / Safari, or open the link in Chrome.</section>'})}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head><body>
+<header><h1>Workshop Tracker</h1><select id="cls" aria-label="Class"></select><input id="newcls" data-enter="1" placeholder="New class name, then Enter" hidden style="width:210px"><span class="lb">AUTOMOTIVE ELECTRICAL · TRAINING RECORD</span><span id="save" class="lb"></span><button class="tb" id="bkBtn" onclick="bak()" title="Download a backup file">⬇ Backup</button><button class="tb" id="undoAll" disabled title="Undo the last change (Ctrl+Z)">↶ Undo</button><button class="tb" id="lang">عربي</button><nav id="nav"></nav></header>
+<div id="alertbar"></div>
+<div id="bkbar"></div>
+<div id="synbar"></div>
+<div id="hero"></div>
+<main id="app"></main>
+<footer>Made by mostafa saeed</footer>
+<script>
+const STANDALONE=true;
+const KEY='wt_v1';
+const DEF={students:[],sessions:[],att:{},assess:[],events:[],audit:[],skills:[],skillAssess:[],plans:[],skillNotes:{},alertSt:{},classes:[],curClass:null,cur:null,
+ set:{hi:80,mid:60,drop:15,low:50,minN:3,bonus:1,pen:-1,absN:2,lowEng:-3,lang:'en',liveCols:'auto',autoXls:true}};
+let D,saveOK=true;
+try{D=Object.assign({},DEF,JSON.parse(localStorage.getItem(KEY)||'{}'));D.set=Object.assign({},DEF.set,D.set)}catch(e){D=JSON.parse(JSON.stringify(DEF));saveOK=false}
+let FH=null,fhTimer=null;
+let SY={st:'local',dev:Math.random().toString(36).slice(2),chunks:null,ts:0,timer:null,busy:false,dirty:false,first:0,col:null,uid:null,conflict:null,unsub:null};
+let undoStack=[],lastSnap=null,lastPush=0;
+function save(){const j=JSON.stringify(D);if(lastSnap!==null&&j!==lastSnap){if(Date.now()-lastPush>800){undoStack.push(lastSnap);lastPush=Date.now();if(undoStack.length>30)undoStack.shift();let tot=undoStack.reduce((a,x)=>a+x.length,0);while(tot>12e6&&undoStack.length>1)tot-=undoStack.shift().length}}lastSnap=j;try{localStorage.setItem(KEY,j);saveOK=true}catch(e){saveOK=false}
+ const s=document.getElementById('save');stTxt();s.style.color=saveOK?'':'#b3261e';try{renderBar()}catch(e){}const u=document.getElementById('undoAll');if(u)u.disabled=!undoStack.length;syncSoon();fhSoon();idbSoon()}
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const AR={Dashboard:'لوحة المعلومات',Students:'الطلاب',Attendance:'الحضور',Quiz:'الكويزات','Live':'المتابعة المباشرة','Practical Skills':'المهارات العملية',Alerts:'التنبيهات',Settings:'الإعدادات'};
+const t=k=>D.set.lang==='ar'&&AR[k]||k;
+const tabs=['Dashboard','Students','Attendance','Quiz','Live','Practical Skills','Alerts','Settings'];
+let tab='Live',q='',pid=null,dTier=null;
+const today=()=>new Date().toISOString().slice(0,10);
+// ---- calculations ----
+const act=()=>D.students.filter(s=>s.status==='Active'&&s.cls===D.curClass).sort((a,b)=>a.name.localeCompare(b.name,'ar'));
+const live=()=>D.events.filter(e=>!e.reversed);
+const sessScore=(sid,stid)=>live().filter(e=>e.sess===sid&&e.stu===stid).reduce((a,e)=>a+e.pts,0);
+function results(stid){return D.assess.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(a=>{const v=a.scores[stid];return v==null||v===''?null:{date:a.date,p:100*v/a.max,t:a.title,v,max:a.max}}).filter(Boolean)}
+const avg=a=>a.length?a.reduce((s,x)=>s+x.p,0)/a.length:null;
+const tier=p=>p>=D.set.hi?['High','hi']:p>=D.set.mid?['Medium','md']:['Low','lo'];
+function trend(id){const r=results(id);if(r.length<D.set.minN)return{c:'Insufficient Data',n:r.length};
+ const k=Math.min(3,Math.floor(r.length/2)),rec=avg(r.slice(-k)),old=avg(r.slice(-2*k,-k)),d=rec-old;
+ return{c:d>=5?'Improving':d<=-5?'Declining':'Stable',d,rec,old,n:r.length}}
+function attStats(id){const ss=D.sessions.slice().sort((a,b)=>a.date.localeCompare(b.date));let p=0,ab=0,run=0,tot=0;
+ ss.forEach(s=>{const v=(D.att[s.id]||{})[id];if(!v||v==='Excused')return;tot++;if(v==='Absent'){ab++;run++}else{run=0;p++}});
+ return{pct:tot?100*p/tot:null,ab,cons:run,tot}}
+function skillLatest(id){const o={};D.skillAssess.filter(x=>x.stu===id&&x.n===10).forEach(x=>o[x.skill]=x.lvl);return o}
+function alerts(only){const out=[];(only?D.students.filter(s=>s.id===only):act()).forEach(s=>{
+ const a=attStats(s.id);if(a.cons>=D.set.absN)out.push({s,key:'abs',sev:'High',k:'neg',m:`${a.cons} consecutive scheduled sessions missed.`,act:'Contact the student about attendance.'});
+ const r=results(s.id);
+ if(r.length>=2){const last=r[r.length-1],base=avg(r.slice(0,-1).slice(-3));if(base-last.p>=D.set.drop)out.push({s,key:'drop',sev:'High',k:'neg',m:`Sudden drop: baseline ${base.toFixed(0)}% → ${last.p.toFixed(0)}% on "${last.t}" (−${(base-last.p).toFixed(0)} pts, rule ≥${D.set.drop}).`,act:'Review the quiz with the student; consider a development plan.'})}
+ if(r.length>=D.set.minN){const m=avg(r);if(m<D.set.low)out.push({s,key:'low',sev:'Medium',k:'',m:`Persistent low performance: average ${m.toFixed(0)}% over ${r.length} quizzes (threshold ${D.set.low}%).`,act:'Offer targeted practice or revision.'})}
+ const tr=trend(s.id);
+ if(tr.c==='Declining')out.push({s,key:'decl',sev:'Medium',k:'',m:`Declining trend: ${tr.old.toFixed(0)}% → ${tr.rec.toFixed(0)}% (${tr.d.toFixed(1)} pts, ${tr.n} quizzes).`,act:'Monitor and discuss.'});
+ if(tr.c==='Improving')out.push({s,key:'impr',sev:'Positive',k:'pos',m:`Improving: ${tr.old.toFixed(0)}% → ${tr.rec.toFixed(0)}% (+${tr.d.toFixed(1)} pts).`,act:'Acknowledge the progress.'});
+ const ses=D.sessions.filter(x=>x.status==='Ended'&&x.cls===s.cls).slice(-3);
+ if(ses.length>=3){const net=ses.reduce((x,y)=>x+sessScore(y.id,s.id),0)/3;if(net<=D.set.lowEng)out.push({s,key:'eng',sev:'Medium',k:'',m:`Low engagement: average net ${net.toFixed(1)} over the last 3 ended sessions.`,act:'Check in privately. Events reflect instructor observations only.'})}
+ });return out.map(a=>{const id=a.s.id+'|'+a.key,r=(D.alertSt||{})[id];return{...a,id,st:r&&r.sig===a.m?r.st:'new'}})}
+// ---- charts ----
+function line(pts,h=140,mx=100,u='%'){if(!pts.length)return '<span class="mut">No data yet.</span>';const w=320,L=26,B=h-18,n=pts.length,x=i=>L+(n===1?(w-L)/2:i*(w-L-8)/(n-1)),y=v=>8+(B-8)*(1-v/mx);
+ return `<svg viewBox="0 0 ${w} ${h}" width="100%" role="img">${[0,mx/2,mx].map(g=>`<line x1="${L}" x2="${w}" y1="${y(g)}" y2="${y(g)}" stroke="var(--line)"/><text x="0" y="${y(g)+3}">${g}</text>`).join('')}
+ <polyline fill="none" stroke="var(--olive)" stroke-width="2" points="${pts.map((p,i)=>x(i)+','+y(p.v)).join(' ')}"/>${pts.map((p,i)=>`<circle cx="${x(i)}" cy="${y(p.v)}" r="3.5" fill="var(--ink)"><title>${esc(p.l)}: ${p.v.toFixed(0)}${u}</title></circle>`).join('')}</svg>`}
+function bars(items,max){if(!items.length)return '<span class="mut">No data yet.</span>';return items.map(i=>`<div class="bar" ${i.c?`onclick="${i.c}"`:''}><span style="width:120px" class="lb">${esc(i.l)}</span><i style="width:${Math.max(2,100*i.v/Math.max(max,1)*.55)}%"></i><b>${i.t??i.v}</b></div>`).join('')}
+const DA=(k,l)=>`<button class="btn" onclick="del('${k}','',this)">${l}</button>`;
+function donut(it){const tot=it.reduce((a,x)=>a+x.v,0);if(!tot)return '<span class="mut">No graded students yet.</span>';let a0=-Math.PI/2;const R=50,r=30,c=60;
+ const arcs=it.map(x=>{if(!x.v)return '';const a1=a0+2*Math.PI*x.v/tot,big=a1-a0>Math.PI?1:0,p=(rr,a)=>(c+rr*Math.cos(a)).toFixed(2)+' '+(c+rr*Math.sin(a)).toFixed(2);let d;
+  if(x.v===tot)d=`M${c} ${c-R}A${R} ${R} 0 1 1 ${c-.01} ${c-R}L${c-.01} ${c-r}A${r} ${r} 0 1 0 ${c} ${c-r}Z`;else d=`M${p(R,a0)}A${R} ${R} 0 ${big} 1 ${p(R,a1)}L${p(r,a1)}A${r} ${r} 0 ${big} 0 ${p(r,a0)}Z`;a0=a1;
+  return `<path d="${d}" fill="${x.col}" style="cursor:pointer" onclick="${x.c}"><title>${x.l}: ${x.v}</title></path>`}).join('');
+ return `<div class="row" style="gap:18px"><svg viewBox="0 0 120 120" width="150" role="img">${arcs}<text x="60" y="65" text-anchor="middle" style="font-size:18px;font-weight:700">${tot}</text></svg><div>${it.map(x=>`<div class="bar" onclick="${x.c}"><i style="width:14px;height:14px;background:${x.col}"></i>${x.l}: <b>${x.v}</b></div>`).join('')}</div></div>`}
+function cols(it,lo,hi){if(!it.length)return '<span class="mut">No data yet.</span>';const w=320,h=150,L=4,B=h-22,T=16,n=it.length,bw=Math.min(36,(w-L)/n*.6),y=v=>T+(B-T)*(1-(v-lo)/(hi-lo)),z=y(Math.max(lo,0));
+ return `<svg viewBox="0 0 ${w} ${h}" width="100%" role="img"><line x1="0" x2="${w}" y1="${z}" y2="${z}" stroke="var(--line)"/>${it.map((d,i)=>{const cx=L+(i+.5)*(w-L)/n,yy=y(d.v);return `<rect x="${cx-bw/2}" y="${Math.min(yy,z)}" width="${bw}" height="${Math.max(1,Math.abs(z-yy))}" fill="${d.v<0?'var(--bad)':'var(--olive)'}"/><text x="${cx}" y="${Math.min(yy,z)-3}" text-anchor="middle">${d.t??d.v}</text><text x="${cx}" y="${h-8}" text-anchor="middle">${esc(d.l.slice(5))}</text>`}).join('')}</svg>`}
+// ---- views ----
+const V={};
+const nm=s=>`<a class="nm" tabindex="0" onclick="openStu('${s.id}')" onkeydown="if(event.key==='Enter'){event.stopPropagation();openStu('${s.id}')}">${esc(s.name)}</a>`;
+V.Dashboard=()=>{const S=act(),rows=S.map(s=>({s,m:avg(results(s.id)),tr:trend(s.id)}));
+ const ranked=rows.filter(x=>x.m!=null).sort((a,b)=>b.m-a.m);const tiers={High:[],Medium:[],Low:[]};ranked.forEach(x=>tiers[tier(x.m)[0]].push(x));
+ const all=D.assess.filter(a=>a.cls===D.curClass).flatMap(a=>Object.values(a.scores).filter(v=>v!==''&&v!=null).map(v=>100*v/a.max)),ats=S.map(s=>attStats(s.id).pct).filter(x=>x!=null);
+ const ss=D.sessions.filter(x=>x.cls===D.curClass).sort((a,b)=>a.date.localeCompare(b.date));
+ const qa=D.assess.filter(a=>a.cls===D.curClass).slice().sort((a,b)=>a.date.localeCompare(b.date)).map(a=>{const v=Object.values(a.scores).filter(x=>x!==''&&x!=null);return v.length?{l:a.title,v:v.reduce((x,y)=>x+100*y/a.max,0)/v.length}:null}).filter(Boolean);
+ const att=ss.map(s=>{const m=D.att[s.id]||{},p=S.filter(x=>m[x.id]==='Present').length,tt=S.filter(x=>m[x.id]).length;return tt?{l:s.date,v:100*p/tt,t:Math.round(100*p/tt)+'%'}:null}).filter(Boolean);
+ const eng=ss.filter(s=>s.status==='Ended').slice(-8).map(s=>{const v=S.reduce((a,x)=>a+sessScore(s.id,x.id),0);return{l:s.date,v,t:v}});
+ const li=a=>a.map((x,i)=>`<div class="li"><span class="mono mut">${i+1}</span><span class="n">${nm(x.s)}</span><b>${x.m.toFixed(1)}%</b></div>`).join('')||'<span class="mut">No graded students yet.</span>';
+ return `<div class="row"><button class="btn" onclick="clsReport()">Class report</button><button class="btn" onclick="exportXlsx()">Export Excel</button><span class="lb">Opens as a file — print it or save as PDF</span></div><div class="stats"><div><div class="lb">ACTIVE STUDENTS</div><div class="big">${S.length}</div></div><div><div class="lb">CLASS AVERAGE</div><div class="big">${all.length?(all.reduce((a,b)=>a+b,0)/all.length).toFixed(0)+'%':'—'}</div></div><div><div class="lb">ATTENDANCE</div><div class="big">${ats.length?(ats.reduce((a,b)=>a+b,0)/ats.length).toFixed(0)+'%':'—'}</div></div><div><div class="lb">OPEN ALERTS</div><div class="big">${alerts().filter(a=>a.k!=='pos'&&a.st!=='resolved').length}</div></div></div>
+ <div class="ch"><section><h2>Performance levels</h2>${donut([{l:'High',col:'#2c5a47'},{l:'Medium',col:'#b8f200'},{l:'Low',col:'#111111'}].map(x=>({...x,v:tiers[x.l].length,c:`dTier='${x.l}';go()`})))}
+ <p class="lb">High ≥ ${D.set.hi}% · Medium ≥ ${D.set.mid}% · Low below. Click a slice for names.</p></section>
+ <section><h2>Quiz average over time (%)</h2>${line(qa)}</section>
+ <section><h2>Attendance per session (%)</h2>${cols(att.slice(-8),0,100)}</section>
+ </div>
+ ${dTier?`<section><h2>${dTier.toUpperCase()} LEVEL STUDENTS <a class="nm" onclick="dTier=null;go()">clear</a></h2>${li(tiers[dTier])}</section>`:''}
+ ${liveBoard()}
+ <div class="ch"><section><h2>TOP 5 — QUIZ AVERAGE</h2>${li(ranked.slice(0,5))}</section><section><h2>BOTTOM 5 — QUIZ AVERAGE</h2>${li(ranked.slice(-5).reverse())}</section></div>
+ <section><h2>ALL STUDENTS — click a name for the full record</h2><div class="wrap"><table><tr><th>NAME</th><th>AVG</th><th>LEVEL</th><th>TREND</th><th>ATT.</th></tr>${rows.map(r=>{const a=attStats(r.s.id);return `<tr><td>${nm(r.s)}</td><td>${r.m==null?'—':r.m.toFixed(1)+'%'}</td><td>${r.m==null?'—':`<span class="tg ${tier(r.m)[1]}">${tier(r.m)[0]}</span>`}</td><td>${r.tr.c}</td><td>${a.pct==null?'—':a.pct.toFixed(0)+'%'}</td></tr>`}).join('')||'<tr><td class="mut">No students yet.</td></tr>'}</table></div></section>`};
+function profile(id){const s=D.students.find(x=>x.id===id);if(!s){pid=null;return V.Students()}
+ const r=results(id),m=avg(r),tr=trend(id),a=attStats(id),sk=skillLatest(id),A=alerts(id).filter(x=>x.st!=='resolved'),P=D.plans.filter(p=>p.stu===id);
+ const ses=D.sessions.slice().sort((x,y)=>x.date.localeCompare(y.date)),net=live().filter(e=>e.stu===id).reduce((x,e)=>x+e.pts,0);
+ return `<p><a class="nm" onclick="pid=null;go()">← Back</a></p><section><h2>STUDENT RECORD</h2><div class="row"><input value="${esc(s.name)}" aria-label="Student name" style="flex:1;min-width:160px;font-size:20px;font-weight:700" onchange="renStu('${id}',this.value)"><button class="btn pri" onclick="stuReport('${id}')">Report</button></div>
+ <div class="stats"><div><div class="lb">QUIZ AVERAGE</div><div class="big">${m==null?'—':m.toFixed(0)+'%'}</div></div><div><div class="lb">LEVEL</div><div class="big ${m==null?'':tier(m)[1]}" style="font-size:22px">${m==null?'—':tier(m)[0]}</div></div><div><div class="lb">TREND</div><div style="font-size:18px;font-weight:600">${tr.c}</div></div><div><div class="lb">ATTENDANCE</div><div class="big">${a.pct==null?'—':a.pct.toFixed(0)+'%'}</div><div class="lb">${a.ab} absent</div></div></div></section>
+ <section><h2>LIVE POINTS <span class="lb">(kept separate from quiz scores)</span></h2>${(()=>{const R=liveRows('all').sort((a,b)=>b.net-a.net),me=R.find(x=>x.s.id===id);if(!me)return '<span class="mut">No data.</span>';const rank=R.filter(x=>x.net>me.net).length+1;return `<div class="stats"><div><div class="lb">NET POINTS</div><div class="big">${me.net}</div></div><div><div class="lb">BONUS</div><div class="big">${me.b}</div></div><div><div class="lb">PENALTY</div><div class="big">${me.p}</div></div><div><div class="lb">RANK IN CLASS</div><div class="big">${me.n?rank+'/'+R.length:'—'}</div>${me.n?'':'<div class="lb">No interaction yet</div>'}</div></div>`})()}</section>
+ <section><h2>NOTES</h2><textarea rows="3" style="width:100%" aria-label="Notes" onchange="setNoteS('${id}',this.value)">${esc(s.notes||'')}</textarea></section>
+ <div class="ch"><section><h2>QUIZ SCORES</h2>${line(r.map(x=>({l:x.t,v:x.p})))}<table><tr><th>QUIZ</th><th>DATE</th><th>SCORE</th><th>%</th></tr>${r.map(x=>`<tr><td>${esc(x.t)}</td><td class="mono">${x.date}</td><td>${x.v}/${x.max}</td><td>${x.p.toFixed(0)}%</td></tr>`).join('')||'<tr><td class="mut">No grades.</td></tr>'}</table></section>
+ <section><h2>LIVE POINTS BY SESSION</h2>${bars(ses.filter(x=>D.events.some(e=>e.sess===x.id&&e.stu===id)).slice(-8).map(x=>{const v=sessScore(x.id,id);return{l:x.date,v:Math.max(0,v),t:v}}),5)}
+ <h2 style="margin-top:14px">PRACTICAL SKILLS (1–10)</h2><table>${D.skills.filter(k=>!k.arch&&k.cls===s.cls).map(k=>`<tr><td>${esc(k.name)}</td><td><b>${sk[k.id]??'—'}</b></td><td class="mut">${esc((D.skillNotes||{})[id+'_'+k.id]||'')}</td></tr>`).join('')||'<tr><td class="mut">No skills defined.</td></tr>'}</table>${D.skills.filter(k=>!k.arch&&k.cls===s.cls).map(k=>{const h=D.skillAssess.filter(x=>x.stu===id&&x.skill===k.id&&x.n===10);return h.length>1?`<div class="lb" style="margin-top:8px">${esc(k.name)} — progress</div>${line(h.map(x=>({l:new Date(x.ts).toLocaleDateString('en-GB'),v:x.lvl})),110,10,'/10')}`:''}).join('')}</section></div>
+ ${A.length?`<section><h2>ALERTS</h2>${A.map(x=>`<div class="al ${x.k}"><span class="tg">${x.sev}</span> ${esc(x.m)}</div>`).join('')}</section>`:''}
+ <section><h2>DEVELOPMENT PLANS — only when needed</h2>${P.map(p=>`<div class="al"><b>${esc(p.title)}</b> <span class="lb">${esc(p.status)} · due ${esc(p.due||'—')}</span><br>${esc(p.problem||'')}<br><span class="mut">Target: ${esc(p.target||'—')}</span>
+ <div class="row" style="margin-top:6px"><select onchange="plan('${p.id}','status',this.value)">${['Active','Completed','Closed'].map(o=>`<option ${p.status===o?'selected':''}>${o}</option>`).join('')}</select><input placeholder="Progress note" value="${esc(p.note||'')}" onchange="plan('${p.id}','note',this.value)"><button class="btn" onclick="del('plan','${p.id}',this)">Delete</button></div></div>`).join('')||'<p class="mut">No plan for this student.</p>'}
+ <div class="row"><input id="pt" placeholder="Plan title"><input id="pp" placeholder="Problem"><input id="pg" placeholder="Measurable target"><input id="pd" type="date"><button class="btn pri" onclick="addPlan('${id}')">Add plan</button></div></section>`}
+V.Students=()=>{if(pid)return profile(pid);const val=s=>stuSort==='avg'?avg(results(s.id)):stuSort==='att'?attStats(s.id).pct:null;const S=D.students.filter(s=>s.cls===D.curClass&&s.name.toLowerCase().includes(q.toLowerCase())).sort((a,b)=>{if(stuSort==='name')return a.name.localeCompare(b.name,'ar');return (val(b)??-1)-(val(a)??-1)});
+ return `${impP?impPrev():''}<section><h2>ADD STUDENT — type a name, press Enter</h2><div class="row"><input id="sn" data-enter="1" placeholder="Student name" onkeydown="if(event.key==='Enter'){event.preventDefault();addStu()}"><button class="btn pri" onclick="addStu()">Add</button></div>
+ <div class="row"><label class="lb">SMART IMPORT (Excel / CSV: names, attendance, quiz grades) <input type="file" accept=".xlsx,.xls,.csv,.txt" onchange="imp(this)"></label><button class="btn" onclick="expStu()">Export CSV</button>${DA('allstudents','Delete all students')}</div></section>
+ <section><h2>STUDENTS (${S.length})</h2><div class="row"><input data-enter="1" placeholder="Search" value="${esc(q)}" oninput="q=this.value;go(true)"><select aria-label="Sort" onchange="stuSort=this.value;go()">${[['name','Sort: name'],['avg','Sort: quiz average'],['att','Sort: attendance']].map(o=>`<option value="${o[0]}" ${stuSort===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select></div><div class="wrap"><table><tr><th>NAME</th><th>AVG</th><th>TREND</th><th>ATT.</th><th></th></tr>
+ ${S.map(s=>{const m=avg(results(s.id));return `<tr><td>${nm(s)}</td><td>${m==null?'—':m.toFixed(1)+'%'}</td><td>${trend(s.id).c}</td><td>${(()=>{const p=attStats(s.id).pct;return p==null?'—':p.toFixed(0)+'%'})()}</td><td><button class="btn" onclick="del('student','${s.id}',this)">Delete</button></td></tr>`}).join('')||'<tr><td class="mut">No students yet.</td></tr>'}</table></div></section>`};
+let attSid=null,attMon=null,qOpen=null,stuSort='name',bkHide=false,impP=null,lvSess='all';
+V.Attendance=()=>{const ss=D.sessions.filter(x=>x.cls===D.curClass).sort((a,b)=>b.date.localeCompare(a.date));const ok=id=>id&&D.sessions.find(x=>x.id===id&&x.cls===D.curClass);const sid=ok(attSid)?attSid:ok(D.cur)?D.cur:(ss[0]||{}).id;const cs=D.sessions.find(x=>x.id===sid);const m=D.att[sid]||{};
+ const cb=(s,v)=>`<td style="text-align:center"><input type="checkbox" aria-label="${v} ${esc(s.name)}" ${m[s.id]===v||(v==='Present'&&m[s.id]==='Late')?'checked':''} onchange="setAtt(this,'${sid}','${s.id}','${v}')"></td>`;
+ return `<section><h2>NEW SESSION</h2><div class="row"><input type="date" id="sd" value="${today()}"><input id="st" data-enter="1" placeholder="Topic (optional)" onkeydown="if(event.key==='Enter')newSess()"><button class="btn pri" onclick="newSess()">New session</button></div></section>
+ ${cs?`<section><div class="row"><h2 style="margin:0;flex:1">Attendance — ${cs.date} ${esc(cs.topic||'')}</h2><button class="btn" onclick="allP('${sid}')">Mark everyone present</button><button class="btn" onclick="del('session','${sid}',this)">Delete day</button>${DA('allsessions','Delete all days')}</div>
+ <div class="wrap"><table style="max-width:560px"><tr><th>Name</th><th style="text-align:center">Absent</th><th style="text-align:center">Present</th></tr>${act().map(s=>`<tr><td>${esc(s.name)}</td>${cb(s,'Absent')}${cb(s,'Present')}</tr>`).join('')||'<tr><td class="mut" colspan="3">Add students first.</td></tr>'}</table></div></section>
+ <section><h2>Other days</h2>${(()=>{const mons=[...new Set(ss.map(x=>x.date.slice(0,7)))],mo=attMon&&mons.includes(attMon)?attMon:cs.date.slice(0,7);return `<div class="row"><select aria-label="Month" onchange="attMon=this.value;go()">${mons.map(m=>`<option ${m===mo?'selected':''}>${m}</option>`).join('')}</select><span class="lb">${ss.filter(x=>x.date.slice(0,7)===mo).length} days</span></div><div class="row" style="flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px">${ss.filter(x=>x.id!==sid&&x.date.slice(0,7)===mo).map(x=>`<button class="btn" style="flex:none" onclick="attSid='${x.id}';go()">${x.date.slice(8)} ${esc(x.topic||'')}</button>`).join('')||'<span class="mut">No other days this month.</span>'}</div>`})()}</section>`:'<section class="mut">Create a session to take attendance.</section>'}`};
+V.Quiz=()=>`<section><div class="row"><h2 style="margin:0;flex:1">NEW QUIZ</h2>${DA('allquiz','Delete all quizzes')}</div><div class="row"><input id="at" placeholder="Title"><input type="date" id="ad" value="${today()}"><input id="am" type="number" placeholder="Max score" style="width:110px" data-enter="1" onkeydown="if(event.key==='Enter')addAs()"><button class="btn pri" onclick="addAs()">Create</button></div></section>
+ ${D.assess.filter(a=>a.cls===D.curClass).slice().reverse().map((a,i)=>{const op=qOpen===null?i===0:qOpen===a.id;const v=Object.values(a.scores).filter(x=>x!==''&&x!=null).map(Number),sd=v.slice().sort((x,y)=>x-y),med=v.length?(sd[Math.floor((v.length-1)/2)]+sd[Math.ceil((v.length-1)/2)])/2:null,dis=a.closed?'disabled':'';
+ return `<section><div class="row"><button class="qt" aria-expanded="${op}" onclick="qOpen=${op}?'':'${a.id}';go()">${op?'▾':'▸'} ${esc(a.title)} <span class="lb">${a.date} · MAX ${a.max} · ${a.closed?'CLOSED':'OPEN'} · ${v.length} graded</span></button><button class="btn ${a.closed?'':'pri'}" onclick="togQ('${a.id}')">${a.closed?'Edit':'End'}</button><button class="btn" onclick="del('quiz','${a.id}',this)">Delete</button></div>
+ ${op?`<p class="lb">GRADED ${v.length}/${act().length} · MEAN ${v.length?(v.reduce((x,y)=>x+y,0)/v.length).toFixed(1):'—'} · MEDIAN ${med??'—'} · HIGH ${v.length?Math.max(...v):'—'} · LOW ${v.length?Math.min(...v):'—'} · PASS ${v.length?(100*v.filter(x=>100*x/a.max>=D.set.mid).length/v.length).toFixed(0)+'%':'—'}</p>
+ <div class="list">${act().map(s=>`<div class="li"><span class="n">${esc(s.name)}</span><input type="number" step="any" style="width:80px" ${dis} value="${a.scores[s.id]??''}" placeholder="—" onchange="setSc('${a.id}','${s.id}',this)"></div>`).join('')}</div>`:''}</section>`}).join('')||'<section class="mut">No quizzes yet. Blank scores stay missing, never zero.</section>'}`;
+V.Live=()=>{const cur=D.sessions.find(x=>x.id===D.cur&&x.cls===D.curClass);
+ if(!cur||cur.status==='Ended')return `<section><div class="row"><h2 style="margin:0;flex:1">LIVE CLASSROOM TRACKER</h2>${DA('allsessions','Delete all sessions')}</div><div class="row"><input type="date" id="sd" value="${today()}"><input id="st" data-enter="1" placeholder="Topic (optional)" onkeydown="if(event.key==='Enter')newSess()"><button class="btn pri" onclick="newSess()">Start session</button></div>
+ ${D.sessions.filter(x=>x.cls===D.curClass).reverse().map(s=>`<div class="li"><span class="n">${s.date} ${esc(s.topic||'')} <span class="lb">${s.status}</span></span><button class="btn" onclick="D.cur='${s.id}';save();go()">Open</button><button class="btn" onclick="del('session','${s.id}',this)">Delete</button></div>`).join('')||'<span class="mut">No sessions yet.</span>'}</section>`+(cur?logView(cur):'');
+ return `<section><div class="row"><b>SESSION ${cur.date} ${esc(cur.topic||'')}</b><input data-enter="1" placeholder="Search" value="${esc(q)}" oninput="q=this.value;go(true)"><button class="btn" onclick="undo()">Undo last</button><select aria-label="Columns" onchange="D.set.liveCols=this.value;save();go()">${['auto','1','2','3'].map(o=>`<option value="${o}" ${(D.set.liveCols||'auto')===o?'selected':''}>${o==='auto'?'Columns: auto':'Columns: '+o}</option>`).join('')}</select><button class="btn" onclick="endS()">End session</button></div>
+ <div class="lg" style="grid-template-columns:${!D.set.liveCols||D.set.liveCols==='auto'?'repeat(auto-fill,minmax(300px,1fr))':`repeat(${D.set.liveCols},1fr)`}">${act().filter(s=>s.name.toLowerCase().includes(q.toLowerCase())).map(s=>`<div class="li" id="st${s.id}"><span class="n">${esc(s.name)}</span><button class="pm minus" aria-label="Penalty for ${esc(s.name)}" onclick="ev('${s.id}',-1)">−</button><span class="sc" id="sc${s.id}">${sessScore(cur.id,s.id)}</span><button class="pm plus" aria-label="Bonus for ${esc(s.name)}" onclick="ev('${s.id}',1)">+</button></div>`).join('')||'<span class="mut">Add students first.</span>'}</div></section>`+logView(cur)};
+function logView(cur){return '';const L=D.events.filter(e=>e.sess===cur.id).slice().reverse();
+ return `<section id="log"><h2>EVENT LOG</h2><table>${L.slice(0,40).map(e=>`<tr class="${e.reversed?'mut':''}"><td class="mono">${new Date(e.ts).toLocaleTimeString('en-GB',{timeZone:'Africa/Cairo'})}</td><td>${esc((D.students.find(s=>s.id===e.stu)||{}).name)}</td><td>${e.pts>0?'Bonus +':'Penalty '}${e.pts}</td><td>${e.reversed?'reversed':''}</td></tr>`).join('')||'<tr><td class="mut">No events yet.</td></tr>'}</table></section>`}
+V['Practical Skills']=()=>{const sk=D.skills.filter(s=>!s.arch&&s.cls===D.curClass),sel=window.skSel&&sk.find(s=>s.id===window.skSel)?window.skSel:(sk[0]||{}).id,cs=sk.find(s=>s.id===sel);
+ return `<section><div class="row"><h2 style="margin:0;flex:1">ADD SKILL</h2>${DA('allskills','Delete all skills')}</div><div class="row"><input id="kn" data-enter="1" placeholder="Skill name" onkeydown="if(event.key==='Enter'){event.preventDefault();addSk()}"><button class="btn pri" onclick="addSk()">Add</button></div></section>
+ ${cs?`<section><div class="row"><h2 style="margin:0;flex:1">${esc(cs.name)} <span class="lb">rating 1–10 · blank = not assessed</span></h2><button class="btn" onclick="arSk('${cs.id}')">Archive</button><button class="btn" onclick="del('skill','${cs.id}',this)">Delete</button></div>
+ <div class="list" style="max-width:780px">${act().map(s=>`<div class="li"><span class="n" style="min-width:110px">${esc(s.name)}</span><input type="number" min="1" max="10" style="width:70px" placeholder="—" aria-label="Rating" value="${skillLatest(s.id)[sel]??''}" onchange="setSk('${s.id}','${sel}',this)"><input style="flex:2;min-width:140px" placeholder="Note" aria-label="Note" value="${esc((D.skillNotes||{})[s.id+'_'+sel]||'')}" onchange="setNote('${s.id}','${sel}',this.value)"></div>`).join('')}</div></section>
+ <section><h2>Other skills</h2><div class="row">${sk.filter(x=>x.id!==sel).map(x=>`<button class="btn" onclick="window.skSel='${x.id}';go()">${esc(x.name)}</button>`).join('')||'<span class="mut">No other skills.</span>'}</div></section>`:'<section class="mut">No skills yet. Add one above.</section>'}`};
+function liveRows(sc){const ids=new Set(D.sessions.filter(x=>x.cls===D.curClass&&(sc==='all'||x.id===sc)).map(x=>x.id));
+ return act().map(s=>{const E=live().filter(e=>e.stu===s.id&&ids.has(e.sess)),b=E.filter(e=>e.pts>0).reduce((a,e)=>a+e.pts,0),p=E.filter(e=>e.pts<0).reduce((a,e)=>a+e.pts,0);return{s,b,p,net:b+p,n:E.length}})}
+function liveBoard(){const ss=D.sessions.filter(x=>x.cls===D.curClass).sort((a,b)=>b.date.localeCompare(a.date));if(lvSess!=='all'&&!ss.find(x=>x.id===lvSess))lvSess='all';
+ const R=liveRows(lvSess).sort((a,b)=>b.net-a.net||a.s.name.localeCompare(b.s.name,'ar'));let rk=0,last=null;R.forEach((r,i)=>{if(r.net!==last){rk=i+1;last=r.net}r.rk=rk});
+ const I=R.filter(r=>r.n>0),N=R.filter(r=>r.n===0),tot=R.reduce((a,r)=>a+r.net,0),top=I[0],mx=Math.max(1,...I.map(r=>r.net));
+ const asc=ss.slice().reverse().filter(x=>live().some(e=>e.sess===x.id)).slice(-8).map(x=>{const v=act().reduce((a,s)=>a+sessScore(x.id,s.id),0);return{l:x.date,v,t:v}});
+ return `<section><div class="row" style="margin:0"><h2 style="margin:0;flex:1">LIVE POINTS <span class="lb">(separate from quiz scores)</span></h2><select aria-label="Scope" onchange="lvSess=this.value;go()"><option value="all">All sessions</option>${ss.map(x=>`<option value="${x.id}" ${x.id===lvSess?'selected':''}>${x.date} ${esc(x.topic||'')}</option>`).join('')}</select></div></section>
+ <div class="stats"><div><div class="lb">TOP STUDENT</div><div style="font-size:20px;font-weight:800">${top?nm(top.s):'—'}</div><div class="lb">${top?top.net+' points':''}</div></div><div><div class="lb">CLASS NET POINTS</div><div class="big">${tot}</div></div><div><div class="lb">INTERACTING</div><div class="big">${I.length}/${R.length}</div></div><div><div class="lb">NO INTERACTION</div><div class="big">${N.length}</div></div></div>
+ <div class="ch"><section><h2>Top 10</h2>${bars(I.slice(0,10).map(r=>({l:r.s.name,v:Math.max(0,r.net),t:r.net,c:`openStu('${r.s.id}')`})),mx)}</section>
+ <section><h2>No interaction at all (${N.length})</h2>${N.map(r=>`<div class="li"><span class="n">${nm(r.s)}</span></div>`).join('')||'<span class="mut">Everyone has at least one event.</span>'}</section></div>
+ <section><h2>Class points per session</h2>${cols(asc,Math.min(0,...asc.map(e=>e.v)),Math.max(1,...asc.map(e=>e.v)))}</section>
+ <section><h2>Full ranking</h2><div class="wrap"><table><tr><th>#</th><th>NAME</th><th>BONUS</th><th>PENALTY</th><th>NET</th></tr>${R.map(r=>`<tr><td>${r.n?r.rk:'—'}</td><td>${nm(r.s)}</td><td>${r.b}</td><td>${r.p}</td><td><b>${r.net}</b></td></tr>`).join('')||'<tr><td class="mut">No students.</td></tr>'}</table></div></section>`}
+V.Alerts=()=>{const A=alerts();window.alv=A;const I=A.map((a,i)=>[a,i]);
+ const row=([a,i])=>`<div class="al ${a.k}"><div class="row" style="margin:0 0 4px"><b>${nm(a.s)}</b> <span class="tg">${a.sev}</span>${a.st==='ack'?'<span class="tg">Acknowledged</span>':''}${a.st==='resolved'?'<span class="tg">Resolved</span>':''}<span style="flex:1"></span>${a.st==='new'?`<button class="btn" onclick="setAl(${i},'ack')">Acknowledge</button>`:''}${a.st==='resolved'?`<button class="btn" onclick="setAl(${i},'')">Reopen</button>`:`<button class="btn" onclick="setAl(${i},'resolved')">Resolve</button>`}</div>${esc(a.m)}</div>`;
+ const ac=I.filter(x=>x[0].st!=='resolved'),rs=I.filter(x=>x[0].st==='resolved');
+ return `<section><h2>ALERTS</h2>${ac.map(row).join('')||'<span class="mut">No alerts.</span>'}</section>${rs.length?`<section><h2>RESOLVED</h2>${rs.map(row).join('')}</section>`:''}`};
+V.Settings=()=>{const f=(k,l,h)=>`<label class="row"><span style="width:250px">${l}</span><input type="number" value="${D.set[k]}" onchange="D.set.${k}=+this.value;save()"><span class="lb">${h}</span></label>`;
+ return `<section><h2>ACCOUNT &amp; SYNC</h2>${SY.uid?`<p>Status: <b>${esc(syncLabel())}</b></p><p>Engineer code: <b class="mono">${engCode()}</b></p><div class="row"><button class="btn" onclick="syncNow()">Sync now</button></div><p class="lb">Open this page signed in on any phone or laptop and you get the same data. Each engineer who opens it with their own account has a separate private workspace.</p><p class="lb"><b>Add an engineer:</b> open this page's Share menu and invite their email as <b>Contributor</b>. Don't turn on a public link if they should sync. They sign in to claude.ai with that email on any phone or laptop and open the same link.</p>`:(STANDALONE?'<p>This version works without any account. Your data is stored on this device only. To move it to another phone or laptop, use ⬇ Backup here, then Restore on the other device.</p>':'<p>Sync is off. Open this page while signed in to claude.ai to keep your data on every device. Right now it is stored on this device only.</p>')}</section>
+ <section><h2>CLASSES</h2>${D.classes.map(c=>`<div class="li"><input value="${esc(c.name)}" style="flex:1" aria-label="Class name" onchange="renCls('${c.id}',this.value)">${D.classes.length>1?`<button class="btn" onclick="del('class','${c.id}',this)">Delete</button>`:''}</div>`).join('')}</section>
+ <section><h2>RULES</h2>${f('hi','High level from (%)','80 and above')}${f('mid','Medium level from (%)','also the pass mark')}${f('drop','Sudden-drop (points)','latest vs previous 3')}${f('low','Persistent-low (%)','average below this')}${f('minN','Minimum quizzes','for trend and alerts')}${f('bonus','Bonus value','per +')}${f('pen','Penalty value','per −, negative')}${f('absN','Consecutive absences','alert at')}${f('lowEng','Low engagement net avg','last 3 sessions')}</section>
+ <section><h2>DATA PROTECTION</h2><p>Storage status: <b>${PERSIST===true?'Protected (the browser promised not to clear it)':'Not guaranteed by the browser'}</b></p><p class="lb">Your data is saved twice on this device, in two separate browser stores. Safari on iPhone can still erase a website's data after about a week without opening it. To avoid that, add this page to the Home Screen and open it from there, or open the app at least once a week. Chrome and Edge keep the data unless the device is very low on space.</p><div class="row"><button class="btn" onclick="protectStorage().then(()=>go())">Request protection</button></div></section>
+ <section><h2>EXCEL</h2><div class="row"><button class="btn pri" onclick="exportXlsx()">Export to Excel now</button><label class="btn">Update my existing file<input type="file" accept=".xlsx" hidden onchange="mergeXlsx(this)"></label><button class="btn" onclick="linkFile()">Link a file (auto-save, Chrome/Edge on a laptop)</button></div><label class="row"><input type="checkbox" ${D.set.autoXls!==false?'checked':''} onchange="D.set.autoXls=this.checked;save()"> Also download the Excel file automatically when I end a session or a quiz</label><p class="lb">Sheets: Students, Attendance, Live points, Quizzes (all quizzes in one sheet, one column per quiz) and Practical skills. "Update my existing file" refreshes only these sheets inside your own workbook and keeps any other sheets you added.</p></section>
+ <section><h2>BACKUP</h2><div class="row"><button class="btn" onclick="bak()">Download backup (JSON)</button><label class="lb">RESTORE <input type="file" accept=".json" onchange="rest(this)"></label><button class="btn" onclick="demo()">Load demo data</button><button class="btn" onclick="rmDemo()">Remove demo data</button></div><p class="lb">Data lives in this browser only. Download backups regularly.</p></section>`};
+// ---- actions ----
+const busy={};
+function ev(stu,sign){const cur=D.sessions.find(x=>x.id===D.cur);if(!cur||cur.status!=='Active')return;const k=stu+sign;if(busy[k]&&Date.now()-busy[k]<80)return;busy[k]=Date.now();
+ D.events.push({id:uid(),stu,sess:cur.id,pts:sign>0?D.set.bonus:D.set.pen,ts:Date.now(),reversed:false});save();
+ const el=document.getElementById('sc'+stu);if(el){el.textContent=sessScore(cur.id,stu);const r=document.getElementById('st'+stu);r.classList.add('flash');setTimeout(()=>r.classList.remove('flash'),250)}
+ const lg=document.getElementById('log');if(lg)lg.outerHTML=logView(cur)}
+function undo(){const cur=D.sessions.find(x=>x.id===D.cur),e=D.events.filter(x=>x.sess===cur.id&&!x.reversed).pop();if(!e)return;e.reversed=true;D.audit.push({ts:Date.now(),act:'undo',ev:e.id});save();go(true)}
+function newSess(){const s={id:uid(),date:document.getElementById('sd').value||today(),topic:document.getElementById('st').value,status:'Active',cls:D.curClass};D.sessions.push(s);D.cur=s.id;attSid=s.id;attMon=null;save();go()}
+function endS(){D.sessions.find(x=>x.id===D.cur).status='Ended';save();go();if(D.set.autoXls!==false)exportXlsx(true)}
+function addStu(){const n=sn.value.trim();if(!n)return;if(D.students.some(s=>s.name.toLowerCase()===n.toLowerCase())){alert('This name already exists');return}
+ D.students.push({id:uid(),name:n,code:'S'+(D.students.length+1),cls:D.curClass,status:'Active'});save();go();document.getElementById('sn').focus()}
+function togStu(id){const s=D.students.find(x=>x.id===id);s.status=s.status==='Active'?'Inactive':'Active';save();go()}
+function openStu(id){pid=id;tab='Students';go();window.scrollTo(0,0)}
+function setAtt(el,s,st,v){const box=el.closest('tr');if(el.checked)box.querySelectorAll('input').forEach(i=>{if(i!==el)i.checked=false});
+ D.att[s]=D.att[s]||{};const old=D.att[s][st];if(el.checked)D.att[s][st]=v;else delete D.att[s][st];D.audit.push({ts:Date.now(),act:'att',s,st,old,v:D.att[s][st]});save()}
+function allP(s){act().forEach(x=>{D.att[s]=D.att[s]||{};if(!D.att[s][x.id])D.att[s][x.id]='Present'});save();go()}
+function setNote(stu,skill,v){D.skillNotes=D.skillNotes||{};D.skillNotes[stu+'_'+skill]=v;save()}
+function addCls(){const n=cn.value.trim();if(!n)return;if(D.classes.some(c=>c.name.toLowerCase()===n.toLowerCase())){alert('Class name already exists');return}const c={id:uid(),name:n};D.classes.push(c);D.curClass=c.id;save();go();document.getElementById('cn').focus()}
+function fixData(){if(!D.set.xv2){D.set.xv2=1;D.set.autoXls=false}D.students.forEach(x=>delete x.photo);if(!D.classes.length){const c={id:uid(),name:'Class 1'};D.classes.push(c);D.curClass=c.id}
+ if(!D.classes.find(c=>c.id===D.curClass))D.curClass=D.classes[0].id;
+ [D.students,D.sessions,D.assess,D.skills].forEach(a=>a.forEach(x=>{if(!x.cls||!D.classes.find(c=>c.id===x.cls))x.cls=D.curClass}))}
+function renCls(id,v){v=v.trim();if(v){D.classes.find(c=>c.id===id).name=v;save();go()}}
+function globalUndo(){if(!undoStack.length)return;const snap=undoStack.pop();D=JSON.parse(snap);fixData();lastSnap=JSON.stringify(D);save();go()}
+function setAl(i,st){const a=window.alv[i];D.alertSt=D.alertSt||{};if(st)D.alertSt[a.id]={st,sig:a.m};else delete D.alertSt[a.id];save();go()}
+function RH(title,body){return `<!DOCTYPE html><html dir="${D.set.lang==='ar'?'rtl':'ltr'}"><head><meta charset="utf-8"><title>${esc(title)}</title><style>body{font:14px/1.5 "Segoe UI",Tahoma,sans-serif;max-width:800px;margin:24px auto;padding:0 16px;color:#111}h1{margin:0 0 4px}h2{font-size:15px;border-bottom:2px solid #111;padding-bottom:3px;margin-top:22px}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #ccc;padding:4px 6px;text-align:start}.k{display:inline-block;margin-inline-end:26px}.k b{display:block;font-size:22px}@media print{.np{display:none}}</style></head><body><button class="np" onclick="print()">Print / Save as PDF</button>${body}<p style="color:#666;font-size:12px">Made by mostafa saeed · ${new Date().toLocaleDateString('en-GB')}</p></body></html>`}
+function stuReport(id){const s=D.students.find(x=>x.id===id),r=results(id),m=avg(r),tr=trend(id),a=attStats(id),sk=skillLatest(id),net=live().filter(e=>e.stu===id).reduce((x,e)=>x+e.pts,0),P=D.plans.filter(p=>p.stu===id),c=D.classes.find(x=>x.id===s.cls);
+ const body=`<h1>${esc(s.name)}</h1><p>${esc(c?c.name:'')}</p><div><span class="k">Quiz average<b>${m==null?'—':m.toFixed(1)+'%'}</b></span><span class="k">Level<b>${m==null?'—':tier(m)[0]}</b></span><span class="k">Trend<b>${tr.c}</b></span><span class="k">Attendance<b>${a.pct==null?'—':a.pct.toFixed(0)+'%'}</b></span><span class="k">Live points (net)<b>${net}</b></span></div>
+ <h2>Quizzes</h2><table><tr><th>Quiz</th><th>Date</th><th>Score</th><th>%</th></tr>${r.map(x=>`<tr><td>${esc(x.t)}</td><td>${x.date}</td><td>${x.v}/${x.max}</td><td>${x.p.toFixed(0)}%</td></tr>`).join('')||'<tr><td>No grades</td></tr>'}</table>
+ <h2>Practical skills (1–10)</h2><table>${D.skills.filter(k=>!k.arch&&k.cls===s.cls).map(k=>`<tr><td>${esc(k.name)}</td><td>${sk[k.id]??'—'}</td><td>${esc((D.skillNotes||{})[id+'_'+k.id]||'')}</td></tr>`).join('')||'<tr><td>None</td></tr>'}</table>
+ <h2>Alerts</h2>${alerts(id).filter(x=>x.st!=='resolved').map(x=>`<p>• ${esc(x.m)}</p>`).join('')||'<p>None</p>'}
+ <h2>Development plans</h2>${P.map(p=>`<p><b>${esc(p.title)}</b> (${esc(p.status)}, due ${esc(p.due||'—')})<br>${esc(p.problem||'')}<br>Target: ${esc(p.target||'—')}<br>${esc(p.note||'')}</p>`).join('')||'<p>None</p>'}${s.notes?`<h2>Instructor notes</h2><p>${esc(s.notes)}</p>`:''}`;
+ dl('report-'+s.name.replace(/[^\w\u0600-\u06FF]+/g,'_')+'.html',RH(s.name,body),'text/html')}
+function clsReport(){const S=act(),c=D.classes.find(x=>x.id===D.curClass),rows=S.map(s=>({s,m:avg(results(s.id)),tr:trend(s.id),a:attStats(s.id),net:live().filter(e=>e.stu===s.id).reduce((x,e)=>x+e.pts,0)})).sort((x,y)=>(y.m??-1)-(x.m??-1)),tc={High:0,Medium:0,Low:0};rows.forEach(x=>{if(x.m!=null)tc[tier(x.m)[0]]++});
+ const body=`<h1>${esc(c?c.name:'Class')} — class report</h1><p>${today()}</p><div><span class="k">Students<b>${S.length}</b></span><span class="k">High<b>${tc.High}</b></span><span class="k">Medium<b>${tc.Medium}</b></span><span class="k">Low<b>${tc.Low}</b></span></div>
+ <h2>Students</h2><table><tr><th>#</th><th>Name</th><th>Avg</th><th>Level</th><th>Trend</th><th>Attendance</th><th>Live points</th></tr>${rows.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.s.name)}</td><td>${x.m==null?'—':x.m.toFixed(1)+'%'}</td><td>${x.m==null?'—':tier(x.m)[0]}</td><td>${x.tr.c}</td><td>${x.a.pct==null?'—':x.a.pct.toFixed(0)+'%'}</td><td>${x.net}</td></tr>`).join('')}</table>
+ <h2>Alerts</h2>${alerts().filter(a=>a.st!=='resolved'&&a.k!=='pos').map(a=>`<p>• <b>${esc(a.s.name)}</b>: ${esc(a.m)}</p>`).join('')||'<p>None</p>'}`;
+ dl('class-report-'+today()+'.html',RH('Class report',body),'text/html')}
+function renStu(id,v){v=v.trim();if(v){D.students.find(x=>x.id===id).name=v;save();go()}}
+function setNoteS(id,v){D.students.find(x=>x.id===id).notes=v;save()}
+function renderBk(){const el=document.getElementById('bkbar');if(!el)return;const age=D.lastBackup?(Date.now()-D.lastBackup)/864e5:null;
+ if(!D.students.length||bkHide||(age!==null&&age<3)){el.innerHTML='';return}
+ el.innerHTML=`<div class="abar bk" role="status"><div style="flex:1">${age===null?'No backup yet.':'Last backup '+Math.floor(age)+' days ago.'} Your data lives only in this browser, so download a backup file.</div><button class="btn pri" onclick="bak()">Download backup</button><button class="btn" onclick="bkHide=true;renderBk()">Later</button></div>`}
+function sheetName(wb,n){n=String(n).replace(/[\[\]:*?\/\\]/g,' ').trim().slice(0,28)||'Sheet';let k=n,i=2;while(wb.SheetNames.includes(k))k=n.slice(0,26)+' '+i++;return k}
+function buildXlsx(){const wb=XLSX.utils.book_new(),S=act(),ss=D.sessions.filter(x=>x.cls===D.curClass).sort((a,b)=>a.date.localeCompare(b.date)),
+ add=(n,rows)=>{const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=rows[0].map((_,i)=>({wch:i?14:28}));XLSX.utils.book_append_sheet(wb,ws,sheetName(wb,n))},
+ pc=v=>v==null?'':Math.round(v*10)/10,sl=x=>x.date+(x.topic?' '+x.topic:''),cn=id=>(D.classes.find(c=>c.id===id)||{}).name||'';
+ add('Students',[['Name','Class','Quiz avg %','Level','Trend','Attendance %','Live points (net)']].concat(S.map(s=>{const m=avg(results(s.id)),a=attStats(s.id);return[s.name,cn(s.cls),pc(m),m==null?'':tier(m)[0],trend(s.id).c,a.pct==null?'':Math.round(a.pct),live().filter(e=>e.stu===s.id).reduce((x,e)=>x+e.pts,0)]})));
+ add('Attendance',[['Name'].concat(ss.map(sl),['Present','Absent','Attendance %'])].concat(S.map(s=>{const a=attStats(s.id),m=ss.map(x=>(D.att[x.id]||{})[s.id]||'');return[s.name].concat(m,[m.filter(v=>v==='Present'||v==='Late').length,m.filter(v=>v==='Absent').length,a.pct==null?'':Math.round(a.pct)])})));
+ const R=liveRows('all');add('Live points',[['Name'].concat(ss.map(sl),['Bonus','Penalty','Net'])].concat(S.map(s=>{const r=R.find(x=>x.s.id===s.id)||{b:0,p:0,net:0};return[s.name].concat(ss.map(x=>sessScore(x.id,s.id)),[r.b,r.p,r.net])})));
+ const Q=D.assess.filter(a=>a.cls===D.curClass).sort((a,b)=>a.date.localeCompare(b.date));
+ add('Quizzes',[['Name'].concat(Q.map(a=>a.title),['Average %']),['Date'].concat(Q.map(a=>a.date),['']),['Max score'].concat(Q.map(a=>a.max),[''])].concat(S.map(s=>{const m=avg(results(s.id));return[s.name].concat(Q.map(a=>{const v=a.scores[s.id];return v===undefined||v===''||v===null?'':v}),[pc(m)])})));
+ const sk=D.skills.filter(k=>!k.arch&&k.cls===D.curClass);add('Practical skills',[['Name'].concat(sk.map(k=>k.name))].concat(S.map(s=>{const L=skillLatest(s.id);return[s.name].concat(sk.map(k=>L[k.id]??''))})));
+ return wb}
+function xlsxBlob(){return new Blob([XLSX.write(buildXlsx(),{bookType:'xlsx',type:'array'})],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})}
+function mergeXlsx(el){const f=el.files[0];if(!f)return;if(!window.XLSX){alert('The Excel library did not load. Check your connection and try again.');return}
+ f.arrayBuffer().then(b=>{const old=XLSX.read(b,{type:'array'}),nw=buildXlsx();
+  old.SheetNames.filter(n=>/^Quiz - /.test(n)).forEach(n=>{delete old.Sheets[n]});old.SheetNames=old.SheetNames.filter(n=>!/^Quiz - /.test(n));
+  nw.SheetNames.forEach(n=>{if(!old.Sheets[n])old.SheetNames.push(n);old.Sheets[n]=nw.Sheets[n]});
+  dl(f.name.replace(/\.xls$/i,'.xlsx'),new Blob([XLSX.write(old,{bookType:'xlsx',type:'array'})],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),'');el.value=''}).catch(()=>alert('Could not read this file'))}
+function exportXlsx(silent){if(!window.XLSX){if(!silent)alert('The Excel library did not load. Check your connection and try again.');return}
+ const c=D.classes.find(x=>x.id===D.curClass);dl('workshop-'+(c?c.name.replace(/[^\w\u0600-\u06FF]+/g,'_'):'class')+'.xlsx',xlsxBlob(),'')}
+async function writeFH(){if(!FH||!window.XLSX)return;const w=await FH.createWritable();await w.write(xlsxBlob());await w.close()}
+function fhSoon(){if(!FH)return;clearTimeout(fhTimer);fhTimer=setTimeout(()=>writeFH().catch(()=>{FH=null}),3000)}
+async function linkFile(){try{if(!window.showSaveFilePicker)throw 0;FH=await showSaveFilePicker({suggestedName:'workshop-data.xlsx',types:[{description:'Excel',accept:{'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':['.xlsx']}}]});await writeFH();alert('Linked. The file updates automatically a few seconds after every change while this page is open. After reopening the page, link it again.')}
+ catch(e){FH=null;if(e&&e.name==='AbortError')return;alert('This browser does not allow linking a file here. It works on Chrome or Edge on a laptop. Use "Export to Excel" instead.')}}
+function togQ(id){const a=D.assess.find(x=>x.id===id);a.closed=!a.closed;save();go();if(a.closed&&D.set.autoXls!==false)exportXlsx(true)}
+function del(k,id,b){if(!b.dataset.sure){b.dataset.sure=1;const o=b.textContent;b.textContent='Click again to confirm';b.style.color='var(--bad)';setTimeout(()=>{if(b.isConnected){delete b.dataset.sure;b.textContent=o;b.style.color=''}},3000);return}
+ if(k==='session'){D.sessions=D.sessions.filter(x=>x.id!==id);delete D.att[id];D.events=D.events.filter(e=>e.sess!==id);if(D.cur===id)D.cur=null;if(attSid===id)attSid=null}
+ if(k==='quiz')D.assess=D.assess.filter(x=>x.id!==id);
+ if(k==='skill'){D.skills=D.skills.filter(x=>x.id!==id);D.skillAssess=D.skillAssess.filter(x=>x.skill!==id)}
+ if(k==='plan')D.plans=D.plans.filter(x=>x.id!==id);
+ if(k==='student'){D.students=D.students.filter(x=>x.id!==id);D.events=D.events.filter(e=>e.stu!==id);Object.values(D.att).forEach(m=>delete m[id]);D.assess.forEach(a=>delete a.scores[id]);D.skillAssess=D.skillAssess.filter(x=>x.stu!==id);D.plans=D.plans.filter(x=>x.stu!==id);if(pid===id)pid=null}
+ const rmSess=i=>{D.sessions=D.sessions.filter(x=>x.id!==i);delete D.att[i];D.events=D.events.filter(e=>e.sess!==i);if(D.cur===i)D.cur=null;if(attSid===i)attSid=null};
+ const rmStu=i=>{D.students=D.students.filter(x=>x.id!==i);D.events=D.events.filter(e=>e.stu!==i);Object.values(D.att).forEach(m=>delete m[i]);D.assess.forEach(a=>delete a.scores[i]);D.skillAssess=D.skillAssess.filter(x=>x.stu!==i);D.plans=D.plans.filter(x=>x.stu!==i);if(pid===i)pid=null};
+ const rmSk=c=>{const ids=D.skills.filter(x=>x.cls===c).map(x=>x.id);D.skills=D.skills.filter(x=>x.cls!==c);D.skillAssess=D.skillAssess.filter(x=>!ids.includes(x.skill))};
+ if(k==='allsessions')D.sessions.filter(x=>x.cls===D.curClass).forEach(x=>rmSess(x.id));
+ if(k==='allstudents')D.students.filter(x=>x.cls===D.curClass).forEach(x=>rmStu(x.id));
+ if(k==='allquiz')D.assess=D.assess.filter(a=>a.cls!==D.curClass);
+ if(k==='allskills')rmSk(D.curClass);
+ if(k==='class'){D.sessions.filter(x=>x.cls===id).forEach(x=>rmSess(x.id));D.students.filter(x=>x.cls===id).forEach(x=>rmStu(x.id));D.assess=D.assess.filter(a=>a.cls!==id);rmSk(id);D.classes=D.classes.filter(c=>c.id!==id);if(D.curClass===id)D.curClass=D.classes[0].id}
+ D.audit.push({ts:Date.now(),act:'delete',k,id});save();go()}
+function addAs(){const m=+am.value;if(!at.value.trim()||!(m>0)){alert('Title and a positive max score are required');return}qOpen=uid();D.assess.push({id:qOpen,title:at.value.trim(),date:ad.value||today(),max:m,scores:{},cls:D.curClass});save();go()}
+function setSc(a,s,el){const as=D.assess.find(x=>x.id===a);if(el.value===''){delete as.scores[s]}else{const v=+el.value;if(v<0||v>as.max){alert('Score must be between 0 and '+as.max);el.value=as.scores[s]??'';return}D.audit.push({ts:Date.now(),act:'grade',a,s,old:as.scores[s],v});as.scores[s]=v}save()}
+function addSk(){if(!kn.value.trim())return;D.skills.push({id:uid(),name:kn.value.trim(),cls:D.curClass});save();go();document.getElementById('kn').focus()}
+function arSk(id){D.skills.find(x=>x.id===id).arch=true;save();go()}
+function setSk(stu,skill,el){if(el.value==='')return;const v=+el.value;if(!(v>=1&&v<=10)){alert('Rating must be 1 to 10');el.value='';return}D.skillAssess.push({stu,skill,lvl:v,n:10,ts:Date.now()});save()}
+function addPlan(stu){if(!pt.value.trim()){alert('Plan title is required');return}D.plans.push({id:uid(),stu,title:pt.value.trim(),problem:pp.value,target:pg.value,due:pd.value,status:'Active',created:Date.now()});save();go()}
+function plan(id,k,v){D.plans.find(p=>p.id===id)[k]=v;save()}
+async function dl(name,text,type){const blob=text instanceof Blob?text:new Blob(['\ufeff'+text],{type});
+ try{if(typeof claude!=='undefined'&&claude.use){const d=await claude.use('downloads');if(d){await d.save({filename:name,data:blob});return}}}catch(e){if(e&&e.code==='declined')return}
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click()}
+function expStu(){dl('students.csv','name,status\n'+D.students.map(s=>`"${s.name.replace(/"/g,'""')}",${s.status}`).join('\n'),'text/csv')}
+const HDR=/^\s*(name|names|student|students|student name|full ?name|الاسم|اسم|الاسماء|الأسماء|اسم الطالب|اسم الطالبة|الطالب|الطلاب|اسماء الطلاب|أسماء الطلاب)\s*$/i;
+const HDR2=/(^|\s)(name|names|student|students|اسم|الاسم|اسماء|أسماء|طالب|طلاب|الطالب|الطلاب)(\s|$)/i;
+const isNm=v=>typeof v==='string'&&/[A-Za-z\u0600-\u06FF]/.test(v)&&!/^[\d\s\/\-.:]+$/.test(v)&&v.trim().length>=2&&v.trim().length<=60;
+const AD=s=>String(s??'').replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+const nn=v=>AD(v==null||v instanceof Date?'':v).trim().toLowerCase();
+const normName=s=>nn(s).replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/\s+/g,' ');
+const tidy=s=>String(s).replace(/\s+/g,' ').trim();
+const META=/^(total|totals|average|avg|mean|sum|max(imum)?( score| marks?)?|min(imum)?|out of|full marks?|date|المجموع|الاجمالي|المتوسط|الدرجه النهايه|النهايه العظمي|الدرجه العظمي|التاريخ|تاريخ|الحد الاقصي)\s*[:：]?$/i;
+const MAXR=/^(max(imum)?( score| marks?)?|out of|full marks?|الدرجه النهايه|النهايه العظمي|الدرجه العظمي|الحد الاقصي)\s*[:：]?$/i;
+const SKIPH=/total|sum|avg|average|mean|rank|%|percent|المجموع|مجموع|المتوسط|النسبه|النسبة|الترتيب|التقدير|^م\.?$|serial|^id$|phone|mobile|tel|تليفون|هاتف|موبايل|رقم|كود|code|فصل|class|group|مجموعه|مجموعة|notes?|ملاحظ|comment/i;
+const PRES=/^(p|present|pres|حاضر|حاضره|حاضرة|حضور|حضر|ح|✓|✔|✅|yes|y|true|نعم|late|متاخر|متأخر|تاخير|تأخير)$/;
+const ABS=/^(a|absent|abs|غائب|غايب|غائبه|غائبة|غياب|غ|✗|✘|x|❌|no|n|false|لا)$/;
+const EXC=/^(excused|عذر|بعذر|اجازه|اجازة|إجازة|مجاز)$/;
+function stat(v,bin){const t=nn(v);if(t==='')return null;if(bin&&t==='1')return 'Present';if(bin&&t==='0')return 'Absent';if(PRES.test(t))return 'Present';if(ABS.test(t))return 'Absent';if(EXC.test(t))return 'Excused';return undefined}
+function num(v){if(typeof v==='number')return v;if(v instanceof Date||v==null)return NaN;const t=AD(v).trim().replace(/٫/g,'.').replace(/,/g,'.').replace(/%$/,'');return /^-?\d+(\.\d+)?$/.test(t)?parseFloat(t):NaN}
+const iso=(y,m,d)=>(m<1||m>12||d<1||d>31)?null:y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+function pdate(v){if(v instanceof Date)return isNaN(v)?null:new Date(v.getTime()+432e5).toISOString().slice(0,10);
+ if(typeof v==='number')return v>30000&&v<80000?new Date(Math.round((v-25569)*864e5)).toISOString().slice(0,10):null;
+ const t=AD(v??'').trim();let m;
+ if(m=t.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})/))return iso(+m[1],+m[2],+m[3]);
+ if(m=t.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2,4})/)){let y=+m[3],d=+m[1],mo=+m[2];if(y<100)y+=2000;if(mo>12&&d<=12)[d,mo]=[mo,d];return iso(y,mo,d)}
+ if(m=t.match(/^(\d{1,2})[-\/.](\d{1,2})$/))return iso(new Date().getFullYear(),+m[2],+m[1]);
+ return null}
+const niceMax=m=>[5,10,15,20,25,30,40,50,60,100].find(x=>x>=m)||Math.ceil(m/10)*10;
+const tr=R=>{const W=Math.max(0,...R.map(r=>r.length));return Array.from({length:W},(_,c)=>R.map(r=>r[c]??''))};
+function detectCol(rows){const W=Math.max(0,...rows.map(r=>r.length));let best=0,bs=-1;
+ for(let c=0;c<W;c++){const set=new Set();let hdr=false;rows.forEach((r,i)=>{const v=r[c];if(isNm(v)&&!HDR.test(v)&&!META.test(normName(v)))set.add(normName(v));if(i<6&&typeof v==='string'&&HDR.test(v))hdr=true});
+  const sc=set.size+(hdr?1000:0);if(sc>bs){bs=sc;best=c}}return best}
+function mkItem(sn,hs,pairs,kind,date,mrv){const vals=pairs.map(p=>num(p[1])).filter(x=>!isNaN(x));
+ const m=hs.match(/(?:\/|out of|من|max\.?)\s*(\d+(?:\.\d+)?)/i)||hs.match(/\(\s*(\d+(?:\.\d+)?)\s*\)\s*$/);let mx=m?+m[1]:null;
+ if(!mx&&mrv!=null&&num(mrv)>0)mx=num(mrv);if(!mx)mx=vals.length?niceMax(Math.max(...vals)):10;
+ let title=hs.replace(/\s*[\(\[]?\s*(?:\/|out of|من|max\.?)\s*\d+(?:\.\d+)?\s*[\)\]]?\s*$/i,'').replace(/\s*\(\s*\d+(?:\.\d+)?\s*\)\s*$/,'').trim()||hs;if(/^\d+$/.test(title))title='Quiz '+title;
+ return{sheet:sn,header:hs,kind,date:date||'',label:hs,title,max:mx,pairs}}
+function analyzeSheet(sn,rows0){
+ const clean=R=>R.filter(r=>r&&r.some(v=>String(v??'').trim()!==''));
+ const isH=v=>typeof v==='string'&&(HDR.test(v)||(v.trim().length<=28&&HDR2.test(nn(v))));
+ const okName=v=>isNm(v)&&!isH(v)&&!META.test(normName(v));
+ const score=R=>{const c=detectCol(R),s=new Set();R.forEach(r=>{if(okName(r[c]))s.add(normName(r[c]))});return{c,n:s.size}};
+ let R=clean(rows0);if(R.length<2)return null;
+ const a=score(R);let c=a.c;const T=clean(tr(R)),b=T.length>1?score(T):{n:0,c:0};
+ if(b.n>a.n*1.5&&b.n>=2){R=T;c=b.c}else if(a.n<2)return null;
+ const fd=R.findIndex(r=>okName(r[c]));if(fd<0)return null;
+ let hi=-1;for(let i=fd-1;i>=0;i--){if(META.test(normName(R[i][c])))continue;if(R[i].filter(v=>String(v??'').trim()!=='').length>=2){hi=i;break}}
+ const rowsD=R.slice(fd).filter(r=>okName(r[c]));let maxRow=null,dateRow=null;
+ R.forEach(r=>{const k=normName(r[c]);if(MAXR.test(k))maxRow=r;if(/^(date|التاريخ|تاريخ)\s*[:：]?$/.test(k))dateRow=r});
+ const W=Math.max(...R.map(r=>r.length)),pairsOf=j=>rowsD.map(r=>[r[c],r[j]]),hdrOf=j=>hi>=0?R[hi][j]:'';
+ const dateAbove=j=>{for(let i=0;i<fd;i++){if(i===hi)continue;if(META.test(normName(R[i][c])))continue;const d=pdate(R[i][j]);if(d)return d}return dateRow?pdate(dateRow[j]):null};
+ const items=[],longF=rowsD.length>=6&&new Set(rowsD.map(r=>normName(r[c]))).size<rowsD.length*.6;
+ const sa=/attendance|حضور|غياب/i.test(sn),sq=/quiz|grade|mark|score|درج|امتحان|اختبار|كويز/i.test(sn);
+ if(!longF){for(let j=0;j<W;j++){if(j===c)continue;const hv=hdrOf(j),hs=String(hv instanceof Date?'':hv??'').trim(),dh=pdate(hv)||dateAbove(j);
+  const ne=rowsD.map(r=>r[j]).filter(v=>String(v??'').trim()!=='');if(ne.length<Math.max(1,Math.ceil(rowsD.length*.2)))continue;
+  const nS=ne.filter(v=>{const t=stat(v,false);return t!==undefined&&t!==null}).length,nB=ne.filter(v=>{const t=nn(v);return t==='0'||t==='1'}).length,nN=ne.filter(v=>!isNaN(num(v))).length,L=ne.length;
+  const attW=/حضور|غياب|attendance|absent|present|حاضر|غائب/i.test(hs),nums=ne.map(num).filter(x=>!isNaN(x));let kind=null;
+  if(nS/L>=.6||((nS+nB)/L>=.8&&nS>0))kind='att';
+  else if(nB/L>=.9&&(pdate(hv)||attW||(sa&&!sq)))kind='att';
+  else if(nN/L>=.7)kind=(!SKIPH.test(hs)&&Math.max(...nums)<1e5)?'quiz':'skip';
+  if(!kind)continue;
+  items.push(mkItem(sn,hs||'Column '+(j+1),pairsOf(j),kind,dh,maxRow?maxRow[j]:null))}}
+ else{const cs=[];for(let j=0;j<W;j++){if(j===c)continue;const ne=rowsD.map(r=>r[j]).filter(v=>String(v??'').trim()!=='');if(!ne.length)continue;
+   cs.push({j,dt:ne.filter(v=>pdate(v)).length/ne.length,st:ne.filter(v=>{const t=stat(v,true);return t!==undefined&&t!==null}).length/ne.length,nu:ne.filter(v=>!isNaN(num(v))).length/ne.length,dist:new Set(ne.map(nn)).size/ne.length})}
+  const dC=cs.filter(x=>x.dt>=.7).sort((x,y)=>y.dt-x.dt)[0],sC=cs.filter(x=>x.st>=.7&&x!==dC).sort((x,y)=>y.st-x.st)[0];
+  if(dC&&sC){const g={};rowsD.forEach(r=>{const d=pdate(r[dC.j]);if(d)(g[d]=g[d]||[]).push([r[c],r[sC.j]])});Object.keys(g).sort().forEach(d=>items.push(mkItem(sn,d,g[d],'att',d)))}
+  const nC=cs.filter(x=>x.nu>=.7&&x!==dC&&x!==sC&&!SKIPH.test(String(hdrOf(x.j)||''))).sort((x,y)=>y.nu-x.nu)[0],tC=cs.filter(x=>x!==dC&&x!==sC&&x!==nC&&x.nu<.5&&x.dist<=.4)[0];
+  if(nC&&(tC||dC)){const g={};rowsD.forEach(r=>{if(String(r[nC.j]??'').trim()==='')return;const k=tC?tidy(r[tC.j]):'Quiz '+(pdate(r[dC.j])||'');(g[k]=g[k]||[]).push([r[c],r[nC.j]])});Object.keys(g).forEach(k=>items.push(mkItem(sn,k,g[k],'quiz','')))}}
+ return{items,names:rowsD.map(r=>tidy(r[c]))}}
+function smSet(i,k,v){const it=impP.items[i];if(k==='max')v=+v>0?+v:it.max;it[k]=v;go()}
+function impPrev(){const P=impP,have=new Set(D.students.filter(s=>s.cls===D.curClass).map(s=>normName(s.name))),nw=P.names.filter(n=>!have.has(normName(n)));
+ const kinds=[['att','Attendance day'],['quiz','Quiz'],['skip','Ignore']];
+ const smp=it=>{const v=it.pairs.map(p=>p[1]).filter(x=>String(x??'').trim()!=='');return v.length+' values · e.g. '+v.slice(0,3).map(x=>x instanceof Date?'date':String(x)).join(', ')};
+ const flds=(it,i)=>it.kind==='att'?`<input type="date" value="${it.date||''}" aria-label="Date" onchange="smSet(${i},'date',this.value)">${it.date?'':'<div class="lb">no date found, today will be used</div>'}`
+  :it.kind==='quiz'?`<input value="${esc(it.title)}" aria-label="Quiz title" style="width:150px" onchange="smSet(${i},'title',this.value)"> <input type="number" value="${it.max}" style="width:70px" aria-label="Max score" onchange="smSet(${i},'max',this.value)"> <input type="date" value="${it.date||''}" aria-label="Date" onchange="smSet(${i},'date',this.value)">${(()=>{const bad=it.pairs.filter(p=>{const x=num(p[1]);return !isNaN(x)&&(x>it.max||x<0)}).length;return bad?`<div class="lb" style="color:var(--bad)">${bad} values above the max will be skipped</div>`:''})()}`:'';
+ return `<section><h2>SMART IMPORT — ${esc(P.file)}</h2>
+ <p><b>${P.names.length}</b> students found · <b>${nw.length}</b> new${P.names.length-nw.length?` · ${P.names.length-nw.length} already in this class (matched by name)`:''}</p>
+ <label class="row"><input type="checkbox" ${P.addNew?'checked':''} onchange="impP.addNew=this.checked;go()"> Add the new students (${nw.length})</label>
+ ${P.items.length?`<p class="lb">Check what the app detected in each column and fix it if needed.</p><div class="wrap"><table><tr><th>SHEET</th><th>COLUMN</th><th>WHAT IS IT?</th><th>DETAILS</th><th>VALUES</th></tr>${P.items.map((it,i)=>`<tr><td>${esc(it.sheet)}</td><td>${esc(it.header)}</td><td><select aria-label="Type" onchange="smSet(${i},'kind',this.value)">${kinds.map(k=>`<option value="${k[0]}" ${it.kind===k[0]?'selected':''}>${k[1]}</option>`).join('')}</select></td><td>${flds(it,i)}</td><td class="lb">${esc(smp(it))}</td></tr>`).join('')}</table></div>`:'<p class="lb">No attendance or grade columns were found, only names.</p>'}
+ <div class="row"><button class="btn pri" onclick="smCommit()">Import</button><button class="btn" onclick="impP=null;go()">Cancel</button></div></section>`}
+function smCommit(){const P=impP;let nS=0,nA=0,nQ=0,sk=0;const have=new Map(D.students.filter(s=>s.cls===D.curClass).map(s=>[normName(s.name),s]));
+ if(P.addNew)P.names.forEach(n=>{const k=normName(n);if(!have.has(k)){const st={id:uid(),name:tidy(n),code:'S'+(D.students.length+1),cls:D.curClass,status:'Active'};D.students.push(st);have.set(k,st);nS++}});
+ P.items.forEach(it=>{if(it.kind==='att'){let ses=it.date?D.sessions.find(x=>x.cls===D.curClass&&x.date===it.date):null;
+   if(!ses){ses={id:uid(),date:it.date||today(),topic:it.date?'':it.label,status:'Ended',cls:D.curClass};D.sessions.push(ses)}
+   D.att[ses.id]=D.att[ses.id]||{};it.pairs.forEach(([n,v])=>{const st=have.get(normName(n)),m=stat(v,true);if(st&&(m==='Present'||m==='Absent'))D.att[ses.id][st.id]=m});nA++}
+  else if(it.kind==='quiz'){const dt=it.date||today();let q=D.assess.find(a=>a.cls===D.curClass&&a.title===it.title&&a.date===dt);
+   if(!q){q={id:uid(),title:it.title||'Quiz',date:dt,max:it.max||10,scores:{},cls:D.curClass};D.assess.push(q)}else if(it.max>q.max)q.max=it.max;
+   it.pairs.forEach(([n,v])=>{const st=have.get(normName(n)),x=num(v);if(!st||isNaN(x))return;if(x<0||x>q.max){sk++;return}q.scores[st.id]=x});nQ++}});
+ impP=null;save();go();alert('Imported: '+nS+' new students, '+nA+' attendance days, '+nQ+' quizzes'+(sk?' ('+sk+' values skipped because they were above the max)':''))}
+async function imp(el){const f=el.files[0];if(!f)return;let sheets=[];
+ try{if(/\.xlsx?$/i.test(f.name)){if(!window.XLSX){alert('The Excel reader could not load. Check your connection, or save the sheet as CSV.');return}
+   const wb=XLSX.read(await f.arrayBuffer(),{type:'array',cellDates:true});sheets=wb.SheetNames.map(n=>({n,rows:XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:true,defval:''})}))}
+  else{const t=(await f.text()).replace(/^\ufeff/,''),d=t.includes('\t')?'\t':(t.split(';').length>t.split(',').length?';':',');sheets=[{n:f.name,rows:t.split(/\r?\n/).map(l=>l.split(d).map(x=>x.replace(/^"|"$/g,'').trim()))}]}}
+ catch(e){alert('Could not read this file');return}
+ const items=[],names=new Map();sheets.forEach(s=>{const a=analyzeSheet(s.n,s.rows);if(!a)return;a.items.forEach(x=>items.push(x));a.names.forEach(n=>{const k=normName(n);if(k&&!names.has(k))names.set(k,n)})});
+ if(!names.size){alert('No student names could be found in this file.');return}
+ impP={file:f.name,items,names:[...names.values()],addNew:true};tab='Students';pid=null;go()}
+function bak(){D.lastBackup=Date.now();dl('backup-'+today()+'.json',JSON.stringify(D),'application/json');save();go()}
+function rest(el){el.files[0].text().then(x=>{try{D=Object.assign({},DEF,JSON.parse(x.replace(/^\ufeff/,'')));fixData();save();go()}catch(e){alert('Invalid backup file')}})}
+function demo(){if(!confirm('Add fictional DEMO students?'))return;['One','Two','Three','Four'].forEach(n=>D.students.push({id:uid(),name:'[DEMO] '+n,code:'D'+n,cls:D.curClass,status:'Active',demo:true}));save();go()}
+function rmDemo(){const ids=D.students.filter(s=>s.demo).map(s=>s.id);D.students=D.students.filter(s=>!s.demo);D.events=D.events.filter(e=>!ids.includes(e.stu));D.assess.forEach(a=>ids.forEach(i=>delete a.scores[i]));save();go()}
+let barSig='',curSig='';
+function renderBar(){renderBk();renderSync();const el=document.getElementById('alertbar'),A=tab==='Alerts'?[]:alerts().filter(a=>a.k!=='pos'&&a.st==='new');curSig=A.map(a=>a.s.id+a.m).join('|');
+ if(!A.length||curSig===barSig){el.innerHTML='';return}
+ el.innerHTML=`<div class="abar" role="alert"><div style="flex:1">${A.slice(0,3).map(a=>`<div><b>${esc(a.s.name)}</b> — ${esc(a.m)}</div>`).join('')}${A.length>3?`<div>+${A.length-3} more</div>`:''}</div><button class="btn" onclick="tab='Alerts';pid=null;go()">View all</button><button class="btn" onclick="barSig=curSig;renderBar()">Dismiss</button></div>`}
+function hero(){const c=D.classes.find(x=>x.id===D.curClass),st=pid&&tab==='Students'?D.students.find(x=>x.id===pid):null;
+ document.getElementById('hero').className='';document.getElementById('hero').innerHTML=`<div class="hw"><div class="ht">${esc(t(tab))}</div></div><div class="gl"><span>${esc(c?c.name:'')}</span><b>${act().length}</b><span>students</span></div>`}
+function syncLabel(){return !saveOK?'⚠ SAVE FAILED — NOT STORED':SY.st==='synced'?'SAVED · SYNCED ☁':SY.st==='syncing'?'SYNCING…':SY.st==='error'?'SAVED ON DEVICE · SYNC ERROR (retrying)':SY.st==='noaccess'?'SAVED ON DEVICE · NO SYNC ACCESS':'SAVED ON THIS DEVICE ONLY'}
+function stTxt(){const s=document.getElementById('save');if(s)s.textContent=syncLabel()}
+function engCode(){return 'ENG-'+Math.abs([...String(SY.uid)].reduce((h,c)=>(h*31+c.charCodeAt(0))|0,7)).toString(36).toUpperCase().padStart(6,'0').slice(0,6)}
+let PERSIST=null,idbReady=false,idbT=null,tipHide=false;
+function idb(){return new Promise((res,rej)=>{const r=indexedDB.open('wt_store',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+async function idbSet(k,v){try{const d=await idb();await new Promise((res,rej)=>{const t=d.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=res;t.onerror=()=>rej(t.error)});d.close()}catch(e){}}
+async function idbGet(k){try{const d=await idb();const v=await new Promise((res,rej)=>{const q=d.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)});d.close();return v}catch(e){return undefined}}
+function idbSoon(){if(!idbReady)return;clearTimeout(idbT);idbT=setTimeout(()=>idbSet(KEY,lastSnap),600)}
+async function protectStorage(){try{if(navigator.storage&&navigator.storage.persist){PERSIST=(await navigator.storage.persisted())||(await navigator.storage.persist())}}catch(e){PERSIST=null}
+ const had=D.students.length||D.assess.length||D.sessions.length,m=await idbGet(KEY);
+ if(!had&&m){try{const x=JSON.parse(m);if(x&&((x.students||[]).length||(x.assess||[]).length)){D=Object.assign({},DEF,x);D.set=Object.assign({},DEF.set,D.set);fixData();idbReady=true;save();go();return}}catch(e){}}
+ idbReady=true;idbSoon()}
+function iosTip(){if(tipHide||typeof navigator==='undefined')return false;const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);const sa=navigator.standalone===true||(typeof matchMedia!=='undefined'&&matchMedia('(display-mode: standalone)').matches);return ios&&!sa}
+function syncSoon(){if(!SY.col||SY.conflict||SY.st==='noaccess')return;SY.dirty=true;if(!SY.first)SY.first=Date.now();clearTimeout(SY.timer);SY.timer=setTimeout(push,Date.now()-SY.first>8000?0:1500)}
+function syncNow(){if(SY.col&&!SY.conflict){SY.st=SY.st==='noaccess'?'local':SY.st;clearTimeout(SY.timer);push()}}
+async function push(){if(!SY.col||SY.busy||SY.conflict)return;SY.busy=true;SY.dirty=false;SY.first=0;SY.st='syncing';stTxt();
+ try{const j=JSON.stringify(D),ch=[];for(let i=0;i<j.length;i+=80000)ch.push(j.slice(i,i+80000));
+  for(let i=0;i<ch.length;i++){if(!SY.chunks||SY.chunks[i]!==ch[i])await SY.col.doc('p'+i).set({d:ch[i]})}
+  const ts=Date.now();await SY.col.doc('meta').set({n:ch.length,ts,by:SY.dev});
+  for(let i=ch.length;SY.chunks&&i<SY.chunks.length;i++)await SY.col.doc('p'+i).delete();
+  SY.chunks=ch;SY.ts=ts;SY.st='synced';try{localStorage.setItem('wt_sync_'+SY.uid,'1')}catch(e){}}
+ catch(e){if(e&&e.code==='invalid_argument'&&!SY.chunks)SY.st='noaccess';else{SY.st='error';SY.dirty=true;clearTimeout(SY.timer);SY.timer=setTimeout(push,8000)}}
+ SY.busy=false;if(SY.dirty&&SY.st!=='error')syncSoon();stTxt();renderSync()}
+async function pull(meta){const parts=[];for(let i=0;i<meta.n;i++){const d=await SY.col.doc('p'+i).get();if(!d.exists)throw new Error('missing');parts.push(d.data().d)}
+ D=Object.assign({},DEF,JSON.parse(parts.join('')));D.set=Object.assign({},DEF.set,D.set);fixData();
+ SY.ts=meta.ts;SY.chunks=parts;undoStack=[];lastSnap=JSON.stringify(D);try{localStorage.setItem(KEY,lastSnap);localStorage.setItem('wt_sync_'+SY.uid,'1')}catch(e){}SY.st='synced';stTxt();go()}
+function subscribeSync(){if(SY.unsub)return;SY.unsub=SY.col.doc('meta').onSnapshot(s=>{if(!s.exists)return;const m=s.data();if(m.ts>SY.ts&&m.by!==SY.dev&&!SY.dirty&&!SY.busy)pull(m).catch(()=>{})},()=>{})}
+async function initSync(){if(STANDALONE)return;try{if(typeof claude==='undefined'||!claude.use){SY.off=true;renderSync();return}const[db,user]=await Promise.all([claude.use('db'),claude.use('user')]);if(!db||!user){SY.off=true;renderSync();return}const uid=await user.id();if(!uid){SY.off=true;renderSync();return}
+ SY.uid=uid;SY.col=db.collection('data/users/'+uid);const m=await SY.col.doc('meta').get();
+ if(m.exists){const localHas=D.students.length>0||D.assess.length>0||D.sessions.length>0;let synced=false;try{synced=!!localStorage.getItem('wt_sync_'+uid)}catch(e){}
+  if(localHas&&!synced){SY.conflict=m.data();SY.st='local';stTxt();renderSync();return}
+  await pull(m.data())}
+ else{SY.st='local';await push()}
+ subscribeSync();stTxt()}catch(e){SY.st='local';stTxt()}}
+async function useCloud(){const m=SY.conflict;SY.conflict=null;try{localStorage.setItem('wt_prev_local',JSON.stringify(D))}catch(e){}try{await pull(m);subscribeSync()}catch(e){SY.st='error'}renderSync()}
+async function useLocal(){SY.conflict=null;SY.chunks=null;await push();subscribeSync();renderSync()}
+function renderSync(){const el=document.getElementById('synbar');if(!el)return;
+ el.innerHTML=SY.conflict?`<div class="abar bk" role="status"><div style="flex:1">Your account already has cloud data. Which one do you want to keep?</div><button class="btn pri" onclick="useCloud()">Use cloud data</button><button class="btn" onclick="useLocal()">Replace cloud with this device</button></div>`:SY.st==='noaccess'?`<div class="abar bk" role="status"><div style="flex:1">Sync is unavailable for your access level, so data stays on this device. Ask the owner to share this page with you as a Contributor.</div></div>`:(!STANDALONE&&SY.off&&!SY.offHide?`<div class="abar bk" role="status"><div style="flex:1">You are not signed in to claude.ai, so your data is saved on this device only. Sign in with your account and reopen this link to use it on your phone and laptop.</div><button class="btn" onclick="SY.offHide=true;renderSync()">OK</button></div>`:(iosTip()?`<div class="abar bk" role="status"><div style="flex:1">On iPhone, Safari can erase a website's data after about a week without opening it. To keep your data safe, add this page to your Home Screen (Share, then Add to Home Screen) and open it from there.</div><button class="btn" onclick="tipHide=true;renderSync()">OK</button></div>`:''))}
+// ---- shell ----
+function go(keep){document.getElementById('nav').innerHTML=tabs.map(x=>`<button aria-current="${x===tab}" onclick="tab='${x}';q='';pid=null;go()">${t(x)}</button>`).join('');
+ const f=document.activeElement,pos=f&&f.selectionStart;document.getElementById('app').innerHTML=V[tab]();document.getElementById('app').setAttribute('data-ok','1');document.documentElement.dir=D.set.lang==='ar'?'rtl':'ltr';document.getElementById('cls').innerHTML=D.classes.map(c=>`<option value="${c.id}" ${c.id===D.curClass?'selected':''}>${esc(c.name)}</option>`).join('')+'<option value="__new">+ Add class</option>';hero();renderBar();
+ if(keep&&f&&f.placeholder==='Search'){const i=document.querySelector('input[placeholder="Search"]');if(i){i.focus();i.setSelectionRange(pos,pos)}}}
+document.getElementById('lang').onclick=()=>{D.set.lang=D.set.lang==='ar'?'en':'ar';save();go()};
+document.addEventListener('keydown',e=>{
+ if(e.key==='z'&&(e.ctrlKey||e.metaKey)&&!/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)){e.preventDefault();globalUndo();return}
+ if(e.key!=='Enter')return;const el=e.target;if(!/^(INPUT|SELECT)$/.test(el.tagName)||el.type==='file'||el.type==='checkbox'||el.dataset.enter)return;
+ e.preventDefault();const sc=el.closest('.list')||document.getElementById('app');const f=[...sc.querySelectorAll('input:not([type=file]):not([type=checkbox]):not(:disabled),select')],i=f.indexOf(el),n=f[i+1]||el;if(n===el){el.blur();return}n.focus();if(n.select&&n.type!=='date')n.select()});
+D.students.forEach(s=>s.status='Active');
+fixData();
+document.getElementById('undoAll').onclick=globalUndo;
+const cs=document.getElementById('cls'),nc=document.getElementById('newcls');
+cs.onchange=function(){if(this.value==='__new'){cs.hidden=true;nc.hidden=false;nc.value='';nc.focus();return}D.curClass=this.value;pid=null;save();go()};
+const done=()=>{nc.hidden=true;cs.hidden=false;go()};
+nc.onkeydown=e=>{if(e.key==='Escape'){done();return}if(e.key!=='Enter')return;e.preventDefault();const n=nc.value.trim();if(!n){done();return}
+ if(D.classes.some(c=>c.name.toLowerCase()===n.toLowerCase())){alert('Class name already exists');return}
+ const c={id:uid(),name:n};D.classes.push(c);D.curClass=c.id;pid=null;tab='Students';save();nc.hidden=true;cs.hidden=false;go()};
+nc.onblur=()=>{if(!nc.hidden)done()};
+save();go();
+initSync();
+protectStorage();
+</script></body></html>

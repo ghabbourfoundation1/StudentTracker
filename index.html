@@ -275,23 +275,58 @@ const wbBlob=wb=>new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:
 const xlsxBlob=()=>wbBlob(buildXlsx());
 const pc=v=>v==null?'':Math.round(v*10)/10,slab=x=>x.date+(x.topic?' '+x.topic:''),cname=id=>(D.classes.find(c=>c.id===id)||{}).name||'',okv=v=>v!==undefined&&v!==''&&v!==null;
 const addSheet=(wb,n,rows,w)=>{const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=w||Array.from({length:Math.max(1,...rows.map(r=>r.length))},(_,i)=>({wch:i===1?26:14}));XLSX.utils.book_append_sheet(wb,ws,n)};
+// shared look for the Excel exports (same design as the student sheet)
+function xk(){const BD={style:'thin',color:{rgb:'B7C2BC'}},BR={top:BD,bottom:BD,left:BD,right:BD},fl=c=>({patternType:'solid',fgColor:{rgb:c}}),AL='left',
+ ST={
+  title:{font:{bold:true,sz:20,color:{rgb:'FFFFFF'}},fill:fl('193129'),alignment:{horizontal:'center',vertical:'center'}},
+  sec:{font:{bold:true,sz:12,color:{rgb:'193129'}},fill:fl('CFE3D6'),alignment:{horizontal:AL,vertical:'center'},border:BR},
+  th:{font:{bold:true,color:{rgb:'FFFFFF'}},fill:fl('193129'),alignment:{horizontal:'center',vertical:'center',wrapText:true},border:BR},
+  lab:{font:{bold:true},fill:fl('EEF3F0'),alignment:{horizontal:AL,vertical:'center',wrapText:true},border:BR},
+  val:{alignment:{horizontal:AL,vertical:'center',wrapText:true},border:BR},
+  cen:{alignment:{horizontal:'center',vertical:'center',wrapText:true},border:BR}
+ };
+ return{ST,fl,
+  tf:p=>p==null?null:p>=D.set.hi?'C6EFCE':p>=D.set.mid?'FFEB9C':'FFC7CE',
+  cs:(base,fill,bold)=>Object.assign({},base,fill?{fill:fl(fill)}:{},bold?{font:Object.assign({},base.font||{},{bold:true})}:{}),
+  C:(v,sty,z)=>{const o={v:v==null?'':v,t:typeof v==='number'?'n':'s'};if(sty)o.s=sty;if(z&&typeof v==='number')o.z=z;return o},
+  PCT:'0.0"%"',PCT0:'0"%"',
+  span:(v,sty,n)=>[{v:v==null?'':v,t:typeof v==='number'?'n':'s',s:sty}].concat(Array.from({length:n-1},()=>({v:'',t:'s',s:sty}))),
+  len:v=>String(v==null?'':v).length,
+  mkws:(rows,w,mg,hs)=>{const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=w.map(x=>({wch:x}));if(mg&&mg.length)ws['!merges']=mg;if(hs)ws['!rows']=rows.map((_,i)=>hs[i]||{});return ws}}}
 function buildXlsx(){const wb=XLSX.utils.book_new(),S=act(),ss=D.sessions.filter(x=>x.cls===D.curClass).sort((a,b)=>a.date.localeCompare(b.date)),Q=D.assess.filter(a=>a.cls===D.curClass).sort((a,b)=>a.date.localeCompare(b.date)),R=liveRows('all');
+ const{ST,tf,cs,C,PCT,PCT0,span,len,mkws}=xk();
+ // ---- sheet 1: Class data (same columns as before) ----
  const head=['#','Name'].concat(ss.map(slab),['Present','Absent','Attendance %'],Q.map(a=>a.title+' (/'+a.max+')'),['Quiz avg %','Live points']);
- addSheet(wb,'Class data',[head].concat(S.map((s,i)=>{const m=ss.map(x=>{const v=(D.att[x.id]||{})[s.id]||'';return v==='Late'?'Present':v==='Excused'?'':v}),a=attStats(s.id),r=R.find(x=>x.s.id===s.id)||{net:0};
-  return[i+1,s.name].concat(m,[m.filter(v=>v==='Present').length,m.filter(v=>v==='Absent').length,a.pct==null?'':Math.round(a.pct)],Q.map(q=>okv(q.scores[s.id])?q.scores[s.id]:''),[pc(avg(results(s.id))),r.net])})));
+ const body=S.map((s,i)=>{const m=ss.map(x=>{const v=(D.att[x.id]||{})[s.id]||'';return v==='Late'?'Present':v==='Excused'?'':v}),a=attStats(s.id),r=R.find(x=>x.s.id===s.id)||{net:0},qa=avg(results(s.id));
+  return[C(i+1,ST.cen),C(s.name,ST.val)].concat(m.map(v=>C(v,cs(ST.cen,v==='Present'?'C6EFCE':v==='Absent'?'FFC7CE':null))),
+   [C(m.filter(v=>v==='Present').length,ST.cen),C(m.filter(v=>v==='Absent').length,ST.cen),C(a.pct==null?'':Math.round(a.pct),ST.cen,PCT0)],
+   Q.map(q=>{const v=q.scores[s.id],ok=okv(v);return C(ok?v:'',cs(ST.cen,ok?tf(100*v/q.max):null))}),
+   [C(qa==null?'':pc(qa),cs(ST.cen,tf(qa),true),PCT),C(r.net,ST.cen)])});
+ const nc=head.length,w0=[5,26].concat(ss.map(()=>14),[10,10,14],Q.map(()=>16),[14,14]),ws0=mkws([head.map(x=>C(x,ST.th))].concat(body),w0,null,{0:{hpt:44}});
+ ws0['!autofilter']={ref:XLSX.utils.encode_range({s:{r:0,c:0},e:{r:Math.max(1,body.length),c:nc-1}})};XLSX.utils.book_append_sheet(wb,ws0,'Class data');
+ // ---- sheet 2: Dashboard (same rows and order as before) ----
  const W=S.map(s=>({s,m:avg(results(s.id))})),G=W.filter(x=>x.m!=null).sort((a,b)=>b.m-a.m),all=Q.flatMap(q=>S.map(s=>q.scores[s.id]).filter(okv).map(v=>100*v/q.max)),at=S.map(s=>attStats(s.id).pct).filter(x=>x!=null),tc={High:0,Medium:0,Low:0};G.forEach(x=>tc[tier(x.m)[0]]++);
- const rows=[],P=(...r)=>rows.push(r),B=()=>rows.push(['']);
- P('CLASS DASHBOARD');P('Class',cname(D.curClass));P('Date',today());B();P('Students',S.length);P('Quizzes',Q.length);P('Sessions',ss.length);P('Class quiz average %',all.length?pc(all.reduce((a,b)=>a+b,0)/all.length):'');P('Attendance %',at.length?Math.round(at.reduce((a,b)=>a+b,0)/at.length):'');B();
- P('PERFORMANCE LEVELS');P('Level','Students');P('High',tc.High);P('Medium',tc.Medium);P('Low',tc.Low);P('Not graded',S.length-G.length);B();
- P('QUIZZES');P('Quiz','Date','Max','Graded','Average %','Highest %','Lowest %','Pass rate %');
- Q.forEach(q=>{const p=S.map(s=>q.scores[s.id]).filter(okv).map(v=>100*v/q.max);P(q.title,q.date,q.max,p.length,p.length?pc(p.reduce((a,b)=>a+b,0)/p.length):'',p.length?pc(Math.max(...p)):'',p.length?pc(Math.min(...p)):'',p.length?Math.round(100*p.filter(x=>x>=D.set.mid).length/p.length):'')});B();
- P('ATTENDANCE PER DAY');P('Day','Present','Absent','Not recorded','Present %');
- ss.forEach(x=>{const m=D.att[x.id]||{},p=S.filter(s=>m[s.id]==='Present'||m[s.id]==='Late').length,ab=S.filter(s=>m[s.id]==='Absent').length;P(slab(x),p,ab,S.length-p-ab,p+ab?Math.round(100*p/(p+ab)):'')});B();
- P('TOP 5 (quiz average)');P('#','Name','Average %');G.slice(0,5).forEach((x,i)=>P(i+1,x.s.name,pc(x.m)));B();
- P('BOTTOM 5 (quiz average)');P('#','Name','Average %');G.slice(-5).reverse().forEach((x,i)=>P(i+1,x.s.name,pc(x.m)));B();
- P('NEEDS ATTENTION');alerts().filter(a=>a.k!=='pos'&&a.st!=='resolved').forEach(a=>P(a.s.name,a.m));B();
- const L=R.filter(r=>r.n>0).sort((a,b)=>b.net-a.net);P('LIVE POINTS (separate from quiz scores)');P('#','Name','Bonus','Penalty','Net');L.slice(0,5).forEach((r,i)=>P(i+1,r.s.name,r.b,r.p,r.net));P('No interaction',R.filter(r=>r.n===0).map(r=>r.s.name).join(', '));
- addSheet(wb,'Dashboard',rows,[{wch:30},{wch:16},{wch:12},{wch:12},{wch:12},{wch:12},{wch:12},{wch:12}]);return wb}
+ const NC=8,rows=[],mg=[],hs={},Rw=(cells,h)=>{rows.push(cells);if(h)hs[rows.length-1]={hpt:h}},M=(c,n)=>mg.push({s:{r:rows.length-1,c},e:{r:rows.length-1,c:c+n-1}}),
+ B=()=>Rw([C('')]),sec=t=>{Rw(span(t,ST.sec,NC),22);M(0,NC)},kv=(k,v,z)=>Rw([C(k,ST.lab),C(v,ST.val,z)],20),
+ th=(...h)=>Rw(h.map(x=>C(x,ST.th)),24),
+ lv={High:'C6EFCE',Medium:'FFEB9C',Low:'FFC7CE'};
+ Rw(span('CLASS DASHBOARD',ST.title,NC),36);M(0,NC);kv('Class',cname(D.curClass));kv('Date',today());B();
+ kv('Students',S.length);kv('Quizzes',Q.length);kv('Sessions',ss.length);kv('Class quiz average %',all.length?pc(all.reduce((a,b)=>a+b,0)/all.length):'',PCT);kv('Attendance %',at.length?Math.round(at.reduce((a,b)=>a+b,0)/at.length):'',PCT0);B();
+ sec('PERFORMANCE LEVELS');th('Level','Students');
+ ['High','Medium','Low'].forEach(k=>Rw([C(k,cs(ST.lab,lv[k])),C(tc[k],ST.cen)]));Rw([C('Not graded',ST.lab),C(S.length-G.length,ST.cen)]);B();
+ sec('QUIZZES');th('Quiz','Date','Max','Graded','Average %','Highest %','Lowest %','Pass rate %');
+ Q.forEach(q=>{const p=S.map(s=>q.scores[s.id]).filter(okv).map(v=>100*v/q.max),av=p.length?pc(p.reduce((a,b)=>a+b,0)/p.length):'',hi=p.length?pc(Math.max(...p)):'',lo=p.length?pc(Math.min(...p)):'';
+  Rw([C(q.title,ST.val),C(q.date,ST.cen),C(q.max,ST.cen),C(p.length,ST.cen),C(av,cs(ST.cen,tf(av===''?null:av)),PCT),C(hi,cs(ST.cen,tf(hi===''?null:hi)),PCT),C(lo,cs(ST.cen,tf(lo===''?null:lo)),PCT),C(p.length?Math.round(100*p.filter(x=>x>=D.set.mid).length/p.length):'',ST.cen,PCT0)])});B();
+ sec('ATTENDANCE PER DAY');th('Day','Present','Absent','Not recorded','Present %');
+ ss.forEach(x=>{const m=D.att[x.id]||{},p=S.filter(s=>m[s.id]==='Present'||m[s.id]==='Late').length,ab=S.filter(s=>m[s.id]==='Absent').length;
+  Rw([C(slab(x),ST.val),C(p,cs(ST.cen,p?'C6EFCE':null)),C(ab,cs(ST.cen,ab?'FFC7CE':null)),C(S.length-p-ab,ST.cen),C(p+ab?Math.round(100*p/(p+ab)):'',ST.cen,PCT0)])});B();
+ sec('TOP 5 (quiz average)');th('#','Name','Average %');G.slice(0,5).forEach((x,i)=>Rw([C(i+1,ST.cen),C(x.s.name,ST.val),C(pc(x.m),cs(ST.cen,tf(x.m)),PCT)]));B();
+ sec('BOTTOM 5 (quiz average)');th('#','Name','Average %');G.slice(-5).reverse().forEach((x,i)=>Rw([C(i+1,ST.cen),C(x.s.name,ST.val),C(pc(x.m),cs(ST.cen,tf(x.m)),PCT)]));B();
+ sec('NEEDS ATTENTION');alerts().filter(a=>a.k!=='pos'&&a.st!=='resolved').forEach(a=>{Rw([C(a.s.name,ST.val)].concat(span(a.m,ST.val,NC-1)),Math.max(20,16*Math.ceil(len(a.m)/80)));M(1,NC-1)});B();
+ const L2=R.filter(r=>r.n>0).sort((a,b)=>b.net-a.net);sec('LIVE POINTS (separate from quiz scores)');th('#','Name','Bonus','Penalty','Net');
+ L2.slice(0,5).forEach((r,i)=>Rw([C(i+1,ST.cen),C(r.s.name,ST.val),C(r.b,ST.cen),C(r.p,ST.cen),C(r.net,ST.cen)]));
+ const ni=R.filter(r=>r.n===0).map(r=>r.s.name).join(', ');Rw([C('No interaction',ST.lab)].concat(span(ni,ST.val,NC-1)),Math.max(20,16*Math.ceil(len(ni)/80)));M(1,NC-1);
+ XLSX.utils.book_append_sheet(wb,mkws(rows,[30,16,12,12,12,12,12,12],mg,hs),'Dashboard');return wb}
 // ---- student Excel: organised + styled (uses xlsx-js-style when it loads; falls back to plain cells otherwise) ----
 let xsTried=false;
 async function loadStyledXlsx(){if(xsTried)return;xsTried=true;await new Promise(r=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js';s.onload=r;s.onerror=r;document.head.appendChild(s)})}
@@ -339,6 +374,11 @@ function buildStuXlsx(id){const wb=XLSX.utils.book_new(),s=D.students.find(x=>x.
  kv(L('Name','الاسم'),s.name);kv(L('Student ID','رقم الطالب'),s.sid||'—');kv(L('Record code','كود السجل'),s.code||'—');kv(L('Class','الفصل'),cname(s.cls));kv(L('Group','المجموعة'),s.grp||'—');
  // quizzes summary line
  kv(L('Quizzes graded','الكويزات المصححة'),r.length+' / '+Q.length);
+ // all quiz grades
+ sec(L('QUIZ GRADES','درجات الكويزات'));
+ R([L('Quiz','الكويز'),L('Date','التاريخ'),L('Score','الدرجة'),L('Max','من'),'%'].map(x=>C(x,ST.th)),22);
+ if(!Q.length){R(span(L('No quizzes yet','لا توجد كويزات بعد'),ST.val,NC),20);M(0,NC)}
+ Q.forEach(q=>{const v=q.scores[id],ok=okv(v),p=ok?100*v/q.max:null;R([C(q.title,ST.val),C(q.date,ST.cen),C(ok?v:'—',ST.cen),C(q.max,ST.cen),C(ok?pc(p):'—',cs(ST.cen,tf(p),true),PCT)],20)});
  // attendance
  const exc=ss.filter(x=>(D.att[x.id]||{})[id]==='Excused').length;
  sec(L('ATTENDANCE','الحضور'));
@@ -389,14 +429,14 @@ function buildStuXlsx(id){const wb=XLSX.utils.book_new(),s=D.students.find(x=>x.
  if(ARB)wb.Workbook={Views:[{RTL:true}]};
  return wb}
 async function exportStu(id){await loadStyledXlsx();if(!window.XLSX){toast('The Excel library did not load. Check your connection and try again.','err');return}const s=D.students.find(x=>x.id===id);if(!s)return;try{const fn=fname(s.name)+'_Student_Data.xlsx';const ok=await dl(fn,wbBlob(buildStuXlsx(id)),'');toast(ok?'Saved '+fn:'Export was cancelled','ok')}catch(e){toast('Excel export failed: '+(e&&e.message||e),'err')}}
-function mergeXlsx(el){const f=el.files[0];if(!f)return;if(!window.XLSX){alert('The Excel library did not load. Check your connection and try again.');return}
+async function mergeXlsx(el){const f=el.files[0];if(!f)return;await loadStyledXlsx();if(!window.XLSX){alert('The Excel library did not load. Check your connection and try again.');return}
  f.arrayBuffer().then(b=>{const old=XLSX.read(b,{type:'array'}),nw=buildXlsx();
   old.SheetNames.filter(n=>/^(Quiz - .*|Students|Attendance|Live points|Quizzes|Practical skills)$/.test(n)).forEach(n=>{delete old.Sheets[n]});old.SheetNames=old.SheetNames.filter(n=>!/^(Quiz - .*|Students|Attendance|Live points|Quizzes|Practical skills)$/.test(n));
   nw.SheetNames.forEach(n=>{if(!old.Sheets[n])old.SheetNames.push(n);old.Sheets[n]=nw.Sheets[n]});
   dl(f.name.replace(/\.xls$/i,'.xlsx'),new Blob([XLSX.write(old,{bookType:'xlsx',type:'array'})],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),'');el.value=''}).catch(()=>alert('Could not read this file'))}
-function exportXlsx(silent){if(!window.XLSX){if(!silent)alert('The Excel library did not load. Check your connection and try again.');return}
+async function exportXlsx(silent){await loadStyledXlsx();if(!window.XLSX){if(!silent)alert('The Excel library did not load. Check your connection and try again.');return}
  const c=D.classes.find(x=>x.id===D.curClass);dl('workshop-'+(c?c.name.replace(/[^\w\u0600-\u06FF]+/g,'_'):'class')+'.xlsx',xlsxBlob(),'')}
-async function writeFH(){if(!FH||!window.XLSX)return;const w=await FH.createWritable();await w.write(xlsxBlob());await w.close()}
+async function writeFH(){if(!FH)return;await loadStyledXlsx();if(!window.XLSX)return;const w=await FH.createWritable();await w.write(xlsxBlob());await w.close()}
 function fhSoon(){if(!FH)return;clearTimeout(fhTimer);fhTimer=setTimeout(()=>writeFH().catch(()=>{FH=null}),3000)}
 async function linkFile(){try{if(!window.showSaveFilePicker)throw 0;FH=await showSaveFilePicker({suggestedName:'workshop-data.xlsx',types:[{description:'Excel',accept:{'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':['.xlsx']}}]});await writeFH();alert('Linked. The file updates automatically a few seconds after every change while this page is open. After reopening the page, link it again.')}
  catch(e){FH=null;if(e&&e.name==='AbortError')return;alert('This browser does not allow linking a file here. It works on Chrome or Edge on a laptop. Use "Export to Excel" instead.')}}

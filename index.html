@@ -292,24 +292,103 @@ function buildXlsx(){const wb=XLSX.utils.book_new(),S=act(),ss=D.sessions.filter
  P('NEEDS ATTENTION');alerts().filter(a=>a.k!=='pos'&&a.st!=='resolved').forEach(a=>P(a.s.name,a.m));B();
  const L=R.filter(r=>r.n>0).sort((a,b)=>b.net-a.net);P('LIVE POINTS (separate from quiz scores)');P('#','Name','Bonus','Penalty','Net');L.slice(0,5).forEach((r,i)=>P(i+1,r.s.name,r.b,r.p,r.net));P('No interaction',R.filter(r=>r.n===0).map(r=>r.s.name).join(', '));
  addSheet(wb,'Dashboard',rows,[{wch:30},{wch:16},{wch:12},{wch:12},{wch:12},{wch:12},{wch:12},{wch:12}]);return wb}
+// ---- student Excel: organised + styled (uses xlsx-js-style when it loads; falls back to plain cells otherwise) ----
+let xsTried=false;
+async function loadStyledXlsx(){if(xsTried)return;xsTried=true;await new Promise(r=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js';s.onload=r;s.onerror=r;document.head.appendChild(s)})}
 function buildStuXlsx(id){const wb=XLSX.utils.book_new(),s=D.students.find(x=>x.id===id),ss=D.sessions.filter(x=>x.cls===s.cls).sort((a,b)=>a.date.localeCompare(b.date)),Q=D.assess.filter(a=>a.cls===s.cls).sort((a,b)=>a.date.localeCompare(b.date)),
- r=results(id),m=avg(r),tr=trend(id),a=attStats(id),sk=skillLatest(id),R=liveRows('all'),me=R.find(x=>x.s.id===id)||{b:0,p:0,net:0,n:0},
- G=act().map(x=>({x,m:avg(results(x.id))})).filter(x=>x.m!=null).sort((p,q)=>q.m-p.m),rk=G.filter(x=>x.m>(m??-1)).length+1,lr=R.filter(x=>x.net>me.net).length+1;
- const rows=[],P=(...q)=>rows.push(q),B=()=>rows.push(['']);
- P('STUDENT DASHBOARD');P('Name',s.name);P('Student ID',s.sid||'');P('Record code',s.code||'');P('Class',cname(s.cls));P('Group',s.grp||'');P('Date',today());B();
- P('Quiz average %',pc(m));P('Level',m==null?'':tier(m)[0]);P('Trend',tr.c);P('Quizzes graded',r.length+' of '+Q.length);P('Rank in class (quiz average)',m==null?'':rk+' of '+G.length);B();
- const exc=ss.filter(x=>(D.att[x.id]||{})[id]==='Excused').length;P('Total recorded sessions',a.tot);P('Present sessions',a.tot-a.ab);P('Absent sessions',a.ab);P('Not recorded (not counted)',ss.length-a.tot-exc);P('Attendance % (recorded sessions only)',a.pct==null?'':pc(a.pct));B();
- P('LIVE POINTS (separate from quiz scores)');P('Net',me.net);P('Bonus',me.b);P('Penalty',me.p);P('Rank in class',me.n?lr+' of '+R.length:'No interaction yet');B();
- P('PRACTICAL SKILLS (1-10)');P('Skill','Rating','Note');D.skills.filter(k=>!k.arch&&k.cls===s.cls).forEach(k=>P(k.name,sk[k.id]??'',(D.skillNotes||{})[id+'_'+k.id]||''));B();
- P('ALERTS');alerts(id).filter(x=>x.st!=='resolved').forEach(x=>P(x.sev,x.m));B();
- P('DEVELOPMENT PLANS');P('Title','Status','Due','Target','Note');D.plans.filter(p=>p.stu===id).forEach(p=>P(p.title,p.status,p.due||'',p.target||'',p.note||''));
- if(s.notes){B();P('NOTES',s.notes)}
- addSheet(wb,'Dashboard',rows,[{wch:34},{wch:18},{wch:14},{wch:22},{wch:26}]);
- addSheet(wb,'Attendance',[['Date','Topic','Status']].concat(ss.map(x=>{const v=(D.att[x.id]||{})[id]||'';return[x.date,x.topic||'',v==='Late'?'Present':v==='Excused'?'Excused':v||'Not Recorded']})),[{wch:14},{wch:24},{wch:12}]);
- addSheet(wb,'Quizzes',[['Quiz','Date','Score','Max','%','Status']].concat(Q.map(q=>{const v=q.scores[id];return[q.title,q.date,okv(v)?v:'',q.max,okv(v)?pc(100*v/q.max):'',okv(v)?'Graded':'Not graded']})),[{wch:26},{wch:14},{wch:10},{wch:10},{wch:10},{wch:14}]);
- addSheet(wb,'Skills',[['Skill','Latest rating (1-10)','Note']].concat(D.skills.filter(k=>!k.arch&&k.cls===s.cls).map(k=>[k.name,sk[k.id]??'',(D.skillNotes||{})[id+'_'+k.id]||''])).concat([[''],['Evaluation history'],['Skill','Rating','Date']]).concat(D.skillAssess.filter(x=>x.stu===id).slice().sort((p,q)=>p.ts-q.ts).map(x=>[(D.skills.find(k=>k.id===x.skill)||{}).name||'',x.lvl,new Date(x.ts).toISOString().slice(0,10)])),[{wch:28},{wch:20},{wch:30}]);
+ r=results(id),m=avg(r),tr=trend(id),a=attStats(id),sk=skillLatest(id),R0=liveRows('all'),me=R0.find(x=>x.s.id===id)||{b:0,p:0,net:0,n:0},
+ G=act().map(x=>({x,m:avg(results(x.id))})).filter(x=>x.m!=null).sort((p,q)=>q.m-p.m),rk=G.filter(x=>x.m>(m??-1)).length+1,lr=R0.filter(x=>x.net>me.net).length+1;
+ const ARB=D.set.lang==='ar',L=(e,x)=>ARB?x:e,
+ VV={Present:'حاضر',Absent:'غائب',Excused:'بعذر','Not Recorded':'غير مسجل',High:'مرتفع',Medium:'متوسط',Low:'منخفض',Improving:'في تحسن',Declining:'في تراجع',Stable:'مستقر','Insufficient Data':'بيانات غير كافية',Active:'جاري',Positive:'إيجابي'},
+ tv=x=>ARB&&VV[x]?VV[x]:x,AL=ARB?'right':'left',
+ BD={style:'thin',color:{rgb:'B7C2BC'}},BR={top:BD,bottom:BD,left:BD,right:BD},
+ fl=c=>({patternType:'solid',fgColor:{rgb:c}}),
+ ST={
+  title:{font:{bold:true,sz:20,color:{rgb:'FFFFFF'}},fill:fl('193129'),alignment:{horizontal:'center',vertical:'center'}},
+  sub:{font:{sz:11,color:{rgb:'FFFFFF'}},fill:fl('2F5D4B'),alignment:{horizontal:'center',vertical:'center'}},
+  sec:{font:{bold:true,sz:12,color:{rgb:'193129'}},fill:fl('CFE3D6'),alignment:{horizontal:AL,vertical:'center'},border:BR},
+  th:{font:{bold:true,color:{rgb:'FFFFFF'}},fill:fl('193129'),alignment:{horizontal:'center',vertical:'center',wrapText:true},border:BR},
+  lab:{font:{bold:true},fill:fl('EEF3F0'),alignment:{horizontal:AL,vertical:'center',wrapText:true},border:BR},
+  val:{alignment:{horizontal:AL,vertical:'center',wrapText:true},border:BR},
+  cen:{alignment:{horizontal:'center',vertical:'center',wrapText:true},border:BR},
+  kl:{font:{bold:true,sz:10,color:{rgb:'4A5A52'}},fill:fl('EEF3F0'),alignment:{horizontal:'center',vertical:'center',wrapText:true},border:BR},
+  kv:{font:{bold:true,sz:16},alignment:{horizontal:'center',vertical:'center'},border:BR}
+ },
+ tf=p=>p==null?null:p>=D.set.hi?'C6EFCE':p>=D.set.mid?'FFEB9C':'FFC7CE',
+ cs=(base,fill,bold)=>Object.assign({},base,fill?{fill:fl(fill)}:{},bold?{font:Object.assign({},base.font||{},{bold:true})}:{}),
+ C=(v,sty,z)=>{const o={v:v==null?'':v,t:typeof v==='number'?'n':'s'};if(sty)o.s=sty;if(z&&typeof v==='number')o.z=z;return o},
+ PCT='0.0"%"',
+ span=(v,sty,n,z)=>[C(v,sty,z)].concat(Array.from({length:n-1},()=>C('',sty))),
+ len=v=>String(v==null?'':v).length,
+ mkws=(rows,w,mg,hs)=>{const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=w.map(x=>({wch:x}));if(mg&&mg.length)ws['!merges']=mg;if(hs)ws['!rows']=rows.map((_,i)=>hs[i]||{});return ws};
+ const NC=5,W1=[28,22,22,22,34],rows=[],mg=[],hs={};
+ const R=(cells,h)=>{rows.push(cells);if(h)hs[rows.length-1]={hpt:h}},M=(c,n)=>mg.push({s:{r:rows.length-1,c},e:{r:rows.length-1,c:c+n-1}}),
+ blank=()=>R([C('')]),
+ sec=t=>{blank();R(span(t,ST.sec,NC),22);M(0,NC)},
+ kv=(k,v,z,fill)=>{R([C(k,ST.lab)].concat(span(v,fill?cs(ST.val,fill):ST.val,NC-1,z)),20);M(1,NC-1)};
+ // title block
+ R(span(s.name,ST.title,NC),36);M(0,NC);
+ R(span(L('Student dashboard','لوحة بيانات الطالب')+'  ·  '+cname(s.cls)+'  ·  '+today(),ST.sub,NC),20);M(0,NC);
+ // key numbers (cards)
+ sec(L('KEY NUMBERS','الملخص السريع'));
+ const trf={Improving:'C6EFCE',Declining:'FFC7CE',Stable:'FFEB9C'}[tr.c]||null;
+ R([L('Quiz average','متوسط الكويزات'),L('Level','المستوى'),L('Trend','الاتجاه'),L('Attendance','نسبة الحضور'),L('Rank in class','الترتيب في الفصل')].map(x=>C(x,ST.kl)),24);
+ R([C(m==null?'—':pc(m),cs(ST.kv,tf(m)),PCT),C(m==null?'—':tv(tier(m)[0]),cs(ST.kv,tf(m))),C(tv(tr.c),cs(ST.kv,trf)),C(a.pct==null?'—':pc(a.pct),ST.kv,PCT),C(m==null?'—':rk+' / '+G.length,ST.kv)],32);
+ // student info
+ sec(L('STUDENT INFO','بيانات الطالب'));
+ kv(L('Name','الاسم'),s.name);kv(L('Student ID','رقم الطالب'),s.sid||'—');kv(L('Record code','كود السجل'),s.code||'—');kv(L('Class','الفصل'),cname(s.cls));kv(L('Group','المجموعة'),s.grp||'—');
+ // quizzes summary line
+ kv(L('Quizzes graded','الكويزات المصححة'),r.length+' / '+Q.length);
+ // attendance
+ const exc=ss.filter(x=>(D.att[x.id]||{})[id]==='Excused').length;
+ sec(L('ATTENDANCE','الحضور'));
+ kv(L('Recorded sessions','الحصص المسجلة'),a.tot);kv(L('Present','حاضر'),a.tot-a.ab);kv(L('Absent','غائب'),a.ab,null,a.ab?'FFC7CE':null);kv(L('Excused (not counted)','بعذر (غير محسوب)'),exc);kv(L('Not recorded (not counted)','غير مسجل (غير محسوب)'),ss.length-a.tot-exc);kv(L('Attendance % (recorded sessions only)','نسبة الحضور % (الحصص المسجلة فقط)'),a.pct==null?'—':pc(a.pct),PCT);
+ // live points
+ sec(L('LIVE POINTS (separate from quiz scores)','نقاط المتابعة المباشرة (منفصلة عن الكويزات)'));
+ kv(L('Net','الصافي'),me.net);kv(L('Bonus','المكافآت'),me.b);kv(L('Penalty','الخصومات'),me.p);kv(L('Rank in class','الترتيب في الفصل'),me.n?lr+' / '+R0.length:L('No interaction yet','لا توجد مشاركات بعد'));
+ // practical skills
+ sec(L('PRACTICAL SKILLS (1-10)','المهارات العملية (من 10)'));
+ R([C(L('Skill','المهارة'),ST.th),C(L('Rating','التقييم'),ST.th)].concat(span(L('Note','ملاحظة'),ST.th,3)),22);M(2,3);
+ const SK=D.skills.filter(k=>!k.arch&&k.cls===s.cls);
+ if(!SK.length){R(span(L('No skills defined for this class','لا توجد مهارات معرّفة لهذا الفصل'),ST.val,NC),20);M(0,NC)}
+ SK.forEach(k=>{const v=sk[k.id],nt=(D.skillNotes||{})[id+'_'+k.id]||'',f=v==null?null:v>=8?'C6EFCE':v>=5?'FFEB9C':'FFC7CE';
+  R([C(k.name,ST.val),C(v==null?'—':v,cs(ST.cen,f,true))].concat(span(nt,ST.val,3)),Math.max(20,16*Math.ceil(len(nt)/55)));M(2,3)});
+ // alerts
+ sec(L('ALERTS','التنبيهات'));
+ const AL2=alerts(id).filter(x=>x.st!=='resolved');
+ if(!AL2.length){R(span(L('No open alerts','لا توجد تنبيهات مفتوحة'),ST.val,NC),20);M(0,NC)}
+ else{R([C(L('Severity','الأهمية'),ST.th)].concat(span(L('Alert','التنبيه'),ST.th,NC-1)),22);M(1,NC-1);
+  AL2.forEach(x=>{const f=x.sev==='High'?'FFC7CE':x.sev==='Positive'?'C6EFCE':'FFEB9C';R([C(tv(x.sev),cs(ST.cen,f,true))].concat(span(x.m,ST.val,NC-1)),Math.max(20,16*Math.ceil(len(x.m)/80)));M(1,NC-1)})}
+ // development plans
+ sec(L('DEVELOPMENT PLANS','خطط التطوير'));
+ const PL=D.plans.filter(p=>p.stu===id);
+ if(!PL.length){R(span(L('No plans yet','لا توجد خطط بعد'),ST.val,NC),20);M(0,NC)}
+ else{R([L('Title','العنوان'),L('Status','الحالة'),L('Due','الموعد'),L('Target','الهدف'),L('Note','ملاحظة')].map(x=>C(x,ST.th)),22);
+  PL.forEach(p=>R([C(p.title,ST.val),C(tv(p.status),ST.cen),C(p.due||'',ST.cen),C(p.target||'',ST.val),C(p.note||'',ST.val)],Math.max(20,16*Math.max(Math.ceil(len(p.title)/26),Math.ceil(len(p.target)/24),Math.ceil(len(p.note)/32)))))}
+ // notes
+ if(s.notes){sec(L('NOTES','ملاحظات'));R(span(s.notes,ST.val,NC),Math.max(24,16*Math.ceil(len(s.notes)/120)));M(0,NC)}
+ const w1=mkws(rows,W1,mg,hs);XLSX.utils.book_append_sheet(wb,w1,L('Summary','الملخص'));
+ // attendance sheet
+ const AT=[[L('Date','التاريخ'),L('Topic','الموضوع'),L('Status','الحالة')].map(x=>C(x,ST.th))];
+ ss.forEach(x=>{const v=(D.att[x.id]||{})[id]||'',k=v==='Late'?'Present':v==='Excused'?'Excused':v||'Not Recorded',f={Present:'C6EFCE',Absent:'FFC7CE',Excused:'D9D9D9','Not Recorded':null}[k];
+  AT.push([C(x.date,ST.cen),C(x.topic||'',ST.val),C(tv(k),cs(ST.cen,f))])});
+ const wa=mkws(AT,[14,34,16]);wa['!autofilter']={ref:'A1:C'+AT.length};XLSX.utils.book_append_sheet(wb,wa,L('Attendance','الحضور'));
+ // quizzes sheet
+ const QZ=[[L('Quiz','الكويز'),L('Date','التاريخ'),L('Score','الدرجة'),L('Max','من'),'%',L('Level','المستوى')].map(x=>C(x,ST.th))];
+ Q.forEach(q=>{const v=q.scores[id],ok=okv(v),p=ok?100*v/q.max:null,f=tf(p);
+  QZ.push([C(q.title,ST.val),C(q.date,ST.cen),C(ok?v:'—',ST.cen),C(q.max,ST.cen),C(ok?pc(p):'—',cs(ST.cen,f),PCT),C(ok?tv(tier(p)[0]):L('Not graded','لم يُصحح'),cs(ST.cen,f))])});
+ QZ.push([C(L('Average','المتوسط'),cs(ST.lab,null,true)),C('',ST.lab),C('',ST.lab),C('',ST.lab),C(m==null?'—':pc(m),cs(ST.kv,tf(m),true),PCT),C(m==null?'—':tv(tier(m)[0]),cs(ST.cen,tf(m),true))]);
+ const wq=mkws(QZ,[30,14,10,10,12,16]);wq['!autofilter']={ref:'A1:F'+(QZ.length-1)};XLSX.utils.book_append_sheet(wb,wq,L('Quizzes','الكويزات'));
+ // skills sheet
+ const SS=[[L('Skill','المهارة'),L('Latest rating (1-10)','آخر تقييم (من 10)'),L('Note','ملاحظة')].map(x=>C(x,ST.th))];
+ SK.forEach(k=>{const v=sk[k.id],f=v==null?null:v>=8?'C6EFCE':v>=5?'FFEB9C':'FFC7CE';SS.push([C(k.name,ST.val),C(v==null?'—':v,cs(ST.cen,f,true)),C((D.skillNotes||{})[id+'_'+k.id]||'',ST.val)])});
+ SS.push([C('')]);SS.push(span(L('Evaluation history','سجل التقييمات'),ST.sec,3));const hr=SS.length-1;
+ SS.push([L('Skill','المهارة'),L('Rating','التقييم'),L('Date','التاريخ')].map(x=>C(x,ST.th)));
+ D.skillAssess.filter(x=>x.stu===id).slice().sort((p,q)=>p.ts-q.ts).forEach(x=>SS.push([C((D.skills.find(k=>k.id===x.skill)||{}).name||'',ST.val),C(x.lvl,ST.cen),C(new Date(x.ts).toISOString().slice(0,10),ST.cen)]));
+ const wsk=mkws(SS,[30,20,40],[{s:{r:hr,c:0},e:{r:hr,c:2}}]);XLSX.utils.book_append_sheet(wb,wsk,L('Skills','المهارات'));
+ if(ARB)wb.Workbook={Views:[{RTL:true}]};
  return wb}
-async function exportStu(id){if(!window.XLSX){toast('The Excel library did not load. Check your connection and try again.','err');return}const s=D.students.find(x=>x.id===id);if(!s)return;try{const fn=fname(s.name)+'_Student_Data.xlsx';const ok=await dl(fn,wbBlob(buildStuXlsx(id)),'');toast(ok?'Saved '+fn:'Export was cancelled','ok')}catch(e){toast('Excel export failed: '+(e&&e.message||e),'err')}}
+async function exportStu(id){await loadStyledXlsx();if(!window.XLSX){toast('The Excel library did not load. Check your connection and try again.','err');return}const s=D.students.find(x=>x.id===id);if(!s)return;try{const fn=fname(s.name)+'_Student_Data.xlsx';const ok=await dl(fn,wbBlob(buildStuXlsx(id)),'');toast(ok?'Saved '+fn:'Export was cancelled','ok')}catch(e){toast('Excel export failed: '+(e&&e.message||e),'err')}}
 function mergeXlsx(el){const f=el.files[0];if(!f)return;if(!window.XLSX){alert('The Excel library did not load. Check your connection and try again.');return}
  f.arrayBuffer().then(b=>{const old=XLSX.read(b,{type:'array'}),nw=buildXlsx();
   old.SheetNames.filter(n=>/^(Quiz - .*|Students|Attendance|Live points|Quizzes|Practical skills)$/.test(n)).forEach(n=>{delete old.Sheets[n]});old.SheetNames=old.SheetNames.filter(n=>!/^(Quiz - .*|Students|Attendance|Live points|Quizzes|Practical skills)$/.test(n));
@@ -541,7 +620,9 @@ function buildHold(stu){const cs=getComputedStyle(document.body),h=document.crea
  const hero=document.getElementById('hero').cloneNode(true),main=document.getElementById('app').cloneNode(true);
  if(stu){const t=hero.querySelector('.ht');if(t)t.textContent=stu.name}
  h.appendChild(hero);h.appendChild(main);
- h.querySelectorAll('.noexp,input[type=file]').forEach(e=>e.remove());h.querySelectorAll('.wrap').forEach(e=>{e.style.overflow='visible'});return h}
+ h.querySelectorAll('.noexp,input[type=file]').forEach(e=>e.remove());
+ // Arabic letters only join when the browser draws a whole word: html2canvas splits text into single letters whenever letter-spacing is set, so switch it off in the capture copy
+ h.querySelectorAll('*').forEach(e=>{e.style.setProperty('letter-spacing','normal','important');e.style.setProperty('word-break','normal','important')});h.querySelectorAll('.wrap').forEach(e=>{e.style.overflow='visible'});return h}
 // html2canvas draws an inline <svg> as a standalone image, so CSS variables and the page stylesheet are lost: resolve them first
 function fixSvgs(root){const rs=getComputedStyle(document.documentElement),v=n=>rs.getPropertyValue(n).trim()||'#000',sub=x=>x.replace(/var\((--[\w-]+)\)/g,(_,n)=>v(n));
  root.querySelectorAll('svg').forEach(sv=>{const r=sv.getBoundingClientRect();if(r.width)sv.setAttribute('width',r.width);if(r.height)sv.setAttribute('height',r.height);

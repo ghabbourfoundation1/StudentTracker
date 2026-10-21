@@ -1134,8 +1134,8 @@ async function rpDlOne(id){
  if(!r){toast(L('No saved report for this class in this week','مفيش تقرير محفوظ للفصل ده في الأسبوع ده'),'err');return}
  if(!await rpXl())return;
  const body=RPQ.map(q=>({c:[L(q.en,q.ar),r[q.k]||''],lab:[0]}));
- const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,rpTable(L('Weekly report','التقرير الأسبوعي'),[[L('Trainer','المدرب'),rpTrainer()],[L('Week','الأسبوع'),rpLabel(w)],[L('Class','الفصل'),r.clsName||rpCn(c)]],[L('Question','السؤال'),L('Answer','الإجابة')],body,[44,90]),L('Report','التقرير'));
- await dl('report-'+fname(rpTrainer())+'-'+fname(r.clsName||rpCn(c)||'class')+'-'+w+'.xlsx',wbBlob(wb),'')}
+ const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,rpTable(L('Weekly report','التقرير الأسبوعي'),[[L('Trainer','المدرب'),rpTrainer()],[L('Week','الأسبوع'),rpLabel(w)],[L('Class','الفصل'),rpCn(c)||r.clsName]],[L('Question','السؤال'),L('Answer','الإجابة')],body,[44,90]),L('Report','التقرير'));
+ await dl('report-'+fname(rpTrainer())+'-'+fname(rpCn(c)||r.clsName||'class')+'-'+w+'.xlsx',wbBlob(wb),'')}
 async function rpDlAll(){
  const w=rpCurWeek();
  if(!D.classes.some(c=>rpFind(w,c.id))){toast(L('No saved reports in this week','مفيش تقارير محفوظة في الأسبوع ده'),'err');return}
@@ -1209,16 +1209,26 @@ async function adminExcel(id,btn){
    cl.forEach(c=>{D.curClass=c.id;let w1;try{w1=buildXlsx()}catch(e){skipped++;return}
     w1.SheetNames.forEach(n=>{let nm=(many?c.name.replace(/[\[\]:*?\/\\]/g,' ').trim().slice(0,12)+' - '+n:n).slice(0,31),b=nm,k=2;while(wb.SheetNames.includes(nm))nm=b.slice(0,28)+' '+(k++);XLSX.utils.book_append_sheet(wb,w1.Sheets[n],nm)})});
    if((D.reports||[]).length){const order=D.classes.map(c=>c.id),list=D.reports.slice().sort((a,b)=>String(a.week).localeCompare(String(b.week))||order.indexOf(a.cls)-order.indexOf(b.cls));
-    XLSX.utils.book_append_sheet(wb,rpTable(L('Weekly reports','التقارير الأسبوعية'),[[L('Trainer','المدرب'),tn]],[L('Week','الأسبوع'),L('Class','الفصل')].concat(rpQHead(),[L('Submitted at','وقت التسليم')]),list.map(x=>({c:[x.week,x.clsName||rpCn(x.cls)].concat(RPQ.map(q=>x[q.k]||''),[rpAt(x)]),bold:[1]})),[14,18].concat(rpWide,[22])),L('Weekly reports','التقارير الأسبوعية'))}
+    XLSX.utils.book_append_sheet(wb,rpTable(L('Weekly reports','التقارير الأسبوعية'),[[L('Trainer','المدرب'),tn]],[L('Week','الأسبوع'),L('Class','الفصل')].concat(rpQHead(),[L('Submitted at','وقت التسليم')]),list.map(x=>({c:[x.week,rpCn(x.cls)||x.clsName].concat(RPQ.map(q=>x[q.k]||''),[rpAt(x)]),bold:[1]})),[14,18].concat(rpWide,[22])),L('Weekly reports','التقارير الأسبوعية'))}
   }finally{D=keep}
   if(!wb.SheetNames.length){toast(L('Nothing to export yet','مفيش حاجة للتصدير لسه'),'err');return}
   await dl('workshop-'+fname(tn)+(many?'-all-classes':'')+'.xlsx',wbBlob(wb),'');
   if(skipped)toast(L('Some empty classes were skipped','اتخطّينا فصول فاضية'))
  }catch(e){toast(L('Could not download: ','تعذّر التحميل: ')+((e&&e.message)||e),'err')}
  finally{if(btn)btn.disabled=false}}
+
+// ---- class menu (top-left list): delete the current class, with a clear warning ----
+function delClsTop(){
+ if(RO||D.classes.length<2)return;
+ const c=D.classes.find(x=>x.id===D.curClass);if(!c)return;
+ const ns=D.students.filter(x=>x.cls===c.id).length,nse=D.sessions.filter(x=>x.cls===c.id).length,nq=D.assess.filter(x=>x.cls===c.id).length;
+ const msg=L('Delete the class "'+c.name+'"?\n\nThis permanently removes its '+ns+' students, '+nse+' sessions and '+nq+' quizzes.\nYou can still press Undo right after.',
+  'حذف الفصل "'+c.name+'"؟\n\nهتتمسح نهائيًا بياناته: '+ns+' طالب و'+nse+' حصة و'+nq+' كويز.\nتقدر تضغط Undo على طول بعد الحذف.');
+ if(!confirm(msg)){go();return}
+ del('class',c.id,{dataset:{sure:'1'}})}
 // ---- shell ----
 function go(keep){document.getElementById('nav').innerHTML=tabs.map(x=>`<button${x==='Report'?' class="rpt"':''} aria-current="${x===tab}" onclick="tab='${x}';q='';pid=null;go()">${t(x)}</button>`).join('');
- const f=document.activeElement,pos=f&&f.selectionStart;document.getElementById('app').innerHTML=V[tab]();document.getElementById('app').setAttribute('data-ok','1');document.documentElement.dir=D.set.lang==='ar'?'rtl':'ltr';document.getElementById('cls').innerHTML=D.classes.map(c=>`<option value="${c.id}" ${c.id===D.curClass?'selected':''}>${esc(c.name)}</option>`).join('')+(RO?'':'<option value="__new">+ Add class</option>');{const s=document.getElementById('cls');s.hidden=!document.getElementById('newcls').hidden||(RO&&!VIEW)}hero();renderBar();trApply();
+ const f=document.activeElement,pos=f&&f.selectionStart;document.getElementById('app').innerHTML=V[tab]();document.getElementById('app').setAttribute('data-ok','1');document.documentElement.dir=D.set.lang==='ar'?'rtl':'ltr';document.getElementById('cls').innerHTML=D.classes.map(c=>`<option value="${c.id}" ${c.id===D.curClass?'selected':''}>${esc(c.name)}</option>`).join('')+(RO?'':'<option disabled>──────────</option><option value="__new">+ Add class</option><option value="__ren">✎ '+L('Rename class','تعديل اسم الفصل')+'</option>'+(D.classes.length>1?'<option value="__del">🗑 '+L('Delete class','حذف الفصل')+'</option>':''));{const s=document.getElementById('cls');s.hidden=!document.getElementById('newcls').hidden||(RO&&!VIEW)}hero();renderBar();trApply();
  if(keep&&f&&f.placeholder==='Search'){const i=document.querySelector('input[placeholder="Search"]');if(i){i.focus();i.setSelectionRange(pos,pos)}}}
 document.getElementById('lang').onclick=()=>{D.set.lang=D.set.lang==='ar'?'en':'ar';save();go()};
 document.addEventListener('keydown',e=>{
@@ -1228,10 +1238,15 @@ document.addEventListener('keydown',e=>{
 D.students.forEach(s=>s.status='Active');
 fixData();
 document.getElementById('undoAll').onclick=globalUndo;
-const cs=document.getElementById('cls'),nc=document.getElementById('newcls');
-cs.onchange=function(){if(this.value==='__new'){cs.hidden=true;nc.hidden=false;nc.value='';nc.focus();return}D.curClass=this.value;pid=null;save();go()};
+const cs=document.getElementById('cls'),nc=document.getElementById('newcls');let ncMode='add';
+cs.onchange=function(){const v=this.value;
+ if(v==='__new'){ncMode='add';nc.placeholder=L('New class name, then Enter','اسم الفصل الجديد ثم Enter');cs.hidden=true;nc.hidden=false;nc.value='';nc.focus();return}
+ if(v==='__ren'){const c=D.classes.find(x=>x.id===D.curClass);ncMode='ren';nc.placeholder=L('New name for this class, then Enter','الاسم الجديد للفصل ثم Enter');cs.hidden=true;nc.hidden=false;nc.value=c?c.name:'';nc.focus();nc.select();return}
+ if(v==='__del'){cs.value=D.curClass;delClsTop();return}
+ D.curClass=v;pid=null;save();go()};
 const done=()=>{nc.hidden=true;cs.hidden=false;go()};
 nc.onkeydown=e=>{if(e.key==='Escape'){done();return}if(e.key!=='Enter')return;e.preventDefault();const n=nc.value.trim();if(!n){done();return}
+ if(ncMode==='ren'){const cur=D.classes.find(c=>c.id===D.curClass);if(D.classes.some(c=>c.id!==D.curClass&&c.name.toLowerCase()===n.toLowerCase())){alert('Class name already exists');return}if(cur&&cur.name!==n){cur.name=n;(D.reports||[]).forEach(r=>{if(r.cls===cur.id)r.clsName=n});save()}nc.hidden=true;cs.hidden=false;go();return}
  if(D.classes.some(c=>c.name.toLowerCase()===n.toLowerCase())){alert('Class name already exists');return}
  const c={id:uid(),name:n};D.classes.push(c);D.curClass=c.id;pid=null;tab='Students';save();nc.hidden=true;cs.hidden=false;go()};
 nc.onblur=()=>{if(!nc.hidden)done()};

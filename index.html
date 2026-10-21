@@ -93,6 +93,25 @@ body.locked>*:not(#auth){display:none!important}
 .trc.ok{background:#1b9e4b;border-color:#1b9e4b;color:#fff;font-size:16px}
 .trc.part{background:#fff3e0;border-color:#ff9f1c;color:#8a4b00;padding:0 6px}
 .trc.none{width:28px}
+#clsBox{position:relative;display:inline-block}
+#clsBox[hidden]{display:none}
+#clsBtn{display:inline-flex;align-items:center;gap:8px;max-width:min(260px,62vw)}
+#clsName{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#clsMenu{position:absolute;inset-inline-start:0;top:calc(100% + 6px);z-index:40;width:min(340px,calc(100vw - 24px));max-height:min(60vh,420px);overflow:auto;background:#fff;color:#000;border:2px solid #000;border-radius:18px;padding:6px;box-shadow:0 12px 32px rgba(0,0,0,.35)}
+#clsMenu[hidden]{display:none}
+#clsMenu .cr{display:flex;align-items:center;gap:2px;padding:1px 2px;border-radius:12px}
+#clsMenu .cr.cur{background:color-mix(in srgb,var(--lime) 45%,#fff)}
+#clsMenu .cn{flex:1;min-width:0;text-align:start;background:none;border:0;padding:9px 10px;border-radius:10px;font:700 14px "Archivo","Noto Sans Arabic",sans-serif;color:#000;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#clsMenu .cn:hover{background:var(--tan)}
+#clsMenu .ci{flex:none;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;border:0;background:none;color:#4a4a4a;cursor:pointer;padding:0}
+#clsMenu .ci:hover,#clsMenu .ci:focus-visible{background:var(--tan);color:#000}
+#clsMenu .ci.del:hover,#clsMenu .ci.del:focus-visible{background:#fde8e6;color:var(--bad)}
+#clsMenu .cadd{display:block;width:100%;text-align:start;margin-top:4px;padding:10px 12px;border:0;border-top:1px solid var(--line);background:none;color:#000;font:700 14px "Archivo","Noto Sans Arabic",sans-serif;cursor:pointer;border-radius:0 0 12px 12px}
+#clsMenu .cadd:hover{background:var(--tan)}
+#clsMenu .cedit{display:flex;flex-direction:column;gap:4px;padding:6px}
+#clsMenu .cedit input{width:100%;box-sizing:border-box;color:#000;border:2px solid var(--blue);background:#fff;border-radius:12px;padding:8px 12px}
+#clsMenu .cedit .lb{color:var(--mut);font-size:12px}
+#clsMenu button:focus-visible{outline:3px solid var(--blue);outline-offset:-2px}
 .rpf{margin:0 0 4px}.rpf .rq{display:block;font-weight:800;margin:14px 0 6px}.rpf textarea{width:100%;box-sizing:border-box;min-height:104px;padding:10px 12px;border:2px solid #000;border-radius:14px;font:inherit;resize:vertical}.rpf select{max-width:100%}.rpf.bad textarea{border-color:#d93025;background:#fff5f5}.rpf .rr{color:#d93025;font-size:12px;font-weight:700;margin-top:4px}
 nav button.rpt{border-color:#ff9f1c;color:#ff9f1c}nav button.rpt[aria-current=true]{background:#ff9f1c;border-color:#ff9f1c;color:#000}
 </style><script>
@@ -115,7 +134,7 @@ try{new Function('a','return a??1;')}catch(e){document.addEventListener('DOMCont
 <button class="btn" id="auSwitch" type="button" onclick="setAuthMode(AUTH_MODE==='in'?'up':'in')"></button>
 <button class="btn" id="auOut" type="button" onclick="logout()" hidden>خروج · Log out</button>
 </div></div>
-<header><h1>Workshop Tracker</h1><select id="cls" aria-label="Class"></select><input id="newcls" data-enter="1" placeholder="New class name, then Enter" hidden style="width:210px"><span class="lb">AUTOMOTIVE ELECTRICAL · TRAINING RECORD</span><span id="save" class="lb"></span><button class="tb" id="bkBtn" onclick="bak()" title="Download a backup file">⬇ Backup</button><button class="tb" id="undoAll" disabled title="Undo the last change (Ctrl+Z)">↶ Undo</button><button class="tb" id="lang">عربي</button><button class="tb" id="modeBtn" onclick="switchMode()" hidden></button><button class="tb" id="outBtn" onclick="logout()" hidden>Log out</button><nav id="nav"></nav></header>
+<header><h1>Workshop Tracker</h1><div id="clsBox"><button type="button" class="tb" id="clsBtn" aria-haspopup="true" aria-expanded="false" aria-controls="clsMenu" onclick="clsToggle(event)"><span id="clsName"></span><span aria-hidden="true">▾</span></button><div id="clsMenu" role="group" aria-label="Classes" hidden></div></div><select id="cls" aria-hidden="true" tabindex="-1" style="display:none"></select><input id="newcls" data-enter="1" placeholder="New class name, then Enter" hidden style="width:210px"><span class="lb">AUTOMOTIVE ELECTRICAL · TRAINING RECORD</span><span id="save" class="lb"></span><button class="tb" id="bkBtn" onclick="bak()" title="Download a backup file">⬇ Backup</button><button class="tb" id="undoAll" disabled title="Undo the last change (Ctrl+Z)">↶ Undo</button><button class="tb" id="lang">عربي</button><button class="tb" id="modeBtn" onclick="switchMode()" hidden></button><button class="tb" id="outBtn" onclick="logout()" hidden>Log out</button><nav id="nav"></nav></header>
 <div id="alertbar"></div>
 <div id="bkbar"></div>
 <div id="synbar"></div>
@@ -1217,18 +1236,49 @@ async function adminExcel(id,btn){
  }catch(e){toast(L('Could not download: ','تعذّر التحميل: ')+((e&&e.message)||e),'err')}
  finally{if(btn)btn.disabled=false}}
 
-// ---- class menu (top-left list): delete the current class, with a clear warning ----
-function delClsTop(){
- if(RO||D.classes.length<2)return;
- const c=D.classes.find(x=>x.id===D.curClass);if(!c)return;
- const ns=D.students.filter(x=>x.cls===c.id).length,nse=D.sessions.filter(x=>x.cls===c.id).length,nq=D.assess.filter(x=>x.cls===c.id).length;
- const msg=L('Delete the class "'+c.name+'"?\n\nThis permanently removes its '+ns+' students, '+nse+' sessions and '+nq+' quizzes.\nYou can still press Undo right after.',
-  'حذف الفصل "'+c.name+'"؟\n\nهتتمسح نهائيًا بياناته: '+ns+' طالب و'+nse+' حصة و'+nq+' كويز.\nتقدر تضغط Undo على طول بعد الحذف.');
- if(!confirm(msg)){go();return}
- del('class',c.id,{dataset:{sure:'1'}})}
+
+// ---- class menu (top-left): pick a class, with a small edit icon and delete icon beside each one ----
+const IC_EDIT='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
+const IC_DEL='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>';
+let clsOpen=false,clsEdit=null;
+function clsMenuRender(){
+ const btn=document.getElementById('clsBtn'),menu=document.getElementById('clsMenu'),nm=document.getElementById('clsName');if(!btn||!menu||!nm)return;
+ const cur=D.classes.find(c=>c.id===D.curClass);nm.textContent=cur?cur.name:'';
+ btn.setAttribute('aria-expanded',clsOpen?'true':'false');btn.title=L('Choose a class','اختار الفصل');
+ menu.hidden=!clsOpen;if(!clsOpen)return;
+ const a=document.activeElement;if(clsEdit&&a&&a.id==='clsIn')return; // never wipe what is being typed
+ const many=D.classes.length>1;
+ menu.innerHTML=D.classes.map(c=>{
+  if(clsEdit===c.id)return `<div class="cedit"><input id="clsIn" data-enter="1" value="${esc(c.name)}" aria-label="${L('New class name','اسم الفصل الجديد')}" onkeydown="clsKey(event,this.dataset.id)" data-id="${esc(c.id)}"><span class="lb">${L('Enter to save · Esc to cancel','Enter للحفظ · Esc للإلغاء')}</span></div>`;
+  const on=c.id===D.curClass;
+  return `<div class="cr${on?' cur':''}"><button type="button" class="cn${on?' cur':''}" data-id="${esc(c.id)}"${on?' aria-current="true"':''} onclick="clsPick(this.dataset.id)">${on?'✓ ':''}${esc(c.name)}</button>${RO?'':`<button type="button" class="ci" data-id="${esc(c.id)}" title="${L('Rename class','تعديل اسم الفصل')}" aria-label="${L('Rename class','تعديل اسم الفصل')}: ${esc(c.name)}" onclick="clsRename(this.dataset.id)">${IC_EDIT}</button>${many?`<button type="button" class="ci del" data-id="${esc(c.id)}" title="${L('Delete class','حذف الفصل')}" aria-label="${L('Delete class','حذف الفصل')}: ${esc(c.name)}" onclick="clsDelete(this.dataset.id)">${IC_DEL}</button>`:''}`}</div>`}).join('')
+  +(RO?'':`<button type="button" class="cadd" onclick="clsAdd()">+ ${L('Add class','إضافة فصل')}</button>`);
+ if(clsEdit){const i=document.getElementById('clsIn');if(i){i.focus();i.select()}}}
+function clsToggle(e){if(e)e.stopPropagation();clsOpen=!clsOpen;clsEdit=null;clsMenuRender();if(clsOpen){const b=document.querySelector('#clsMenu .cn.cur')||document.querySelector('#clsMenu .cn');if(b)b.focus()}}
+function clsClose(focusBtn){clsOpen=false;clsEdit=null;clsMenuRender();if(focusBtn){const b=document.getElementById('clsBtn');if(b)b.focus()}}
+function clsPick(id){clsClose();if(id===D.curClass)return;D.curClass=id;pid=null;save();go()}
+function clsRename(id){if(RO)return;clsEdit=id;clsMenuRender()}
+function clsKey(e,id){
+ if(e.key==='Escape'){e.preventDefault();e.stopPropagation();clsEdit=null;clsMenuRender();const b=document.querySelector('#clsMenu .ci[data-id="'+id+'"]');if(b)b.focus();return}
+ if(e.key!=='Enter')return;e.preventDefault();
+ const n=e.target.value.trim(),c=D.classes.find(x=>x.id===id);
+ if(!n||!c||n===c.name){clsEdit=null;clsMenuRender();return}
+ if(D.classes.some(x=>x.id!==id&&x.name.toLowerCase()===n.toLowerCase())){alert('Class name already exists');return}
+ c.name=n;(D.reports||[]).forEach(r=>{if(r.cls===id)r.clsName=n});clsOpen=false;clsEdit=null;save();go()}
+function clsDelete(id){
+ if(RO||D.classes.length<2)return;const c=D.classes.find(x=>x.id===id);if(!c)return;
+ const ns=D.students.filter(x=>x.cls===id).length,nse=D.sessions.filter(x=>x.cls===id).length,nq=D.assess.filter(x=>x.cls===id).length;
+ if(!confirm(L('Delete the class "'+c.name+'"?\n\nThis permanently removes its '+ns+' students, '+nse+' sessions and '+nq+' quizzes.\nYou can still press Undo right after.',
+  'حذف الفصل "'+c.name+'"؟\n\nهتتمسح نهائيًا بياناته: '+ns+' طالب و'+nse+' حصة و'+nq+' كويز.\nتقدر تضغط Undo على طول بعد الحذف.')))return;
+ clsClose();del('class',id,{dataset:{sure:'1'}})}
+function clsAdd(){if(RO)return;clsClose();const cs=document.getElementById('cls'),nc=document.getElementById('newcls');cs.hidden=true;nc.hidden=false;nc.value='';nc.placeholder=L('New class name, then Enter','اسم الفصل الجديد ثم Enter');nc.focus()}
+document.addEventListener('click',e=>{if(!clsOpen)return;const p=e.composedPath?e.composedPath():[];if(!p.includes(document.getElementById('clsBox')))clsClose()});
+document.addEventListener('keydown',e=>{if(!clsOpen)return;const t=e.target;
+ if(e.key==='Escape'&&!(t&&t.id==='clsIn')){e.preventDefault();clsClose(true);return}
+ if((e.key==='ArrowDown'||e.key==='ArrowUp')&&!(t&&t.id==='clsIn')){const bs=[...document.querySelectorAll('#clsMenu button')],i=bs.indexOf(document.activeElement);if(bs.length){e.preventDefault();bs[(i+(e.key==='ArrowDown'?1:-1)+bs.length)%bs.length].focus()}}});
 // ---- shell ----
 function go(keep){document.getElementById('nav').innerHTML=tabs.map(x=>`<button${x==='Report'?' class="rpt"':''} aria-current="${x===tab}" onclick="tab='${x}';q='';pid=null;go()">${t(x)}</button>`).join('');
- const f=document.activeElement,pos=f&&f.selectionStart;document.getElementById('app').innerHTML=V[tab]();document.getElementById('app').setAttribute('data-ok','1');document.documentElement.dir=D.set.lang==='ar'?'rtl':'ltr';document.getElementById('cls').innerHTML=D.classes.map(c=>`<option value="${c.id}" ${c.id===D.curClass?'selected':''}>${esc(c.name)}</option>`).join('')+(RO?'':'<option disabled>──────────</option><option value="__new">+ Add class</option><option value="__ren">✎ '+L('Rename class','تعديل اسم الفصل')+'</option>'+(D.classes.length>1?'<option value="__del">🗑 '+L('Delete class','حذف الفصل')+'</option>':''));{const s=document.getElementById('cls');s.hidden=!document.getElementById('newcls').hidden||(RO&&!VIEW)}hero();renderBar();trApply();
+ const f=document.activeElement,pos=f&&f.selectionStart;document.getElementById('app').innerHTML=V[tab]();document.getElementById('app').setAttribute('data-ok','1');document.documentElement.dir=D.set.lang==='ar'?'rtl':'ltr';document.getElementById('cls').innerHTML=D.classes.map(c=>`<option value="${c.id}" ${c.id===D.curClass?'selected':''}>${esc(c.name)}</option>`).join('')+(RO?'':'<option value="__new">+ Add class</option>');{const s=document.getElementById('cls');s.hidden=!document.getElementById('newcls').hidden||(RO&&!VIEW)}clsMenuRender();hero();renderBar();trApply();
  if(keep&&f&&f.placeholder==='Search'){const i=document.querySelector('input[placeholder="Search"]');if(i){i.focus();i.setSelectionRange(pos,pos)}}}
 document.getElementById('lang').onclick=()=>{D.set.lang=D.set.lang==='ar'?'en':'ar';save();go()};
 document.addEventListener('keydown',e=>{
@@ -1238,15 +1288,10 @@ document.addEventListener('keydown',e=>{
 D.students.forEach(s=>s.status='Active');
 fixData();
 document.getElementById('undoAll').onclick=globalUndo;
-const cs=document.getElementById('cls'),nc=document.getElementById('newcls');let ncMode='add';
-cs.onchange=function(){const v=this.value;
- if(v==='__new'){ncMode='add';nc.placeholder=L('New class name, then Enter','اسم الفصل الجديد ثم Enter');cs.hidden=true;nc.hidden=false;nc.value='';nc.focus();return}
- if(v==='__ren'){const c=D.classes.find(x=>x.id===D.curClass);ncMode='ren';nc.placeholder=L('New name for this class, then Enter','الاسم الجديد للفصل ثم Enter');cs.hidden=true;nc.hidden=false;nc.value=c?c.name:'';nc.focus();nc.select();return}
- if(v==='__del'){cs.value=D.curClass;delClsTop();return}
- D.curClass=v;pid=null;save();go()};
+const cs=document.getElementById('cls'),nc=document.getElementById('newcls');Object.defineProperty(cs,'hidden',{configurable:true,get(){return document.getElementById('clsBox').hidden},set(v){document.getElementById('clsBox').hidden=!!v}});
+cs.onchange=function(){if(this.value==='__new'){cs.hidden=true;nc.hidden=false;nc.value='';nc.focus();return}D.curClass=this.value;pid=null;save();go()};
 const done=()=>{nc.hidden=true;cs.hidden=false;go()};
 nc.onkeydown=e=>{if(e.key==='Escape'){done();return}if(e.key!=='Enter')return;e.preventDefault();const n=nc.value.trim();if(!n){done();return}
- if(ncMode==='ren'){const cur=D.classes.find(c=>c.id===D.curClass);if(D.classes.some(c=>c.id!==D.curClass&&c.name.toLowerCase()===n.toLowerCase())){alert('Class name already exists');return}if(cur&&cur.name!==n){cur.name=n;(D.reports||[]).forEach(r=>{if(r.cls===cur.id)r.clsName=n});save()}nc.hidden=true;cs.hidden=false;go();return}
  if(D.classes.some(c=>c.name.toLowerCase()===n.toLowerCase())){alert('Class name already exists');return}
  const c={id:uid(),name:n};D.classes.push(c);D.curClass=c.id;pid=null;tab='Students';save();nc.hidden=true;cs.hidden=false;go()};
 nc.onblur=()=>{if(!nc.hidden)done()};

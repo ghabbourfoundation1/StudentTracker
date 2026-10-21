@@ -115,7 +115,7 @@ try{new Function('a','return a??1;')}catch(e){document.addEventListener('DOMCont
 <button class="btn" id="auSwitch" type="button" onclick="setAuthMode(AUTH_MODE==='in'?'up':'in')"></button>
 <button class="btn" id="auOut" type="button" onclick="logout()" hidden>خروج · Log out</button>
 </div></div>
-<header><h1>Workshop Tracker</h1><select id="cls" aria-label="Class"></select><input id="newcls" data-enter="1" placeholder="New class name, then Enter" hidden style="width:210px"><span class="lb">AUTOMOTIVE ELECTRICAL · TRAINING RECORD</span><span id="save" class="lb"></span><button class="tb" id="bkBtn" onclick="bak()" title="Download a backup file">⬇ Backup</button><button class="tb" id="undoAll" disabled title="Undo the last change (Ctrl+Z)">↶ Undo</button><button class="tb" id="lang">عربي</button><button class="tb" id="outBtn" onclick="logout()" hidden>Log out</button><nav id="nav"></nav></header>
+<header><h1>Workshop Tracker</h1><select id="cls" aria-label="Class"></select><input id="newcls" data-enter="1" placeholder="New class name, then Enter" hidden style="width:210px"><span class="lb">AUTOMOTIVE ELECTRICAL · TRAINING RECORD</span><span id="save" class="lb"></span><button class="tb" id="bkBtn" onclick="bak()" title="Download a backup file">⬇ Backup</button><button class="tb" id="undoAll" disabled title="Undo the last change (Ctrl+Z)">↶ Undo</button><button class="tb" id="lang">عربي</button><button class="tb" id="modeBtn" onclick="switchMode()" hidden></button><button class="tb" id="outBtn" onclick="logout()" hidden>Log out</button><nav id="nav"></nav></header>
 <div id="alertbar"></div>
 <div id="bkbar"></div>
 <div id="synbar"></div>
@@ -971,7 +971,16 @@ async function onSignedIn(user){
  let p=null;try{const r=await SB.from('profiles').select('role,name').eq('id',user.id).maybeSingle();p=r.data}catch(e){}
  if(!p){ME.id=null;showAuth('الحساب مالوش بروفايل. شغّل ملف supabase.sql ثم سجّل الدخول تاني. · No profile found for this account. Run supabase.sql, then sign in again.');try{await SB.auth.signOut()}catch(e){}return}
  ME.role=p.role;ME.name=p.name;
- if(ME.role==='admin'){hideAuth();adminBoot()}else await teacherBoot()}
+ // an admin can work in two modes with the same account: 'admin' (read-only view of all trainers) or 'trainer' (own classes, fully editable)
+ let m=null;try{m=localStorage.getItem('wt_mode')}catch(e){}
+ ME.mode=ME.role==='admin'&&m!=='trainer'?'admin':'trainer';
+ if(ME.mode==='admin'){hideAuth();adminBoot()}else await teacherBoot()}
+async function switchMode(){
+ if(ME.role!=='admin')return;
+ if(ME.mode==='trainer'&&SY.on){clearTimeout(SY.timer);if(SY.dirty||SY.st==='error'||SY.st==='local')await push();
+  if(SY.st!=='synced'){toast(L('Your latest changes are not synced yet. Check your connection, then try again.','آخر تعديلاتك لسه ما اتزامنتش. اتأكد من الإنترنت وجرّب تاني.'),'err');return}}
+ try{localStorage.setItem('wt_mode',ME.mode==='admin'?'trainer':'admin')}catch(e){}
+ location.reload()}
 async function teacherBoot(){
  RO=false;VIEW=null;tabs=TABS.slice();
  authWait('جاري تحميل بياناتك من السيرفر… · Loading your data from the server…');
@@ -1007,11 +1016,12 @@ function backToTeachers(){clearInterval(ROT);VIEW=null;SY.ts=0;D=blankD();fixDat
 
 function acctSection(){
  if(STANDALONE)return '<section><h2>ACCOUNT</h2><p>This version works without any account. Your data is stored on this device only. To move it to another phone or laptop, use ⬇ Backup here, then Restore on the other device.</p><p class="lb">To turn on trainer / admin accounts, fill in SUPABASE_URL and SUPABASE_KEY at the top of the script.</p></section>';
- return `<section><h2>${L('ACCOUNT &amp; SYNC','الحساب والمزامنة')}</h2><p>${L('Signed in as','مسجّل بحساب')} <b>${esc(ME.email)}</b> · ${L('Role','الدور')}: <b>${ME.role==='admin'?L('Admin','أدمن'):L('Trainer','مدرب')}</b></p>
+ return `<section><h2>${L('ACCOUNT &amp; SYNC','الحساب والمزامنة')}</h2><p>${L('Signed in as','مسجّل بحساب')} <b>${esc(ME.email)}</b> · ${L('Role','الدور')}: <b>${ME.role==='admin'?L('Admin','أدمن')+' · '+(ME.mode==='admin'?L('admin mode','وضع الأدمن'):L('trainer mode','وضع المدرب')):L('Trainer','مدرب')}</b></p>
  ${RO?`<p>${VIEW?L('Viewing','تشاهد بيانات')+' <b>'+esc(VIEW.name)+'</b> — '+L('read only','قراءة فقط'):L('Read-only admin account','حساب أدمن (قراءة فقط)')}</p>`:`<p>${L('Status','الحالة')}: <b>${esc(syncLabel())}</b></p><p>${L('Engineer code','كود المهندس')}: <b class="mono">${engCode()}</b></p><p class="lb">${L('Sign in with the same account on any phone or laptop and you get the same data.','سجّل الدخول بنفس الحساب من أي موبايل أو لابتوب وهتلاقي نفس البيانات.')}</p>`}
- <div class="row">${RO?'':`<button class="btn" onclick="syncNow()">${L('Sync now','مزامنة الآن')}</button>`}<button class="btn" onclick="logout()">${L('Log out','تسجيل الخروج')}</button></div></section>`}
+ <div class="row">${RO?'':`<button class="btn" onclick="syncNow()">${L('Sync now','مزامنة الآن')}</button>`}${ME.role==='admin'?`<button class="btn" onclick="switchMode()">⇄ ${ME.mode==='admin'?L('Switch to trainer mode','التحويل لوضع المدرب'):L('Switch to admin mode','التحويل لوضع الأدمن')}</button>`:''}<button class="btn" onclick="logout()">${L('Log out','تسجيل الخروج')}</button></div></section>`}
 
 function renderSync(){stTxt();const ob=document.getElementById('outBtn');if(ob){ob.hidden=!ME.id;ob.textContent=L('Log out','خروج');ob.title=ME.email||''}
+ const mb=document.getElementById('modeBtn');if(mb){mb.hidden=!(ME.id&&ME.role==='admin');const toT=ME.mode==='admin';mb.textContent='⇄ '+(toT?L('Trainer mode','وضع المدرب'):L('Admin mode','وضع الأدمن'));mb.title=toT?L('Switch to trainer mode (your own classes)','التحويل لوضع المدرب (فصولك أنت)'):L('Switch to admin mode (see all trainers)','التحويل لوضع الأدمن (مشاهدة كل المدربين)')}
  const bk=document.getElementById('bkBtn'),ud=document.getElementById('undoAll');if(bk)bk.hidden=RO;if(ud)ud.hidden=RO;
  const el=document.getElementById('synbar');if(!el)return;
  el.innerHTML=RO&&VIEW?`<div class="abar rb" role="status"><div style="flex:1">👁 ${L('View only — you are looking at','عرض فقط — أنت تشاهد بيانات')} <b>${esc(VIEW.name)}</b></div><button class="btn" onclick="refreshRO(true)">${L('Refresh','تحديث')}</button><button class="btn" onclick="backToTeachers()">${L('All trainers','كل المدربين')}</button></div>`

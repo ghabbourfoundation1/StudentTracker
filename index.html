@@ -77,7 +77,7 @@ footer{text-align:center;font-size:12px;color:#eae4d6;padding:0 0 18px}
 #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 18px);z-index:60;max-width:min(560px,calc(100% - 24px));padding:10px 18px;border-radius:18px;background:#fff;border:3px solid var(--olive);color:#000;font-weight:600;box-shadow:0 10px 32px rgba(0,0,0,.4);display:none}#toast.t-err{border-color:var(--bad)}#toast.t-busy{border-color:var(--lime)}
 
 body.locked>*:not(#auth){display:none!important}
-#auth{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:18px;background:var(--bg,#193129);overflow:auto}
+#auth{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:18px;background:var(--blue);overflow:auto}
 #auth[hidden]{display:none}
 #auth .acard{width:min(420px,100%);background:#fff;color:#193129;border-radius:24px;padding:26px 22px;display:flex;flex-direction:column;gap:12px;box-shadow:0 10px 40px rgba(0,0,0,.35)}
 #auth .achip{font-weight:800;letter-spacing:.02em}
@@ -89,9 +89,115 @@ body.locked>*:not(#auth){display:none!important}
 #authMsg{min-height:1.2em;font-size:13px;color:#b3261e}
 #authMsg.ok{color:#1b6b3a}
 .abar.rb{border-width:3px}
-.trc{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;box-sizing:border-box;border-radius:999px;border:2px solid #8a948f;background:#fff;color:#4b5651;font-weight:900;font-size:12px;vertical-align:middle}
-.trc.ok{background:#1b9e4b;border-color:#1b9e4b;color:#fff;font-size:16px}
-.trc.part{background:#fff3e0;border-color:#ff9f1c;color:#8a4b00;padding:0 6px}
+.req{color:var(--bad);font-weight:900}
+.pw{display:flex;gap:8px;align-items:center}.pw input{flex:1;min-width:0}.pw .btn{flex:none;padding:6px 12px;font-size:13px}
+.abar{flex-wrap:wrap}.abar>div:first-child{min-width:min(240px,100%)}
+:root{--bad-ink:#b42318}.lo{color:var(--bad-ink)}
+.hact{display:contents}
+@media(max-width:700px){
+ header{padding:8px 12px;gap:6px 8px;transition:transform .22s ease}
+ header.hide{transform:translateY(-100%)}
+ header h1{font-size:12px;padding:4px 10px;margin:0}
+ .hact{display:flex;gap:6px;align-items:center;width:100%;overflow-x:auto;scrollbar-width:none;order:5;padding:1px 0 2px}
+ .hact>*{flex:none;white-space:nowrap}
+ #lang{order:1}#modeBtn{order:2}#outBtn{order:3}#undoAll{order:4}#bkBtn{order:5}#save{order:6;font-size:11px}
+ nav{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x proximity;padding:1px 0 2px}
+ nav button{flex:none;scroll-snap-align:center;white-space:nowrap}
+ .hact::-webkit-scrollbar,nav::-webkit-scrollbar{display:none}
+ .hact.ovf,nav.ovf{-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 30px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 30px),transparent)}
+ html[dir=rtl] .hact.ovf,html[dir=rtl] nav.ovf{-webkit-mask-image:linear-gradient(to left,#000 calc(100% - 30px),transparent);mask-image:linear-gradient(to left,#000 calc(100% - 30px),transparent)}
+}
+@media(max-width:480px){.li.exr{flex-wrap:wrap}.li.exr .n{flex:1 1 100%}}
+@media(prefers-reduced-motion:reduce){header{transition:none}}
+@media(pointer:coarse){nav button,header .tb{min-height:40px}.btn{min-height:40px}input[type=checkbox]{width:26px;height:26px}}
+.abar.rn{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 8%,#fff)}
+.abar.ofl{border-color:var(--warn)}
+
+/* ---- dialogs, bottom sheet, small controls ---- */
+body.ui-open{overflow:hidden}
+.ui-ov{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(10,20,16,.55);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.ui-ov.sheetov{align-items:flex-end;padding:0}
+.ui-dlg{width:min(420px,100%);background:#fff;color:var(--ink);border:2px solid var(--ink);border-radius:24px;padding:20px;box-shadow:0 24px 60px rgba(0,0,0,.35);outline:0}
+.ui-dlg h2{margin:0 0 8px}
+.ui-m{white-space:pre-line;margin:0 0 16px;line-height:1.5;overflow-wrap:anywhere}
+.ui-b{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.btn.danger{background:var(--bad);border-color:var(--bad);color:#fff}
+.ui-sheet{width:100%;max-height:80vh;overflow:auto;background:#fff;color:var(--ink);border-radius:24px 24px 0 0;padding:10px 12px calc(14px + env(safe-area-inset-bottom,0px));box-shadow:0 -12px 40px rgba(0,0,0,.3);outline:0}
+.ui-sheet .grab{width:42px;height:4px;border-radius:2px;background:var(--line);margin:2px auto 8px}
+.ui-sheet .sh-i{display:flex;width:100%;align-items:center;justify-content:space-between;min-height:50px;padding:0 14px;border:0;background:none;color:#000;font:700 16px "Archivo","Noto Sans Arabic",sans-serif;text-align:start;border-radius:14px;cursor:pointer}
+.ui-sheet .sh-i[aria-current=true]{background:var(--lime)}
+.ui-sheet .sh-i:focus-visible{outline:3px solid var(--blue);outline-offset:-2px}
+.ui-ov.out{pointer-events:none}
+.moreBtn{display:none}
+.lnk{background:none;border:0;padding:4px 0;color:var(--blue);text-decoration:underline;font:600 13px "Archivo","Noto Sans Arabic",sans-serif;cursor:pointer;align-self:flex-start}
+.spin{width:30px;height:30px;box-sizing:border-box;border:3px solid color-mix(in srgb,var(--ink) 14%,transparent);border-top-color:var(--olive);border-radius:50%;margin:8px auto;animation:spin .8s linear infinite}
+.spin[hidden]{display:none}
+.trq{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 10px}
+.trq input[type=search]{flex:1 1 220px;min-width:0}
+@media(max-width:700px){nav button.sec{display:none}.moreBtn{display:inline-flex;align-items:center;flex:none;white-space:nowrap}}
+#save::before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;margin-inline-end:6px;vertical-align:1px;background:var(--lime)}
+:root{--dot-warn:#ffd166;--dot-bad:#ff7a6b}
+#save[data-st=offline]::before,#save[data-st=local]::before{background:var(--dot-warn)}
+#save[data-st=error]::before,#save[data-st=noaccess]::before{background:var(--dot-bad)}
+#save[data-st=view]::before{background:#8fb3a2}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{50%{opacity:.35;transform:scale(.7)}}
+
+/* ---- motion (transform + opacity only; fully switched off for people who ask for reduced motion) ---- */
+@media(prefers-reduced-motion:no-preference){
+ :root{--ease:cubic-bezier(.2,.8,.2,1)}
+ header{animation:headIn .45s var(--ease) backwards}
+ #app.enter>*{animation:rise .4s var(--ease) both}
+ #app.enter>*:nth-child(2){animation-delay:.05s}#app.enter>*:nth-child(3){animation-delay:.1s}#app.enter>*:nth-child(4){animation-delay:.15s}#app.enter>*:nth-child(5){animation-delay:.2s}#app.enter>*:nth-child(n+6){animation-delay:.25s}
+ #hero.enter .ht{animation:heroIn .55s var(--ease) both}
+ #hero.enter .ht~*{animation:rise .4s .1s var(--ease) both}
+ nav button,header .tb,.btn,.qt,.sh-i,#clsMenu .cn,#clsMenu .ci,#clsMenu .cadd{transition:background-color .16s ease,border-color .16s ease,color .16s ease,box-shadow .16s ease,transform .14s var(--ease)}
+ .btn:active,nav button:active,header .tb:active,.moreBtn:active,#clsMenu .cn:active,.sh-i:active{transform:scale(.96)}
+ input,select,textarea{transition:border-color .16s ease,box-shadow .16s ease,background-color .16s ease}
+ input:focus-visible,select:focus-visible,textarea:focus-visible{box-shadow:0 0 0 3px color-mix(in srgb,var(--olive) 30%,transparent)}
+ .li{transition:background-color .15s ease}
+ #clsMenu:not([hidden]){animation:pop .18s var(--ease);transform-origin:top left}
+ html[dir=rtl] #clsMenu:not([hidden]){transform-origin:top right}
+ #toast.in{animation:toastIn .28s var(--ease)}
+ #synbar.anim .abar{animation:slideDown .32s var(--ease)}
+ .ui-ov{animation:fade .16s ease}
+ .ui-dlg{animation:dlgIn .24s var(--ease)}
+ .ui-sheet{animation:sheetIn .28s var(--ease)}
+ .ui-ov.out{animation:fadeOut .15s ease forwards}
+ .ui-ov.out .ui-dlg{animation:dlgOut .15s ease forwards}
+ .ui-ov.out .ui-sheet{animation:sheetOut .19s ease forwards}
+ #app.enter .bar i{transform-origin:left;animation:grow .6s .12s var(--ease) both}
+ html[dir=rtl] #app.enter .bar i{transform-origin:right}
+ #app.enter svg polyline{stroke-dasharray:1;animation:draw .9s .1s var(--ease) both}
+ #app.enter svg circle{transform-box:fill-box;transform-origin:center;animation:dot .35s .6s var(--ease) both}
+ #app.enter svg rect{transform-box:fill-box;transform-origin:50% 100%;animation:growY .6s .1s var(--ease) both}
+ #app.enter svg path{transform-origin:60px 60px;animation:donut .65s .1s var(--ease) both}
+ #save[data-st=syncing]::before{animation:pulse 1s ease-in-out infinite}
+ .abar{transition:opacity .2s ease}
+ @media(hover:hover){.btn.pri:hover,.btn:hover{transform:translateY(-1px)}.btn:active{transform:scale(.96)}}
+}
+@keyframes headIn{from{opacity:0;transform:translateY(-14px)}}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}}
+@keyframes heroIn{from{opacity:0;transform:translateY(22px)}}
+@keyframes pop{from{opacity:0;transform:scale(.94) translateY(-4px)}}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,14px)}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-10px)}}
+@keyframes fade{from{opacity:0}}
+@keyframes fadeOut{to{opacity:0}}
+@keyframes dlgIn{from{opacity:0;transform:translateY(14px) scale(.96)}}
+@keyframes dlgOut{to{opacity:0;transform:translateY(8px) scale(.97)}}
+@keyframes sheetIn{from{transform:translateY(100%)}}
+@keyframes sheetOut{to{transform:translateY(100%)}}
+@keyframes grow{from{transform:scaleX(0)}}
+@keyframes growY{from{transform:scaleY(0)}}
+@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes dot{from{opacity:0;transform:scale(0)}}
+@keyframes donut{from{opacity:0;transform:rotate(-70deg) scale(.7)}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+.trc{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;box-sizing:border-box;border-radius:999px;border:2px solid var(--mut);background:#fff;color:var(--mut);font-weight:900;font-size:12px;vertical-align:middle}
+.trc.ok{background:var(--good);border-color:var(--good);color:#fff;font-size:16px}
+.trc.part{background:color-mix(in srgb,var(--warn) 12%,#fff);border-color:var(--warn);color:var(--warn);padding:0 6px}
 .trc.none{width:28px}
 #clsBox{position:relative;display:inline-block}
 #clsBox[hidden]{display:none}
@@ -112,8 +218,8 @@ body.locked>*:not(#auth){display:none!important}
 #clsMenu .cedit input{width:100%;box-sizing:border-box;color:#000;border:2px solid var(--blue);background:#fff;border-radius:12px;padding:8px 12px}
 #clsMenu .cedit .lb{color:var(--mut);font-size:12px}
 #clsMenu button:focus-visible{outline:3px solid var(--blue);outline-offset:-2px}
-.rpf{margin:0 0 4px}.rpf .rq{display:block;font-weight:800;margin:14px 0 6px}.rpf textarea{width:100%;box-sizing:border-box;min-height:104px;padding:10px 12px;border:2px solid #000;border-radius:14px;font:inherit;resize:vertical}.rpf select{max-width:100%}.rpf.bad textarea{border-color:#d93025;background:#fff5f5}.rpf .rr{color:#d93025;font-size:12px;font-weight:700;margin-top:4px}
-nav button.rpt{border-color:#ff9f1c;color:#ff9f1c}nav button.rpt[aria-current=true]{background:#ff9f1c;border-color:#ff9f1c;color:#000}
+.rpf{margin:0 0 4px}.rpf .rq{display:block;font-weight:800;margin:14px 0 6px}.rpf textarea{width:100%;box-sizing:border-box;min-height:104px;padding:10px 12px;border:2px solid #000;border-radius:14px;font:inherit;resize:vertical}.rpf select{max-width:100%}.rpf.bad textarea{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 6%,#fff)}.rpf .rr{color:var(--bad);font-size:12px;font-weight:700;margin-top:4px}
+nav button.rpt{background:#fff;border-color:#fff;color:var(--blue);font-weight:800}nav button.rpt[aria-current=true]{background:var(--lime);border-color:var(--lime);color:#000}
 </style><script>
 window.addEventListener('error',function(e){var b=document.getElementById('app');if(b&&!b.getAttribute('data-ok')){b.innerHTML='<section style="padding:16px"><b>The page hit an error:</b><br>'+String(e.message).replace(/</g,'&lt;')+' (line '+e.lineno+')<br><br>Please send this message to the developer.</section>'}});
 try{new Function('a','return a??1;')}catch(e){document.addEventListener('DOMContentLoaded',function(){var b=document.getElementById('app');if(b)b.innerHTML='<section style="padding:16px">This browser is too old for the app. Please update iOS / Safari, or open the link in Chrome.</section>'})}
@@ -123,18 +229,21 @@ try{new Function('a','return a??1;')}catch(e){document.addEventListener('DOMCont
 </head><body>
 <div id="auth" hidden><div class="acard">
 <div class="achip">Workshop Tracker</div>
+<div class="spin" id="auSpin" hidden></div>
 <h2 id="auTitle"></h2>
 <form id="auForm" onsubmit="authSubmit(event);return false" novalidate>
 <label id="auNameL" hidden>الاسم · Name<input id="auName" data-enter="1" autocomplete="name"></label>
-<label>الإيميل · Email<input id="auEmail" type="email" data-enter="1" autocomplete="email" inputmode="email"></label>
-<label>كلمة المرور · Password<input id="auPass" type="password" data-enter="1" autocomplete="current-password"></label>
+<label id="auEmailL">الإيميل · Email<input id="auEmail" type="email" data-enter="1" autocomplete="email" inputmode="email"></label>
+<label id="auPassL"><span id="auPassT">كلمة المرور · Password</span><span class="pw"><input id="auPass" type="password" data-enter="1" autocomplete="current-password"><button type="button" class="btn" id="auEye" aria-pressed="false" onclick="togPw()">إظهار · Show</button></span></label>
+<label id="auPass2L" hidden>تأكيد كلمة المرور · Confirm password<input id="auPass2" type="password" data-enter="1" autocomplete="new-password"></label>
+<button type="button" class="lnk" id="auForgot" onclick="setAuthMode('reset')">نسيت كلمة المرور؟ · Forgot password?</button>
 <div id="authMsg" role="alert"></div>
 <button class="btn pri" id="auBtn" type="submit"></button>
 </form>
-<button class="btn" id="auSwitch" type="button" onclick="setAuthMode(AUTH_MODE==='in'?'up':'in')"></button>
+<button class="btn" id="auSwitch" type="button" onclick="authSwitch()"></button>
 <button class="btn" id="auOut" type="button" onclick="logout()" hidden>خروج · Log out</button>
 </div></div>
-<header><h1>Workshop Tracker</h1><div id="clsBox"><button type="button" class="tb" id="clsBtn" aria-haspopup="true" aria-expanded="false" aria-controls="clsMenu" onclick="clsToggle(event)"><span id="clsName"></span><span aria-hidden="true">▾</span></button><div id="clsMenu" role="group" aria-label="Classes" hidden></div></div><select id="cls" aria-hidden="true" tabindex="-1" style="display:none"></select><input id="newcls" data-enter="1" placeholder="New class name, then Enter" hidden style="width:210px"><span class="lb">AUTOMOTIVE ELECTRICAL · TRAINING RECORD</span><span id="save" class="lb"></span><button class="tb" id="bkBtn" onclick="bak()" title="Download a backup file">⬇ Backup</button><button class="tb" id="undoAll" disabled title="Undo the last change (Ctrl+Z)">↶ Undo</button><button class="tb" id="lang">عربي</button><button class="tb" id="modeBtn" onclick="switchMode()" hidden></button><button class="tb" id="outBtn" onclick="logout()" hidden>Log out</button><nav id="nav"></nav></header>
+<header><h1>Workshop Tracker</h1><div id="clsBox"><button type="button" class="tb" id="clsBtn" aria-haspopup="true" aria-expanded="false" aria-controls="clsMenu" onclick="clsToggle(event)"><span id="clsName"></span><span aria-hidden="true">▾</span></button><div id="clsMenu" role="group" aria-label="Classes" hidden></div></div><select id="cls" aria-hidden="true" tabindex="-1" style="display:none"></select><input id="newcls" data-enter="1" placeholder="New class name, then Enter" hidden style="width:210px"><span class="lb">AUTOMOTIVE ELECTRICAL · TRAINING RECORD</span><div class="hact"><span id="save" class="lb"></span><button class="tb" id="bkBtn" onclick="bak()" title="Download a backup file">⬇ Backup</button><button class="tb" id="undoAll" disabled title="Undo the last change (Ctrl+Z)">↶ Undo</button><button class="tb" id="lang">عربي</button><button class="tb" id="modeBtn" onclick="switchMode()" hidden></button><button class="tb" id="outBtn" onclick="logout()" hidden>Log out</button></div><nav id="nav"></nav></header>
 <div id="alertbar"></div>
 <div id="bkbar"></div>
 <div id="synbar"></div>
@@ -148,7 +257,7 @@ const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI
 // While these two are not filled in, the app works exactly as before (local only, no accounts).
 const STANDALONE=/PASTE_|^\s*$/.test(SUPABASE_URL+SUPABASE_KEY);
 const KEY='wt_v1';
-const DEF={reports:[],students:[],sessions:[],att:{},assess:[],events:[],audit:[],skills:[],skillAssess:[],plans:[],skillNotes:{},behavior:{},bonusB:{},bonusQ:{},bonusNote:{},alertSt:{},classes:[],curClass:null,cur:null,
+const DEF={reports:[],exams:[],students:[],sessions:[],att:{},assess:[],events:[],audit:[],skills:[],skillAssess:[],plans:[],skillNotes:{},behavior:{},bonusB:{},bonusQ:{},bonusNote:{},alertSt:{},classes:[],curClass:null,cur:null,
  set:{hi:80,mid:60,drop:15,low:50,minN:3,bonus:1,pen:-1,absN:2,lowEng:-3,lang:'en',liveCols:'auto',autoXls:true,behMax:10,bonusTo:'behavior'}};
 let D,saveOK=true,rbT=null;
 try{D=Object.assign({},DEF,JSON.parse(localStorage.getItem(KEY)||'{}'));D.set=Object.assign({},DEF.set,D.set)}catch(e){D=JSON.parse(JSON.stringify(DEF));saveOK=false}
@@ -161,7 +270,7 @@ function save(){const j=JSON.stringify(D);if(RO){roGuard(j);return}if(lastSnap!=
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const dt=d=>d?'\u2066'+d+'\u2069':'';// keep YYYY-MM-DD in order even next to Arabic text (RTL page)
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const AR={Trainers:'المدربين',Report:'التقرير',Dashboard:'لوحة المعلومات',Students:'الطلاب',Attendance:'الحضور',Quiz:'الكويزات','Live':'المتابعة المباشرة','Practical Skills':'المهارات العملية',Alerts:'التنبيهات',Settings:'الإعدادات',Behavior:'السلوك',Bonus:'البونص'};
+const AR={Trainers:'المدربين',Report:'التقرير',Exam:'الامتحانات',Dashboard:'لوحة المعلومات',Students:'الطلاب',Attendance:'الحضور',Quiz:'الكويزات','Live':'المتابعة المباشرة','Practical Skills':'المهارات العملية',Alerts:'التنبيهات',Settings:'الإعدادات',Behavior:'السلوك',Bonus:'البونص'};
 const t=k=>D.set.lang==='ar'&&AR[k]||k;
 // ---- Arabic mode: translates the whole interface. Common English names (Excel, PDF, PNG, CSV, JSON, Chrome, Edge, Safari, claude.ai, Ctrl+Z, Workshop Tracker) stay in English ----
 const TRD={"+ Add class": "+ إضافة فصل", "AUTOMOTIVE ELECTRICAL · TRAINING RECORD": "كهرباء السيارات · سجل التدريب", "SAVED ON THIS DEVICE ONLY": "محفوظ على هذا الجهاز فقط", "SAVED ON DEVICE · NO SYNC ACCESS": "محفوظ على الجهاز · لا توجد صلاحية مزامنة", "SAVED ON DEVICE · SYNC ERROR (retrying)": "محفوظ على الجهاز · خطأ في المزامنة (جارٍ إعادة المحاولة)", "SAVED · SYNCED ☁": "محفوظ · تمت المزامنة ☁", "⚠ SAVE FAILED — NOT STORED": "⚠ فشل الحفظ — لم يتم التخزين", "⬇ Backup": "⬇ نسخة احتياطية", "↶ Undo": "↶ تراجع", "← Back": "← رجوع", "Made by mostafa saeed": "تطوير: مصطفى سعيد", "Class": "الفصل", "Class name": "اسم الفصل", "New class name, then Enter": "اسم الفصل الجديد ثم Enter", "Download a backup file": "تحميل ملف نسخة احتياطية", "Undo the last change (Ctrl+Z)": "التراجع عن آخر تغيير (Ctrl+Z)", "Scope": "النطاق", "View all": "عرض الكل", "Dismiss": "إخفاء", "Download backup": "تحميل نسخة احتياطية", "Later": "لاحقًا", "No backup yet. Your data lives only in this browser, so download a backup file.": "لا توجد نسخة احتياطية بعد. بياناتك محفوظة في هذا المتصفح فقط، لذلك حمّل ملف نسخة احتياطية.", "students": "طالب", "Students": "الطلاب", "Class report": "تقرير الفصل", "Export Excel": "تصدير Excel", "Dashboard PDF": "لوحة المعلومات PDF", "Dashboard PNG": "لوحة المعلومات PNG", "Opens as a file — print it or save as PDF": "يُفتح كملف — اطبعه أو احفظه بصيغة PDF", "ACTIVE STUDENTS": "الطلاب النشطون", "CLASS AVERAGE": "متوسط الفصل", "ATTENDANCE": "الحضور", "Attendance": "الحضور", "OPEN ALERTS": "تنبيهات مفتوحة", "Performance levels": "مستويات الأداء", "High": "مرتفع", "Medium": "متوسط", "Low": "منخفض", "High:": "مرتفع:", "Medium:": "متوسط:", "Low:": "منخفض:", "Quiz average over time (%)": "متوسط الكويزات عبر الوقت (%)", "Attendance per session (%)": "الحضور لكل حصة (%)", "LIVE POINTS": "نقاط المتابعة", "(separate from quiz scores)": "(منفصلة عن درجات الكويزات)", "(kept separate from quiz scores)": "(منفصلة عن درجات الكويزات)", "All sessions": "كل الحصص", "TOP STUDENT": "الطالب المتميز", "CLASS NET POINTS": "صافي نقاط الفصل", "INTERACTING": "المشاركون", "NO INTERACTION": "بدون مشاركة", "Top 10": "أفضل 10", "Class points per session": "نقاط الفصل لكل حصة", "Full ranking": "الترتيب الكامل", "NAME": "الاسم", "Name": "الاسم", "BONUS": "المكافآت", "PENALTY": "الخصومات", "NET": "الصافي", "TOP 5 — QUIZ AVERAGE": "أفضل 5 — متوسط الكويزات", "BOTTOM 5 — QUIZ AVERAGE": "أقل 5 — متوسط الكويزات", "ALL STUDENTS — click a name for the full record": "كل الطلاب — اضغط على الاسم لعرض السجل الكامل", "AVG": "المتوسط", "Avg": "المتوسط", "LEVEL": "المستوى", "Level": "المستوى", "TREND": "الاتجاه", "Trend": "الاتجاه", "ATT.": "الحضور", "Declining": "في تراجع", "Improving": "في تحسن", "Stable": "مستقر", "Insufficient Data": "بيانات غير كافية", "ADD STUDENT — type a name, press Enter": "إضافة طالب — اكتب الاسم ثم اضغط Enter", "Add": "إضافة", "SMART IMPORT (Excel / CSV: names, attendance, quiz grades)": "الاستيراد الذكي (Excel / CSV: الأسماء والحضور ودرجات الكويزات)", "Export CSV": "تصدير CSV", "Delete all students": "حذف كل الطلاب", "Sort: name": "ترتيب: الاسم", "Sort: quiz average": "ترتيب: متوسط الكويزات", "Sort: attendance": "ترتيب: الحضور", "Delete": "حذف", "Student name": "اسم الطالب", "Search": "بحث", "Sort": "ترتيب", "No students yet.": "لا يوجد طلاب بعد.", "No students.": "لا يوجد طلاب.", "Add students first.": "أضف الطلاب أولًا.", "STUDENT RECORD": "سجل الطالب", "Report": "تقرير", "Student data (Excel)": "بيانات الطالب (Excel)", "Dashboard (PDF)": "لوحة المعلومات (PDF)", "Dashboard (PNG)": "لوحة المعلومات (PNG)", "QUIZ AVERAGE": "متوسط الكويزات", "Quiz average": "متوسط الكويزات", "NET POINTS": "صافي النقاط", "RANK IN CLASS": "الترتيب في الفصل", "NOTES": "ملاحظات", "Notes": "ملاحظات", "QUIZ SCORES": "درجات الكويزات", "QUIZ": "الكويز", "Quiz": "الكويز", "Quizzes": "الكويزات", "DATE": "التاريخ", "Date": "التاريخ", "SCORE": "الدرجة", "Score": "الدرجة", "LIVE POINTS BY SESSION": "نقاط المتابعة لكل حصة", "PRACTICAL SKILLS (1–10)": "المهارات العملية (من 10)", "ALERTS": "التنبيهات", "Alerts": "التنبيهات", "DEVELOPMENT PLANS — only when needed": "خطط التطوير — عند الحاجة فقط", "Development plans": "خطط التطوير", "No plan for this student.": "لا توجد خطة لهذا الطالب.", "Add plan": "إضافة خطة", "Plan title": "عنوان الخطة", "Problem": "المشكلة", "Measurable target": "هدف قابل للقياس", "Progress note": "ملاحظة التقدم", "Active": "جارية", "Completed": "مكتملة", "Closed": "مغلقة", "Ended": "منتهية", "Late": "متأخر", "Excused": "بعذر", "Not Recorded": "غير مسجل", "Not recorded": "غير مسجل", "No grades": "لا توجد درجات", "No grades.": "لا توجد درجات.", "None": "لا يوجد", "NEW SESSION": "حصة جديدة", "New session": "حصة جديدة", "Create a session to take attendance.": "أنشئ حصة لتسجيل الحضور.", "Mark everyone present": "تسجيل الكل حاضر", "Delete day": "حذف اليوم", "Delete all days": "حذف كل الأيام", "Delete all sessions": "حذف كل الحصص", "Absent": "غائب", "Present": "حاضر", "Other days": "أيام أخرى", "Topic (optional)": "الموضوع (اختياري)", "Month": "الشهر", "No other days this month.": "لا توجد أيام أخرى هذا الشهر.", "No sessions yet.": "لا توجد حصص بعد.", "ATTENDANCE PER DAY": "الحضور لكل يوم", "Attendance day": "يوم حضور", "NEW QUIZ": "كويز جديد", "Delete all quizzes": "حذف كل الكويزات", "Create": "إنشاء", "End": "إنهاء", "Edit": "تعديل", "Reopen": "إعادة فتح", "Title": "العنوان", "Max score": "الدرجة العظمى", "No quizzes yet. Blank scores stay missing, never zero.": "لا توجد كويزات بعد. الدرجات الفارغة تبقى بلا قيمة ولا تُحسب صفرًا.", "Undo last": "تراجع عن الأخير", "Columns: auto": "الأعمدة: تلقائي", "End session": "إنهاء الحصة", "Start session": "بدء الحصة", "Columns": "الأعمدة", "Everyone has at least one event.": "لكل طالب حدث واحد على الأقل.", "EVENT LOG": "سجل الأحداث", "No events yet.": "لا توجد أحداث بعد.", "No interaction yet": "لا توجد مشاركة بعد", "ADD SKILL": "إضافة مهارة", "Delete all skills": "حذف كل المهارات", "rating 1–10 · blank = not assessed": "التقييم من 1 إلى 10 · فارغ = لم يُقيَّم", "Archive": "أرشفة", "Other skills": "مهارات أخرى", "Skill name": "اسم المهارة", "Rating": "التقييم", "Note": "ملاحظة", "No other skills.": "لا توجد مهارات أخرى.", "No skills defined.": "لا توجد مهارات معرّفة.", "No skills yet. Add one above.": "لا توجد مهارات بعد. أضف واحدة بالأعلى.", "Acknowledge": "تم الاطلاع", "Acknowledged": "تم الاطلاع عليه", "Resolve": "تم الحل", "Resolved": "تم الحل", "RESOLVED": "تم الحل", "Positive": "إيجابي", "No problems right now.": "لا توجد مشاكل حاليًا.", "Contact the student about attendance.": "تواصل مع الطالب بخصوص الحضور.", "Review the quiz with the student; consider a development plan.": "راجع الكويز مع الطالب، وفكّر في خطة تطوير.", "Offer targeted practice or revision.": "قدّم تدريبًا أو مراجعة موجهة.", "Monitor and discuss.": "تابع الحالة وناقشها.", "Acknowledge the progress.": "أشِد بالتقدم الذي أحرزه.", "Check in privately. Events reflect instructor observations only.": "تحدث معه على انفراد. الأحداث تعكس ملاحظات المدرّب فقط.", "ACCOUNT & SYNC": "الحساب والمزامنة", "CLASSES": "الفصول", "RULES": "القواعد", "High level from (%)": "بداية المستوى المرتفع (%)", "Medium level from (%)": "بداية المستوى المتوسط (%)", "also the pass mark": "وهي أيضًا درجة النجاح", "Sudden-drop (points)": "الانخفاض المفاجئ (نقاط)", "latest vs previous 3": "آخر كويز مقابل آخر 3 سابقة", "Persistent-low (%)": "الضعف المستمر (%)", "average below this": "المتوسط أقل من هذا", "Minimum quizzes": "الحد الأدنى للكويزات", "for trend and alerts": "للاتجاه والتنبيهات", "Bonus value": "قيمة المكافأة", "per +": "لكل +", "Penalty value": "قيمة الخصم", "per −, negative": "لكل −، بالسالب", "Consecutive absences": "الغياب المتتالي", "alert at": "تنبيه عند", "Low engagement net avg": "متوسط صافي ضعف المشاركة", "last 3 sessions": "آخر 3 حصص", "DATA PROTECTION": "حماية البيانات", "Storage status:": "حالة التخزين:", "Status:": "الحالة:", "Not guaranteed by the browser": "غير مضمونة من المتصفح", "Protected (the browser promised not to clear it)": "محمية (تعهّد المتصفح بعدم مسحها)", "Request protection": "طلب الحماية", "Export to Excel now": "تصدير Excel الآن", "Update my existing file": "تحديث ملفي الحالي", "Link a file (auto-save, Chrome/Edge on a laptop)": "ربط ملف (حفظ تلقائي، Chrome/Edge على اللابتوب)", "Also download the Excel file automatically when I end a session or a quiz": "حمّل ملف Excel تلقائيًا أيضًا عند إنهاء حصة أو كويز", "BACKUP": "النسخ الاحتياطي", "Download backup (JSON)": "تحميل نسخة احتياطية (JSON)", "RESTORE": "استعادة", "Load demo data": "تحميل بيانات تجريبية", "Remove demo data": "حذف البيانات التجريبية", "Data lives in this browser only. Download backups regularly.": "البيانات محفوظة في هذا المتصفح فقط. حمّل نسخًا احتياطية بانتظام.", "Click again to confirm": "اضغط مرة أخرى للتأكيد", "Cancel": "إلغاء", "OK": "موافق", "Open": "مفتوح", "Contributor": "مساهم", "Add an engineer:": "إضافة مهندس:", "Engineer code:": "كود المهندس:", "Sync now": "مزامنة الآن", "Replace cloud with this device": "استبدال بيانات السحابة ببيانات هذا الجهاز", "Use cloud data": "استخدام بيانات السحابة", "Your account already has cloud data. Which one do you want to keep?": "حسابك يحتوي على بيانات في السحابة بالفعل. أي نسخة تريد الاحتفاظ بها؟", "The page hit an error:": "حدث خطأ في الصفحة:", "Please send this message to the developer.": "يرجى إرسال هذه الرسالة إلى المطوّر.", "This browser is too old for the app. Please update iOS / Safari, or open the link in Chrome.": "هذا المتصفح قديم ولا يدعم البرنامج. حدّث iOS / Safari أو افتح الرابط في Chrome.", "Worksheets to import:": "أوراق العمل المراد استيرادها:", "Import:": "استيراد:", "Import": "استيراد", "Names + attendance + quiz grades + IDs": "الأسماء + الحضور + درجات الكويزات + الأرقام", "Names + attendance only": "الأسماء + الحضور فقط", "Add new students and records (keep existing values)": "إضافة الطلاب والسجلات الجديدة (مع الإبقاء على القيم الحالية)", "Update matching records (overwrite existing values)": "تحديث السجلات المتطابقة (استبدال القيم الحالية)", "Import only new records (leave existing days/quizzes untouched)": "استيراد السجلات الجديدة فقط (دون المساس بالأيام/الكويزات الموجودة)", "Skip duplicates (leave students already in this class untouched)": "تخطي المكرر (دون المساس بالطلاب الموجودين في هذا الفصل)", "Student ID": "رقم الطالب", "Class / group": "الفصل / المجموعة", "Ignore": "تجاهل", "SHEET": "الورقة", "COLUMN": "العمود", "WHAT IS IT?": "نوع العمود", "CONFIDENCE": "درجة الثقة", "DETAILS": "التفاصيل", "VALUES": "القيم", "high": "عالية", "check": "راجع", "uncertain": "غير مؤكدة", "set by you": "حددته أنت", "Looks right": "سليم", "Remove": "إزالة", "students found ·": "طالب تم العثور عليهم ·", "new": "جديد", "attendance columns ·": "عمود حضور ·", "quiz columns": "عمود كويز", "Check what each column is. 1 = Present, 0 = Absent, blank = Not Recorded. A quiz score of 0 is never an absence.": "راجع نوع كل عمود. 1 = حاضر، 0 = غائب، فارغ = غير مسجل. درجة الكويز 0 لا تُعتبر غيابًا أبدًا.", "No attendance or quiz columns were found for this selection. Only the names will be added.": "لم يتم العثور على أعمدة حضور أو كويزات في هذا الاختيار. ستُضاف الأسماء فقط.", "NAMES TO CHECK": "أسماء تحتاج مراجعة", "These names look like existing students but are not identical. Nothing is merged unless you say so.": "هذه الأسماء تشبه طلابًا موجودين لكنها ليست مطابقة تمامًا. لن يتم الدمج إلا إذا طلبت ذلك.", "Skip this student": "تخطي هذا الطالب", "Create a new student": "إنشاء طالب جديد", "SAMPLE OF THE CLEANED DATA": "عينة من البيانات بعد التنظيف", "THINGS TO KNOW": "أمور يجب معرفتها", "PROPOSED CHANGES": "التغييرات المقترحة", "no date found, today will be used": "لم يتم العثور على تاريخ، سيُستخدم تاريخ اليوم", "maximum score not found: enter it": "لم يتم العثور على الدرجة العظمى: أدخلها", "Quiz title": "عنوان الكويز", "What to import": "ما المراد استيراده", "Import strategy": "طريقة الاستيراد", "Type": "النوع", "Columns: 1": "الأعمدة: 1", "Select at least one worksheet that contains students.": "اختر ورقة عمل واحدة على الأقل تحتوي على طلاب.", "header is a date": "العنوان تاريخ", "Present/Absent values": "قيم حاضر/غائب", "header says ID/code": "العنوان يشير إلى رقم/كود", "header says class/group": "العنوان يشير إلى فصل/مجموعة", "long-format table": "جدول بصيغة طويلة", "looks like a total, rank, phone or other number": "يبدو كمجموع أو ترتيب أو هاتف أو رقم آخر", "only 0 and 1, no header": "قيم 0 و1 فقط بدون عنوان", "only 0/1, but the header looks like a quiz": "قيم 0/1 فقط لكن العنوان يبدو كويزًا", "row numbers (1, 2, 3 …)": "أرقام صفوف (1، 2، 3 …)", "numeric scores (values other than 0/1)": "درجات رقمية (قيم غير 0/1)", "numeric scores, header looks like a quiz": "درجات رقمية والعنوان يبدو كويزًا", "several students share this name": "عدة طلاب بنفس الاسم", "similar to an existing name": "مشابه لاسم موجود", "Preparing": "جارٍ التحضير", "… this can take a few seconds": "… قد يستغرق هذا بضع ثوانٍ", "Add fictional DEMO students?": "إضافة طلاب تجريبيين وهميين؟", "Class name already exists": "اسم الفصل موجود بالفعل", "Could not read this file": "تعذّرت قراءة هذا الملف", "Export was cancelled": "تم إلغاء التصدير", "Invalid backup file": "ملف النسخة الاحتياطية غير صالح", "No student names could be found in this file.": "لم يتم العثور على أسماء طلاب في هذا الملف.", "Plan title is required": "عنوان الخطة مطلوب", "Rating must be 1 to 10": "يجب أن يكون التقييم من 1 إلى 10", "Student not found": "لم يتم العثور على الطالب", "This name already exists": "هذا الاسم موجود بالفعل", "Title and a positive max score are required": "العنوان ودرجة عظمى أكبر من صفر مطلوبان", "The Excel library did not load. Check your connection and try again.": "لم يتم تحميل مكتبة Excel. تأكد من الاتصال بالإنترنت وحاول مرة أخرى.", "The Excel reader could not load. Check your connection, or save the sheet as CSV.": "تعذّر تحميل قارئ Excel. تأكد من الاتصال بالإنترنت أو احفظ الشيت بصيغة CSV.", "This browser does not allow linking a file here. It works on Chrome or Edge on a laptop. Use \"Export to Excel\" instead.": "هذا المتصفح لا يسمح بربط ملف هنا. الميزة تعمل على Chrome أو Edge في اللابتوب. استخدم \"تصدير Excel\" بدلًا منها.", "Linked. The file updates automatically a few seconds after every change while this page is open. After reopening the page, link it again.": "تم الربط. يتحدّث الملف تلقائيًا بعد ثوانٍ من كل تغيير طالما الصفحة مفتوحة. بعد إعادة فتح الصفحة اربطه مرة أخرى.", "Print / Save as PDF": "طباعة / حفظ بصيغة PDF", "Last backup": "آخر نسخة احتياطية", "No data.": "لا توجد بيانات.", "No data yet.": "لا توجد بيانات بعد.", "No graded students yet.": "لا يوجد طلاب تم تصحيحهم بعد.", "No improvements detected yet.": "لم يتم رصد تحسّن بعد.", "Everyone": "الجميع", "No open alerts": "لا توجد تنبيهات مفتوحة", "No plans yet": "لا توجد خطط بعد", "No quizzes yet": "لا توجد كويزات بعد", "Dashboard": "لوحة المعلومات", "Settings": "الإعدادات", "Live": "المتابعة المباشرة", "Practical Skills": "المهارات العملية", "This version works without any account. Your data is stored on this device only. To move it to another phone or laptop, use ⬇ Backup here, then Restore on the other device.": "يعمل هذا الإصدار بدون أي حساب. بياناتك محفوظة على هذا الجهاز فقط. لنقلها إلى هاتف أو لابتوب آخر استخدم ⬇ نسخة احتياطية هنا، ثم استعدها على الجهاز الآخر.", "Your data is saved twice on this device, in two separate browser stores. Safari on iPhone can still erase a website's data after about a week without opening it. To avoid that, add this page to the Home Screen and open it from there, or open the app at least once a week. Chrome and Edge keep the data unless the device is very low on space.": "بياناتك محفوظة مرتين على هذا الجهاز في مخزنين منفصلين بالمتصفح. ومع ذلك قد يمسح Safari على iPhone بيانات أي موقع بعد نحو أسبوع من عدم فتحه. لتجنب ذلك أضف هذه الصفحة إلى الشاشة الرئيسية وافتحها من هناك، أو افتح البرنامج مرة واحدة على الأقل أسبوعيًا. يحتفظ Chrome وEdge بالبيانات ما لم تكن مساحة الجهاز منخفضة جدًا.", "The class file has two sheets: \"Class data\" (each student with attendance and quiz grades) and \"Dashboard\" (class totals). For one student, open the profile and press Export Excel. \"Update my existing file\" refreshes only these two sheets inside your own workbook and keeps any other sheets you added.": "ملف الفصل فيه شيتان: \"Class data\" (كل طالب مع الحضور ودرجات الكويزات) و\"Dashboard\" (إجماليات الفصل). لتصدير طالب واحد افتح ملفه واضغط تصدير Excel. زر \"تحديث ملفي الحالي\" يحدّث هذين الشيتين فقط داخل ملفك ويُبقي أي شيتات أخرى أضفتها.", "On iPhone, Safari can erase a website's data after about a week without opening it. To keep your data safe, add this page to your Home Screen (Share, then Add to Home Screen) and open it from there.": "على iPhone قد يمسح Safari بيانات أي موقع بعد نحو أسبوع من عدم فتحه. للحفاظ على بياناتك أضف هذه الصفحة إلى الشاشة الرئيسية (مشاركة ثم إضافة إلى الشاشة الرئيسية) وافتحها من هناك.", "You are not signed in to claude.ai, so your data is saved on this device only. Sign in with your account and reopen this link to use it on your phone and laptop.": "لم تسجّل الدخول إلى claude.ai، لذلك بياناتك محفوظة على هذا الجهاز فقط. سجّل الدخول بحسابك وأعد فتح هذا الرابط لاستخدامه على هاتفك وجهاز اللابتوب.", "Open this page signed in on any phone or laptop and you get the same data. Each engineer who opens it with their own account has a separate private workspace.": "افتح هذه الصفحة بعد تسجيل الدخول من أي هاتف أو لابتوب وستحصل على البيانات نفسها. كل مهندس يفتحها بحسابه الخاص له مساحة عمل خاصة ومنفصلة.", "Sync is off. Open this page while signed in to claude.ai to keep your data on every device. Right now it is stored on this device only.": "المزامنة متوقفة. افتح هذه الصفحة وأنت مسجّل الدخول إلى claude.ai للاحتفاظ ببياناتك على كل أجهزتك. حاليًا بياناتك محفوظة على هذا الجهاز فقط.", "Sync is unavailable for your access level, so data stays on this device. Ask the owner to share this page with you as a Contributor.": "المزامنة غير متاحة لمستوى صلاحيتك، لذلك تبقى البيانات على هذا الجهاز. اطلب من المالك مشاركة هذه الصفحة معك بصفة مساهم.", "+ ADD CLASS": "+ إضافة فصل", "SAVED ON DEVICE · SYNC ERROR (RETRYING)": "محفوظ على الجهاز · خطأ في المزامنة (جارٍ إعادة المحاولة)", "⬇ BACKUP": "⬇ نسخة احتياطية", "↶ UNDO": "↶ تراجع", "← BACK": "← رجوع", "MADE BY MOSTAFA SAEED": "تطوير: مصطفى سعيد", "CLASS": "الفصل", "CLASS NAME": "اسم الفصل", "NEW CLASS NAME, THEN ENTER": "اسم الفصل الجديد ثم Enter", "DOWNLOAD A BACKUP FILE": "تحميل ملف نسخة احتياطية", "UNDO THE LAST CHANGE (CTRL+Z)": "التراجع عن آخر تغيير (Ctrl+Z)", "SCOPE": "النطاق", "VIEW ALL": "عرض الكل", "DISMISS": "إخفاء", "DOWNLOAD BACKUP": "تحميل نسخة احتياطية", "LATER": "لاحقًا", "NO BACKUP YET. YOUR DATA LIVES ONLY IN THIS BROWSER, SO DOWNLOAD A BACKUP FILE.": "لا توجد نسخة احتياطية بعد. بياناتك محفوظة في هذا المتصفح فقط، لذلك حمّل ملف نسخة احتياطية.", "STUDENTS": "طالب", "CLASS REPORT": "تقرير الفصل", "EXPORT EXCEL": "تصدير Excel", "DASHBOARD PDF": "لوحة المعلومات PDF", "DASHBOARD PNG": "لوحة المعلومات PNG", "OPENS AS A FILE — PRINT IT OR SAVE AS PDF": "يُفتح كملف — اطبعه أو احفظه بصيغة PDF", "PERFORMANCE LEVELS": "مستويات الأداء", "HIGH": "مرتفع", "MEDIUM": "متوسط", "LOW": "منخفض", "HIGH:": "مرتفع:", "MEDIUM:": "متوسط:", "LOW:": "منخفض:", "QUIZ AVERAGE OVER TIME (%)": "متوسط الكويزات عبر الوقت (%)", "ATTENDANCE PER SESSION (%)": "الحضور لكل حصة (%)", "(SEPARATE FROM QUIZ SCORES)": "(منفصلة عن درجات الكويزات)", "(KEPT SEPARATE FROM QUIZ SCORES)": "(منفصلة عن درجات الكويزات)", "ALL SESSIONS": "كل الحصص", "TOP 10": "أفضل 10", "CLASS POINTS PER SESSION": "نقاط الفصل لكل حصة", "FULL RANKING": "الترتيب الكامل", "ALL STUDENTS — CLICK A NAME FOR THE FULL RECORD": "كل الطلاب — اضغط على الاسم لعرض السجل الكامل", "DECLINING": "في تراجع", "IMPROVING": "في تحسن", "STABLE": "مستقر", "INSUFFICIENT DATA": "بيانات غير كافية", "ADD STUDENT — TYPE A NAME, PRESS ENTER": "إضافة طالب — اكتب الاسم ثم اضغط Enter", "ADD": "إضافة", "SMART IMPORT (EXCEL / CSV: NAMES, ATTENDANCE, QUIZ GRADES)": "الاستيراد الذكي (Excel / CSV: الأسماء والحضور ودرجات الكويزات)", "EXPORT CSV": "تصدير CSV", "DELETE ALL STUDENTS": "حذف كل الطلاب", "SORT: NAME": "ترتيب: الاسم", "SORT: QUIZ AVERAGE": "ترتيب: متوسط الكويزات", "SORT: ATTENDANCE": "ترتيب: الحضور", "DELETE": "حذف", "STUDENT NAME": "اسم الطالب", "SEARCH": "بحث", "SORT": "ترتيب", "NO STUDENTS YET.": "لا يوجد طلاب بعد.", "NO STUDENTS.": "لا يوجد طلاب.", "ADD STUDENTS FIRST.": "أضف الطلاب أولًا.", "REPORT": "تقرير", "STUDENT DATA (EXCEL)": "بيانات الطالب (Excel)", "DASHBOARD (PDF)": "لوحة المعلومات (PDF)", "DASHBOARD (PNG)": "لوحة المعلومات (PNG)", "QUIZZES": "الكويزات", "DEVELOPMENT PLANS — ONLY WHEN NEEDED": "خطط التطوير — عند الحاجة فقط", "DEVELOPMENT PLANS": "خطط التطوير", "NO PLAN FOR THIS STUDENT.": "لا توجد خطة لهذا الطالب.", "ADD PLAN": "إضافة خطة", "PLAN TITLE": "عنوان الخطة", "PROBLEM": "المشكلة", "MEASURABLE TARGET": "هدف قابل للقياس", "PROGRESS NOTE": "ملاحظة التقدم", "ACTIVE": "جارية", "COMPLETED": "مكتملة", "CLOSED": "مغلقة", "ENDED": "منتهية", "LATE": "متأخر", "EXCUSED": "بعذر", "NOT RECORDED": "غير مسجل", "NO GRADES": "لا توجد درجات", "NO GRADES.": "لا توجد درجات.", "NONE": "لا يوجد", "CREATE A SESSION TO TAKE ATTENDANCE.": "أنشئ حصة لتسجيل الحضور.", "MARK EVERYONE PRESENT": "تسجيل الكل حاضر", "DELETE DAY": "حذف اليوم", "DELETE ALL DAYS": "حذف كل الأيام", "DELETE ALL SESSIONS": "حذف كل الحصص", "ABSENT": "غائب", "PRESENT": "حاضر", "OTHER DAYS": "أيام أخرى", "TOPIC (OPTIONAL)": "الموضوع (اختياري)", "MONTH": "الشهر", "NO OTHER DAYS THIS MONTH.": "لا توجد أيام أخرى هذا الشهر.", "NO SESSIONS YET.": "لا توجد حصص بعد.", "ATTENDANCE DAY": "يوم حضور", "DELETE ALL QUIZZES": "حذف كل الكويزات", "CREATE": "إنشاء", "END": "إنهاء", "EDIT": "تعديل", "REOPEN": "إعادة فتح", "TITLE": "العنوان", "MAX SCORE": "الدرجة العظمى", "NO QUIZZES YET. BLANK SCORES STAY MISSING, NEVER ZERO.": "لا توجد كويزات بعد. الدرجات الفارغة تبقى بلا قيمة ولا تُحسب صفرًا.", "UNDO LAST": "تراجع عن الأخير", "COLUMNS: AUTO": "الأعمدة: تلقائي", "END SESSION": "إنهاء الحصة", "START SESSION": "بدء الحصة", "COLUMNS": "الأعمدة", "EVERYONE HAS AT LEAST ONE EVENT.": "لكل طالب حدث واحد على الأقل.", "NO EVENTS YET.": "لا توجد أحداث بعد.", "NO INTERACTION YET": "لا توجد مشاركة بعد", "DELETE ALL SKILLS": "حذف كل المهارات", "RATING 1–10 · BLANK = NOT ASSESSED": "التقييم من 1 إلى 10 · فارغ = لم يُقيَّم", "ARCHIVE": "أرشفة", "OTHER SKILLS": "مهارات أخرى", "SKILL NAME": "اسم المهارة", "RATING": "التقييم", "NOTE": "ملاحظة", "NO OTHER SKILLS.": "لا توجد مهارات أخرى.", "NO SKILLS DEFINED.": "لا توجد مهارات معرّفة.", "NO SKILLS YET. ADD ONE ABOVE.": "لا توجد مهارات بعد. أضف واحدة بالأعلى.", "ACKNOWLEDGE": "تم الاطلاع", "ACKNOWLEDGED": "تم الاطلاع عليه", "RESOLVE": "تم الحل", "POSITIVE": "إيجابي", "NO PROBLEMS RIGHT NOW.": "لا توجد مشاكل حاليًا.", "CONTACT THE STUDENT ABOUT ATTENDANCE.": "تواصل مع الطالب بخصوص الحضور.", "REVIEW THE QUIZ WITH THE STUDENT; CONSIDER A DEVELOPMENT PLAN.": "راجع الكويز مع الطالب، وفكّر في خطة تطوير.", "OFFER TARGETED PRACTICE OR REVISION.": "قدّم تدريبًا أو مراجعة موجهة.", "MONITOR AND DISCUSS.": "تابع الحالة وناقشها.", "ACKNOWLEDGE THE PROGRESS.": "أشِد بالتقدم الذي أحرزه.", "CHECK IN PRIVATELY. EVENTS REFLECT INSTRUCTOR OBSERVATIONS ONLY.": "تحدث معه على انفراد. الأحداث تعكس ملاحظات المدرّب فقط.", "HIGH LEVEL FROM (%)": "بداية المستوى المرتفع (%)", "MEDIUM LEVEL FROM (%)": "بداية المستوى المتوسط (%)", "ALSO THE PASS MARK": "وهي أيضًا درجة النجاح", "SUDDEN-DROP (POINTS)": "الانخفاض المفاجئ (نقاط)", "LATEST VS PREVIOUS 3": "آخر كويز مقابل آخر 3 سابقة", "PERSISTENT-LOW (%)": "الضعف المستمر (%)", "AVERAGE BELOW THIS": "المتوسط أقل من هذا", "MINIMUM QUIZZES": "الحد الأدنى للكويزات", "FOR TREND AND ALERTS": "للاتجاه والتنبيهات", "BONUS VALUE": "قيمة المكافأة", "PER +": "لكل +", "PENALTY VALUE": "قيمة الخصم", "PER −, NEGATIVE": "لكل −، بالسالب", "CONSECUTIVE ABSENCES": "الغياب المتتالي", "ALERT AT": "تنبيه عند", "LOW ENGAGEMENT NET AVG": "متوسط صافي ضعف المشاركة", "LAST 3 SESSIONS": "آخر 3 حصص", "STORAGE STATUS:": "حالة التخزين:", "STATUS:": "الحالة:", "NOT GUARANTEED BY THE BROWSER": "غير مضمونة من المتصفح", "PROTECTED (THE BROWSER PROMISED NOT TO CLEAR IT)": "محمية (تعهّد المتصفح بعدم مسحها)", "REQUEST PROTECTION": "طلب الحماية", "EXPORT TO EXCEL NOW": "تصدير Excel الآن", "UPDATE MY EXISTING FILE": "تحديث ملفي الحالي", "LINK A FILE (AUTO-SAVE, CHROME/EDGE ON A LAPTOP)": "ربط ملف (حفظ تلقائي، Chrome/Edge على اللابتوب)", "ALSO DOWNLOAD THE EXCEL FILE AUTOMATICALLY WHEN I END A SESSION OR A QUIZ": "حمّل ملف Excel تلقائيًا أيضًا عند إنهاء حصة أو كويز", "DOWNLOAD BACKUP (JSON)": "تحميل نسخة احتياطية (JSON)", "LOAD DEMO DATA": "تحميل بيانات تجريبية", "REMOVE DEMO DATA": "حذف البيانات التجريبية", "DATA LIVES IN THIS BROWSER ONLY. DOWNLOAD BACKUPS REGULARLY.": "البيانات محفوظة في هذا المتصفح فقط. حمّل نسخًا احتياطية بانتظام.", "CLICK AGAIN TO CONFIRM": "اضغط مرة أخرى للتأكيد", "CANCEL": "إلغاء", "OPEN": "مفتوح", "CONTRIBUTOR": "مساهم", "ADD AN ENGINEER:": "إضافة مهندس:", "ENGINEER CODE:": "كود المهندس:", "SYNC NOW": "مزامنة الآن", "REPLACE CLOUD WITH THIS DEVICE": "استبدال بيانات السحابة ببيانات هذا الجهاز", "USE CLOUD DATA": "استخدام بيانات السحابة", "YOUR ACCOUNT ALREADY HAS CLOUD DATA. WHICH ONE DO YOU WANT TO KEEP?": "حسابك يحتوي على بيانات في السحابة بالفعل. أي نسخة تريد الاحتفاظ بها؟", "THE PAGE HIT AN ERROR:": "حدث خطأ في الصفحة:", "PLEASE SEND THIS MESSAGE TO THE DEVELOPER.": "يرجى إرسال هذه الرسالة إلى المطوّر.", "THIS BROWSER IS TOO OLD FOR THE APP. PLEASE UPDATE IOS / SAFARI, OR OPEN THE LINK IN CHROME.": "هذا المتصفح قديم ولا يدعم البرنامج. حدّث iOS / Safari أو افتح الرابط في Chrome.", "WORKSHEETS TO IMPORT:": "أوراق العمل المراد استيرادها:", "IMPORT:": "استيراد:", "IMPORT": "استيراد", "NAMES + ATTENDANCE + QUIZ GRADES + IDS": "الأسماء + الحضور + درجات الكويزات + الأرقام", "NAMES + ATTENDANCE ONLY": "الأسماء + الحضور فقط", "ADD NEW STUDENTS AND RECORDS (KEEP EXISTING VALUES)": "إضافة الطلاب والسجلات الجديدة (مع الإبقاء على القيم الحالية)", "UPDATE MATCHING RECORDS (OVERWRITE EXISTING VALUES)": "تحديث السجلات المتطابقة (استبدال القيم الحالية)", "IMPORT ONLY NEW RECORDS (LEAVE EXISTING DAYS/QUIZZES UNTOUCHED)": "استيراد السجلات الجديدة فقط (دون المساس بالأيام/الكويزات الموجودة)", "SKIP DUPLICATES (LEAVE STUDENTS ALREADY IN THIS CLASS UNTOUCHED)": "تخطي المكرر (دون المساس بالطلاب الموجودين في هذا الفصل)", "STUDENT ID": "رقم الطالب", "CLASS / GROUP": "الفصل / المجموعة", "IGNORE": "تجاهل", "CHECK": "راجع", "UNCERTAIN": "غير مؤكدة", "SET BY YOU": "حددته أنت", "LOOKS RIGHT": "سليم", "REMOVE": "إزالة", "STUDENTS FOUND ·": "طالب تم العثور عليهم ·", "NEW": "جديد", "ATTENDANCE COLUMNS ·": "عمود حضور ·", "QUIZ COLUMNS": "عمود كويز", "CHECK WHAT EACH COLUMN IS. 1 = PRESENT, 0 = ABSENT, BLANK = NOT RECORDED. A QUIZ SCORE OF 0 IS NEVER AN ABSENCE.": "راجع نوع كل عمود. 1 = حاضر، 0 = غائب، فارغ = غير مسجل. درجة الكويز 0 لا تُعتبر غيابًا أبدًا.", "NO ATTENDANCE OR QUIZ COLUMNS WERE FOUND FOR THIS SELECTION. ONLY THE NAMES WILL BE ADDED.": "لم يتم العثور على أعمدة حضور أو كويزات في هذا الاختيار. ستُضاف الأسماء فقط.", "THESE NAMES LOOK LIKE EXISTING STUDENTS BUT ARE NOT IDENTICAL. NOTHING IS MERGED UNLESS YOU SAY SO.": "هذه الأسماء تشبه طلابًا موجودين لكنها ليست مطابقة تمامًا. لن يتم الدمج إلا إذا طلبت ذلك.", "SKIP THIS STUDENT": "تخطي هذا الطالب", "CREATE A NEW STUDENT": "إنشاء طالب جديد", "NO DATE FOUND, TODAY WILL BE USED": "لم يتم العثور على تاريخ، سيُستخدم تاريخ اليوم", "MAXIMUM SCORE NOT FOUND: ENTER IT": "لم يتم العثور على الدرجة العظمى: أدخلها", "QUIZ TITLE": "عنوان الكويز", "WHAT TO IMPORT": "ما المراد استيراده", "IMPORT STRATEGY": "طريقة الاستيراد", "TYPE": "النوع", "COLUMNS: 1": "الأعمدة: 1", "SELECT AT LEAST ONE WORKSHEET THAT CONTAINS STUDENTS.": "اختر ورقة عمل واحدة على الأقل تحتوي على طلاب.", "HEADER IS A DATE": "العنوان تاريخ", "PRESENT/ABSENT VALUES": "قيم حاضر/غائب", "HEADER SAYS ID/CODE": "العنوان يشير إلى رقم/كود", "HEADER SAYS CLASS/GROUP": "العنوان يشير إلى فصل/مجموعة", "LONG-FORMAT TABLE": "جدول بصيغة طويلة", "LOOKS LIKE A TOTAL, RANK, PHONE OR OTHER NUMBER": "يبدو كمجموع أو ترتيب أو هاتف أو رقم آخر", "ONLY 0 AND 1, NO HEADER": "قيم 0 و1 فقط بدون عنوان", "ONLY 0/1, BUT THE HEADER LOOKS LIKE A QUIZ": "قيم 0/1 فقط لكن العنوان يبدو كويزًا", "ROW NUMBERS (1, 2, 3 …)": "أرقام صفوف (1، 2، 3 …)", "NUMERIC SCORES (VALUES OTHER THAN 0/1)": "درجات رقمية (قيم غير 0/1)", "NUMERIC SCORES, HEADER LOOKS LIKE A QUIZ": "درجات رقمية والعنوان يبدو كويزًا", "SEVERAL STUDENTS SHARE THIS NAME": "عدة طلاب بنفس الاسم", "SIMILAR TO AN EXISTING NAME": "مشابه لاسم موجود", "PREPARING": "جارٍ التحضير", "… THIS CAN TAKE A FEW SECONDS": "… قد يستغرق هذا بضع ثوانٍ", "ADD FICTIONAL DEMO STUDENTS?": "إضافة طلاب تجريبيين وهميين؟", "CLASS NAME ALREADY EXISTS": "اسم الفصل موجود بالفعل", "COULD NOT READ THIS FILE": "تعذّرت قراءة هذا الملف", "EXPORT WAS CANCELLED": "تم إلغاء التصدير", "INVALID BACKUP FILE": "ملف النسخة الاحتياطية غير صالح", "NO STUDENT NAMES COULD BE FOUND IN THIS FILE.": "لم يتم العثور على أسماء طلاب في هذا الملف.", "PLAN TITLE IS REQUIRED": "عنوان الخطة مطلوب", "RATING MUST BE 1 TO 10": "يجب أن يكون التقييم من 1 إلى 10", "STUDENT NOT FOUND": "لم يتم العثور على الطالب", "THIS NAME ALREADY EXISTS": "هذا الاسم موجود بالفعل", "TITLE AND A POSITIVE MAX SCORE ARE REQUIRED": "العنوان ودرجة عظمى أكبر من صفر مطلوبان", "THE EXCEL LIBRARY DID NOT LOAD. CHECK YOUR CONNECTION AND TRY AGAIN.": "لم يتم تحميل مكتبة Excel. تأكد من الاتصال بالإنترنت وحاول مرة أخرى.", "THE EXCEL READER COULD NOT LOAD. CHECK YOUR CONNECTION, OR SAVE THE SHEET AS CSV.": "تعذّر تحميل قارئ Excel. تأكد من الاتصال بالإنترنت أو احفظ الشيت بصيغة CSV.", "THIS BROWSER DOES NOT ALLOW LINKING A FILE HERE. IT WORKS ON CHROME OR EDGE ON A LAPTOP. USE \"EXPORT TO EXCEL\" INSTEAD.": "هذا المتصفح لا يسمح بربط ملف هنا. الميزة تعمل على Chrome أو Edge في اللابتوب. استخدم \"تصدير Excel\" بدلًا منها.", "LINKED. THE FILE UPDATES AUTOMATICALLY A FEW SECONDS AFTER EVERY CHANGE WHILE THIS PAGE IS OPEN. AFTER REOPENING THE PAGE, LINK IT AGAIN.": "تم الربط. يتحدّث الملف تلقائيًا بعد ثوانٍ من كل تغيير طالما الصفحة مفتوحة. بعد إعادة فتح الصفحة اربطه مرة أخرى.", "PRINT / SAVE AS PDF": "طباعة / حفظ بصيغة PDF", "LAST BACKUP": "آخر نسخة احتياطية", "NO DATA.": "لا توجد بيانات.", "NO DATA YET.": "لا توجد بيانات بعد.", "NO GRADED STUDENTS YET.": "لا يوجد طلاب تم تصحيحهم بعد.", "NO IMPROVEMENTS DETECTED YET.": "لم يتم رصد تحسّن بعد.", "EVERYONE": "الجميع", "NO OPEN ALERTS": "لا توجد تنبيهات مفتوحة", "NO PLANS YET": "لا توجد خطط بعد", "NO QUIZZES YET": "لا توجد كويزات بعد", "DASHBOARD": "لوحة المعلومات", "SETTINGS": "الإعدادات", "LIVE": "المتابعة المباشرة", "PRACTICAL SKILLS": "المهارات العملية", "THIS VERSION WORKS WITHOUT ANY ACCOUNT. YOUR DATA IS STORED ON THIS DEVICE ONLY. TO MOVE IT TO ANOTHER PHONE OR LAPTOP, USE ⬇ BACKUP HERE, THEN RESTORE ON THE OTHER DEVICE.": "يعمل هذا الإصدار بدون أي حساب. بياناتك محفوظة على هذا الجهاز فقط. لنقلها إلى هاتف أو لابتوب آخر استخدم ⬇ نسخة احتياطية هنا، ثم استعدها على الجهاز الآخر.", "YOUR DATA IS SAVED TWICE ON THIS DEVICE, IN TWO SEPARATE BROWSER STORES. SAFARI ON IPHONE CAN STILL ERASE A WEBSITE'S DATA AFTER ABOUT A WEEK WITHOUT OPENING IT. TO AVOID THAT, ADD THIS PAGE TO THE HOME SCREEN AND OPEN IT FROM THERE, OR OPEN THE APP AT LEAST ONCE A WEEK. CHROME AND EDGE KEEP THE DATA UNLESS THE DEVICE IS VERY LOW ON SPACE.": "بياناتك محفوظة مرتين على هذا الجهاز في مخزنين منفصلين بالمتصفح. ومع ذلك قد يمسح Safari على iPhone بيانات أي موقع بعد نحو أسبوع من عدم فتحه. لتجنب ذلك أضف هذه الصفحة إلى الشاشة الرئيسية وافتحها من هناك، أو افتح البرنامج مرة واحدة على الأقل أسبوعيًا. يحتفظ Chrome وEdge بالبيانات ما لم تكن مساحة الجهاز منخفضة جدًا.", "THE CLASS FILE HAS TWO SHEETS: \"CLASS DATA\" (EACH STUDENT WITH ATTENDANCE AND QUIZ GRADES) AND \"DASHBOARD\" (CLASS TOTALS). FOR ONE STUDENT, OPEN THE PROFILE AND PRESS EXPORT EXCEL. \"UPDATE MY EXISTING FILE\" REFRESHES ONLY THESE TWO SHEETS INSIDE YOUR OWN WORKBOOK AND KEEPS ANY OTHER SHEETS YOU ADDED.": "ملف الفصل فيه شيتان: \"Class data\" (كل طالب مع الحضور ودرجات الكويزات) و\"Dashboard\" (إجماليات الفصل). لتصدير طالب واحد افتح ملفه واضغط تصدير Excel. زر \"تحديث ملفي الحالي\" يحدّث هذين الشيتين فقط داخل ملفك ويُبقي أي شيتات أخرى أضفتها.", "ON IPHONE, SAFARI CAN ERASE A WEBSITE'S DATA AFTER ABOUT A WEEK WITHOUT OPENING IT. TO KEEP YOUR DATA SAFE, ADD THIS PAGE TO YOUR HOME SCREEN (SHARE, THEN ADD TO HOME SCREEN) AND OPEN IT FROM THERE.": "على iPhone قد يمسح Safari بيانات أي موقع بعد نحو أسبوع من عدم فتحه. للحفاظ على بياناتك أضف هذه الصفحة إلى الشاشة الرئيسية (مشاركة ثم إضافة إلى الشاشة الرئيسية) وافتحها من هناك.", "YOU ARE NOT SIGNED IN TO CLAUDE.AI, SO YOUR DATA IS SAVED ON THIS DEVICE ONLY. SIGN IN WITH YOUR ACCOUNT AND REOPEN THIS LINK TO USE IT ON YOUR PHONE AND LAPTOP.": "لم تسجّل الدخول إلى claude.ai، لذلك بياناتك محفوظة على هذا الجهاز فقط. سجّل الدخول بحسابك وأعد فتح هذا الرابط لاستخدامه على هاتفك وجهاز اللابتوب.", "OPEN THIS PAGE SIGNED IN ON ANY PHONE OR LAPTOP AND YOU GET THE SAME DATA. EACH ENGINEER WHO OPENS IT WITH THEIR OWN ACCOUNT HAS A SEPARATE PRIVATE WORKSPACE.": "افتح هذه الصفحة بعد تسجيل الدخول من أي هاتف أو لابتوب وستحصل على البيانات نفسها. كل مهندس يفتحها بحسابه الخاص له مساحة عمل خاصة ومنفصلة.", "SYNC IS OFF. OPEN THIS PAGE WHILE SIGNED IN TO CLAUDE.AI TO KEEP YOUR DATA ON EVERY DEVICE. RIGHT NOW IT IS STORED ON THIS DEVICE ONLY.": "المزامنة متوقفة. افتح هذه الصفحة وأنت مسجّل الدخول إلى claude.ai للاحتفاظ ببياناتك على كل أجهزتك. حاليًا بياناتك محفوظة على هذا الجهاز فقط.", "SYNC IS UNAVAILABLE FOR YOUR ACCESS LEVEL, SO DATA STAYS ON THIS DEVICE. ASK THE OWNER TO SHARE THIS PAGE WITH YOU AS A CONTRIBUTOR.": "المزامنة غير متاحة لمستوى صلاحيتك، لذلك تبقى البيانات على هذا الجهاز. اطلب من المالك مشاركة هذه الصفحة معك بصفة مساهم."};
@@ -244,10 +353,11 @@ function trStart(){if(trObs||typeof MutationObserver==='undefined')return;trObs=
 ['alert','confirm','prompt'].forEach(k=>{const o=window[k].bind(window);window[k]=(m,...a)=>o(D&&D.set&&D.set.lang==='ar'?trMsg(m):m,...a)});
 function trApply(){document.documentElement.lang=D.set.lang==='ar'?'ar':'en';const lb=document.getElementById('lang');if(lb)lb.textContent=D.set.lang==='ar'?'English':'عربي';if(D.set.lang==='ar'){trStart();trDom(document.body)}else trRestore(document.body)}
 
-const TABS=['Dashboard','Students','Attendance','Quiz','Behavior','Bonus','Live','Practical Skills','Alerts','Report','Settings'];
+const TABS=['Dashboard','Students','Attendance','Quiz','Exam','Behavior','Bonus','Live','Practical Skills','Alerts','Report','Settings'];
 let tabs=TABS.slice();
 let tab='Attendance',q='',pid=null,dTier=null;
-const today=()=>new Date().toISOString().slice(0,10);
+const locDay=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');// local calendar day (toISOString would give the UTC day: yesterday after midnight in Egypt)
+const today=()=>locDay(new Date());
 // ---- calculations ----
 const act=()=>D.students.filter(s=>s.status==='Active'&&s.cls===D.curClass).sort((a,b)=>stuCmp(a,b));
 const live=()=>D.events.filter(e=>!e.reversed);
@@ -271,7 +381,7 @@ function byQuiz(rows){return rows.map((r,i)=>({r,i,p:(quizTot(r.s.id)||{}).p})).
 const clsList=()=>D.students.filter(s=>s.cls===D.curClass).sort(stuCmp);
 function applyOrd(L){L.forEach((s,i)=>s.ord=i+1);save();go()}
 function moveStu(id,d){const L=clsList(),i=L.findIndex(s=>s.id===id),j=i+d;if(i<0||j<0||j>=L.length)return;[L[i],L[j]]=[L[j],L[i]];applyOrd(L)}
-function resetOrd(){if(!confirm('Go back to the automatic alphabetical order for this class?'))return;D.students.filter(s=>s.cls===D.curClass).forEach(s=>{delete s.ord});save();go()}
+async function resetOrd(){if(!await uiConfirm('Go back to the automatic alphabetical order for this class?'))return;D.students.filter(s=>s.cls===D.curClass).forEach(s=>{delete s.ord});save();go()}
 function ordCtl(s,i,n){if(stuSort!=='name'||q)return `<span class="mono mut">${i+1}</span>`;return `<span class="dh" tabindex="0" role="button" data-id="${s.id}" aria-label="Drag to reorder" title="Drag to reorder" onpointerdown="dragStart(event,'${s.id}')" onkeydown="dragKey(event,'${s.id}')">⠿</span> <span class="mono mut">${i+1}</span>`}
 function commitOrd(ids){ids.forEach((id,i)=>{const s=D.students.find(x=>x.id===id);if(s)s.ord=i+1});save();go()}
 function dragKey(e,id){const d=e.key==='ArrowUp'?-1:e.key==='ArrowDown'?1:0;if(!d)return;e.preventDefault();moveStu(id,d);const h=document.querySelector('.dh[data-id="'+id+'"]');if(h)h.focus()}
@@ -352,7 +462,7 @@ function profile(id){const s=D.students.find(x=>x.id===id);if(!s){pid=null;retur
  <section><h2>NOTES</h2><textarea rows="3" style="width:100%" aria-label="Notes" onchange="setNoteS('${id}',this.value)">${esc(s.notes||'')}</textarea></section>
  <div class="ch"><section><h2>QUIZ SCORES</h2>${line(r.map(x=>({l:x.t,v:x.p})))}<table><tr><th>QUIZ</th><th>DATE</th><th>SCORE</th><th>%</th></tr>${r.map(x=>`<tr><td>${esc(x.t)}</td><td class="mono">${dt(x.date)}</td><td>${x.v}/${x.max}</td><td>${x.p.toFixed(0)}%</td></tr>`).join('')||'<tr><td class="mut">No grades.</td></tr>'}</table></section>
  <section><h2>LIVE POINTS BY SESSION</h2>${bars(ses.filter(x=>D.events.some(e=>e.sess===x.id&&e.stu===id)).slice(-8).map(x=>{const v=sessScore(x.id,id);return{l:x.date,v:Math.max(0,v),t:v}}),5)}
- <h2 style="margin-top:14px">PRACTICAL SKILLS (1–10)</h2><table>${D.skills.filter(k=>!k.arch&&k.cls===s.cls).map(k=>`<tr><td>${esc(k.name)}</td><td><b>${sk[k.id]??'—'}</b></td><td class="mut">${esc((D.skillNotes||{})[id+'_'+k.id]||'')}</td></tr>`).join('')||'<tr><td class="mut">No skills defined.</td></tr>'}</table>${D.skills.filter(k=>!k.arch&&k.cls===s.cls).map(k=>{const h=D.skillAssess.filter(x=>x.stu===id&&x.skill===k.id&&x.n===10);return h.length>1?`<div class="lb" style="margin-top:8px">${esc(k.name)} — progress</div>${line(h.map(x=>({l:new Date(x.ts).toISOString().slice(0,10),v:x.lvl})),110,10,'/10')}`:''}).join('')}</section></div>
+ <h2 style="margin-top:14px">PRACTICAL SKILLS (1–10)</h2><table>${D.skills.filter(k=>!k.arch&&k.cls===s.cls).map(k=>`<tr><td>${esc(k.name)}</td><td><b>${sk[k.id]??'—'}</b></td><td class="mut">${esc((D.skillNotes||{})[id+'_'+k.id]||'')}</td></tr>`).join('')||'<tr><td class="mut">No skills defined.</td></tr>'}</table>${D.skills.filter(k=>!k.arch&&k.cls===s.cls).map(k=>{const h=D.skillAssess.filter(x=>x.stu===id&&x.skill===k.id&&x.n===10);return h.length>1?`<div class="lb" style="margin-top:8px">${esc(k.name)} — progress</div>${line(h.map(x=>({l:locDay(new Date(x.ts)),v:x.lvl})),110,10,'/10')}`:''}).join('')}</section></div>
  ${A.length?`<section><h2>ALERTS</h2>${A.map(x=>`<div class="al ${x.k}"><span class="tg">${x.sev}</span> ${esc(x.m)}</div>`).join('')}</section>`:''}
  <section><h2>DEVELOPMENT PLANS — only when needed</h2>${P.map(p=>`<div class="al"><b>${esc(p.title)}</b> <span class="lb">${esc(p.status)} · due ${esc(p.due||'—')}</span><br>${esc(p.problem||'')}<br><span class="mut">Target: ${esc(p.target||'—')}</span>
  <div class="row noexp" style="margin-top:6px"><select onchange="plan('${p.id}','status',this.value)">${['Active','Completed','Closed'].map(o=>`<option ${p.status===o?'selected':''}>${o}</option>`).join('')}</select><input placeholder="Progress note" value="${esc(p.note||'')}" onchange="plan('${p.id}','note',this.value)"><button class="btn" onclick="del('plan','${p.id}',this)">Delete</button></div></div>`).join('')||'<p class="mut">No plan for this student.</p>'}
@@ -439,7 +549,7 @@ function setAtt(el,s,st,v){const box=el.closest('tr');if(el.checked)box.querySel
 function allP(s){act().forEach(x=>{D.att[s]=D.att[s]||{};if(!D.att[s][x.id])D.att[s][x.id]='Present'});save();go()}
 function setNote(stu,skill,v){D.skillNotes=D.skillNotes||{};D.skillNotes[stu+'_'+skill]=v;save()}
 function addCls(){const n=cn.value.trim();if(!n)return;if(D.classes.some(c=>c.name.toLowerCase()===n.toLowerCase())){alert('Class name already exists');return}const c={id:uid(),name:n};D.classes.push(c);D.curClass=c.id;save();go();document.getElementById('cn').focus()}
-function fixData(){D.reports=D.reports||[];D.behavior=D.behavior||{};D.bonusB=D.bonusB||{};D.bonusQ=D.bonusQ||{};D.bonusNote=D.bonusNote||{};if(D.bonus&&!D.set.bv2){const m=D.set.bonusTo==='quiz'?D.bonusQ:D.bonusB;Object.keys(D.bonus).forEach(k=>{if(m[k]==null)m[k]=D.bonus[k]})}D.set.bv2=1;delete D.bonus;if(!D.set.xv2){D.set.xv2=1;D.set.autoXls=false}D.students.forEach(x=>delete x.photo);if(!D.classes.length){const c={id:uid(),name:'Class 1'};D.classes.push(c);D.curClass=c.id}
+function fixData(){D.reports=D.reports||[];D.exams=D.exams||[];D.behavior=D.behavior||{};D.bonusB=D.bonusB||{};D.bonusQ=D.bonusQ||{};D.bonusNote=D.bonusNote||{};if(D.bonus&&!D.set.bv2){const m=D.set.bonusTo==='quiz'?D.bonusQ:D.bonusB;Object.keys(D.bonus).forEach(k=>{if(m[k]==null)m[k]=D.bonus[k]})}D.set.bv2=1;delete D.bonus;if(!D.set.xv2){D.set.xv2=1;D.set.autoXls=false}D.students.forEach(x=>delete x.photo);if(!D.classes.length){const c={id:uid(),name:'Class 1'};D.classes.push(c);D.curClass=c.id}
  if(!D.classes.find(c=>c.id===D.curClass))D.curClass=D.classes[0].id;
  [D.students,D.sessions,D.assess,D.skills].forEach(a=>a.forEach(x=>{if(!x.cls||!D.classes.find(c=>c.id===x.cls))x.cls=D.curClass}))}
 function renCls(id,v){v=v.trim();if(v){D.classes.find(c=>c.id===id).name=v;save();go()}}
@@ -462,7 +572,7 @@ function clsReport(){const S=act(),c=D.classes.find(x=>x.id===D.curClass),rows=S
 function renStu(id,v){v=v.trim();if(v){D.students.find(x=>x.id===id).name=v;save();go()}}
 function setNoteS(id,v){D.students.find(x=>x.id===id).notes=v;save()}
 function renderBk(){const el=document.getElementById('bkbar');if(!el)return;if(RO){el.innerHTML='';return}const age=D.lastBackup?(Date.now()-D.lastBackup)/864e5:null;
- if(!D.students.length||bkHide||(age!==null&&age<3)){el.innerHTML='';return}
+ if(!D.students.length||bkHide||(age!==null&&age<3)||(!STANDALONE&&ME.id)){el.innerHTML='';return}
  el.innerHTML=`<div class="abar bk" role="status"><div style="flex:1">${age===null?'No backup yet.':'Last backup '+Math.floor(age)+' days ago.'} Your data lives only in this browser, so download a backup file.</div><button class="btn pri" onclick="bak()">Download backup</button><button class="btn" onclick="bkHide=true;renderBk()">Later</button></div>`}
 const XT='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 const wbBlob=wb=>new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:XT});
@@ -624,14 +734,14 @@ function buildStuXlsx(id){const wb=XLSX.utils.book_new(),s=D.students.find(x=>x.
  SK.forEach(k=>{const v=sk[k.id],f=v==null?null:v>=8?'C6EFCE':v>=5?'FFEB9C':'FFC7CE';SS.push([C(k.name,ST.val),C(v==null?'—':v,cs(ST.cen,f,true)),C((D.skillNotes||{})[id+'_'+k.id]||'',ST.val)])});
  SS.push([C('')]);SS.push(span(L('Evaluation history','سجل التقييمات'),ST.sec,3));const hr=SS.length-1;
  SS.push([L('Skill','المهارة'),L('Rating','التقييم'),L('Date','التاريخ')].map(x=>C(x,ST.th)));
- D.skillAssess.filter(x=>x.stu===id).slice().sort((p,q)=>p.ts-q.ts).forEach(x=>SS.push([C((D.skills.find(k=>k.id===x.skill)||{}).name||'',ST.val),C(x.lvl,ST.cen),DT(new Date(x.ts).toISOString().slice(0,10))]));
+ D.skillAssess.filter(x=>x.stu===id).slice().sort((p,q)=>p.ts-q.ts).forEach(x=>SS.push([C((D.skills.find(k=>k.id===x.skill)||{}).name||'',ST.val),C(x.lvl,ST.cen),DT(locDay(new Date(x.ts)))]));
  const wsk=mkws(SS,[30,20,40],[{s:{r:hr,c:0},e:{r:hr,c:2}}]);XLSX.utils.book_append_sheet(wb,wsk,L('Skills','المهارات'));
  if(ARB)wb.Workbook={Views:[{RTL:true}]};
  return wb}
 async function exportStu(id){await loadStyledXlsx();if(!window.XLSX){toast('The Excel library did not load. Check your connection and try again.','err');return}const s=D.students.find(x=>x.id===id);if(!s)return;try{const fn=fname(s.name)+'_Student_Data.xlsx';const ok=await dl(fn,wbBlob(buildStuXlsx(id)),'');toast(ok?'Saved '+fn:'Export was cancelled','ok')}catch(e){toast('Excel export failed: '+(e&&e.message||e),'err')}}
 async function mergeXlsx(el){const f=el.files[0];if(!f)return;await loadStyledXlsx();if(!window.XLSX){alert('The Excel library did not load. Check your connection and try again.');return}
  f.arrayBuffer().then(b=>{const old=XLSX.read(b,{type:'array'}),nw=buildXlsx();
-  old.SheetNames.filter(n=>/^(Quiz - .*|Students|Attendance|Live points|Quizzes|Practical skills)$/.test(n)).forEach(n=>{delete old.Sheets[n]});old.SheetNames=old.SheetNames.filter(n=>!/^(Quiz - .*|Students|Attendance|Live points|Quizzes|Practical skills)$/.test(n));
+  old.SheetNames.filter(n=>/^(Quiz - .*|Students|Attendance|Live points|Quizzes|Exams|Practical skills)$/.test(n)).forEach(n=>{delete old.Sheets[n]});old.SheetNames=old.SheetNames.filter(n=>!/^(Quiz - .*|Students|Attendance|Live points|Quizzes|Exams|Practical skills)$/.test(n));
   nw.SheetNames.forEach(n=>{if(!old.Sheets[n])old.SheetNames.push(n);old.Sheets[n]=nw.Sheets[n]});
   dl(f.name.replace(/\.xls$/i,'.xlsx'),new Blob([XLSX.write(old,{bookType:'xlsx',type:'array'})],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),'');el.value=''}).catch(()=>alert('Could not read this file'))}
 async function exportXlsx(silent){await loadStyledXlsx();if(!window.XLSX){if(!silent)alert('The Excel library did not load. Check your connection and try again.');return}
@@ -644,17 +754,18 @@ function togQ(id){const a=D.assess.find(x=>x.id===id);a.closed=!a.closed;save();
 function del(k,id,b){if(!b.dataset.sure){b.dataset.sure=1;const o=b.textContent;b.textContent='Click again to confirm';b.style.color='var(--bad)';setTimeout(()=>{if(b.isConnected){delete b.dataset.sure;b.textContent=o;b.style.color=''}},3000);return}
  if(k==='session'){D.sessions=D.sessions.filter(x=>x.id!==id);delete D.att[id];D.events=D.events.filter(e=>e.sess!==id);if(D.cur===id)D.cur=null;if(attSid===id)attSid=null}
  if(k==='quiz')D.assess=D.assess.filter(x=>x.id!==id);
+ if(k==='exam')D.exams=(D.exams||[]).filter(x=>x.id!==id);
  if(k==='skill'){D.skills=D.skills.filter(x=>x.id!==id);D.skillAssess=D.skillAssess.filter(x=>x.skill!==id)}
  if(k==='plan')D.plans=D.plans.filter(x=>x.id!==id);
- if(k==='student'){['behavior','bonusB','bonusQ','bonusNote'].forEach(k=>{if(D[k])delete D[k][id]});D.students=D.students.filter(x=>x.id!==id);D.events=D.events.filter(e=>e.stu!==id);Object.values(D.att).forEach(m=>delete m[id]);D.assess.forEach(a=>delete a.scores[id]);D.skillAssess=D.skillAssess.filter(x=>x.stu!==id);D.plans=D.plans.filter(x=>x.stu!==id);if(pid===id)pid=null}
+ if(k==='student'){['behavior','bonusB','bonusQ','bonusNote'].forEach(k=>{if(D[k])delete D[k][id]});D.students=D.students.filter(x=>x.id!==id);D.events=D.events.filter(e=>e.stu!==id);Object.values(D.att).forEach(m=>delete m[id]);D.assess.forEach(a=>delete a.scores[id]);(D.exams||[]).forEach(a=>{delete a.scores[id];if(a.absent)delete a.absent[id]});D.skillAssess=D.skillAssess.filter(x=>x.stu!==id);D.plans=D.plans.filter(x=>x.stu!==id);if(pid===id)pid=null}
  const rmSess=i=>{D.sessions=D.sessions.filter(x=>x.id!==i);delete D.att[i];D.events=D.events.filter(e=>e.sess!==i);if(D.cur===i)D.cur=null;if(attSid===i)attSid=null};
- const rmStu=i=>{['behavior','bonusB','bonusQ','bonusNote'].forEach(k=>{if(D[k])delete D[k][i]});D.students=D.students.filter(x=>x.id!==i);D.events=D.events.filter(e=>e.stu!==i);Object.values(D.att).forEach(m=>delete m[i]);D.assess.forEach(a=>delete a.scores[i]);D.skillAssess=D.skillAssess.filter(x=>x.stu!==i);D.plans=D.plans.filter(x=>x.stu!==i);if(pid===i)pid=null};
+ const rmStu=i=>{['behavior','bonusB','bonusQ','bonusNote'].forEach(k=>{if(D[k])delete D[k][i]});D.students=D.students.filter(x=>x.id!==i);D.events=D.events.filter(e=>e.stu!==i);Object.values(D.att).forEach(m=>delete m[i]);D.assess.forEach(a=>delete a.scores[i]);(D.exams||[]).forEach(a=>{delete a.scores[i];if(a.absent)delete a.absent[i]});D.skillAssess=D.skillAssess.filter(x=>x.stu!==i);D.plans=D.plans.filter(x=>x.stu!==i);if(pid===i)pid=null};
  const rmSk=c=>{const ids=D.skills.filter(x=>x.cls===c).map(x=>x.id);D.skills=D.skills.filter(x=>x.cls!==c);D.skillAssess=D.skillAssess.filter(x=>!ids.includes(x.skill))};
  if(k==='allsessions')D.sessions.filter(x=>x.cls===D.curClass).forEach(x=>rmSess(x.id));
  if(k==='allstudents')D.students.filter(x=>x.cls===D.curClass).forEach(x=>rmStu(x.id));
  if(k==='allquiz')D.assess=D.assess.filter(a=>a.cls!==D.curClass);
  if(k==='allskills')rmSk(D.curClass);
- if(k==='class'){D.sessions.filter(x=>x.cls===id).forEach(x=>rmSess(x.id));D.students.filter(x=>x.cls===id).forEach(x=>rmStu(x.id));D.assess=D.assess.filter(a=>a.cls!==id);rmSk(id);D.classes=D.classes.filter(c=>c.id!==id);if(D.curClass===id)D.curClass=D.classes[0].id}
+ if(k==='class'){D.sessions.filter(x=>x.cls===id).forEach(x=>rmSess(x.id));D.students.filter(x=>x.cls===id).forEach(x=>rmStu(x.id));D.assess=D.assess.filter(a=>a.cls!==id);D.exams=(D.exams||[]).filter(a=>a.cls!==id);rmSk(id);D.classes=D.classes.filter(c=>c.id!==id);if(D.curClass===id)D.curClass=D.classes[0].id}
  D.audit.push({ts:Date.now(),act:'delete',k,id});save();go()}
 function addAs(){const m=+am.value;if(!at.value.trim()||!(m>0)){alert('Title and a positive max score are required');return}qOpen=uid();D.assess.push({id:qOpen,title:at.value.trim(),date:ad.value||today(),max:m,scores:{},cls:D.curClass});save();go()}
 function setSc(a,s,el){const as=D.assess.find(x=>x.id===a);if(el.value===''){delete as.scores[s]}else{const v=+el.value;if(v<0||v>as.max){alert('Score must be between 0 and '+as.max);el.value=as.scores[s]??'';return}D.audit.push({ts:Date.now(),act:'grade',a,s,old:as.scores[s],v});as.scores[s]=v}save()}
@@ -835,8 +946,8 @@ function impPrev(){const P=impP,names=pNames(P),S=smApply(P,true),blk=smBlockers
  <h2>PROPOSED CHANGES</h2>${smSum(S).map(x=>`<div class="li">${esc(x)}</div>`).join('')}
  ${blk.length?`<div class="al neg">${blk.map(esc).join('<br>')}</div>`:''}
  <div class="row"><button class="btn pri" ${blk.length?'disabled':''} onclick="smCommit()">Import</button><button class="btn" onclick="impP=null;go()">Cancel</button></div></section>`}
-function smCommit(){const P=impP,b=smBlockers(P);if(b.length){alert(b.join('\n'));return}
- const pre=smApply(P,true);if(!confirm('Apply these changes?\n\n'+smSum(pre).join('\n')))return;
+async function smCommit(){const P=impP,b=smBlockers(P);if(b.length){alert(b.join('\n'));return}
+ const pre=smApply(P,true);if(!await uiConfirm('Apply these changes?\n\n'+smSum(pre).join('\n')))return;
  smApply(P,false);impP=null;save();go();toast('Import finished: '+pre.newStu+' new students, '+(pre.aNew+pre.aUpd)+' attendance marks, '+(pre.qNew+pre.qUpd)+' quiz scores saved.','ok')}
 async function imp(el){const f=el.files[0];if(!f)return;let sheets=[];
  try{if(/\.xlsx?$/i.test(f.name)){if(!window.XLSX){toast('The Excel reader could not load. Check your connection, or save the sheet as CSV.','err');el.value='';return}
@@ -852,7 +963,7 @@ async function imp(el){const f=el.files[0];if(!f)return;let sheets=[];
 // ---- export UX + dashboard/profile PDF and PNG ----
 let toastT=null;
 function toast(m,k){let e=document.getElementById('toast');if(!e){e=document.createElement('div');e.id='toast';e.setAttribute('role','status');document.body.appendChild(e)}
- e.className='t-'+(k||'ok');e.textContent=m;e.style.display='block';clearTimeout(toastT);if(k!=='busy')toastT=setTimeout(()=>{e.style.display='none'},k==='err'?9000:4500)}
+ e.className='t-'+(k||'ok');void e.offsetWidth;e.className+=' in';e.textContent=m;e.style.display='block';clearTimeout(toastT);if(k!=='busy')toastT=setTimeout(()=>{e.style.display='none'},k==='err'?9000:4500)}
 const fname=s=>String(s).replace(/[^\w\u0600-\u06FF]+/g,'_').replace(/^_+|_+$/g,'')||'Student';
 const LIBS={h2c:['https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',()=>window.html2canvas],pdf:['https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',()=>window.jspdf&&window.jspdf.jsPDF]};
 function loadLib(k){const[u,ok]=LIBS[k];if(ok())return Promise.resolve();return new Promise((res,rej)=>{const s=document.createElement('script');s.src=u;s.onload=()=>ok()?res():rej(new Error('lib'));s.onerror=()=>rej(new Error('lib'));document.head.appendChild(s)})}
@@ -902,11 +1013,11 @@ async function snapNow(){if(!D.students.length)return;await idbSet('snap:'+new D
 async function snapDaily(){if(!D.students.length)return;const day='snap:'+today();if((await snapKeys()).some(k=>k.startsWith(day)))return;await idbSet(day,JSON.stringify(D));await snapPrune()}
 async function loadSnaps(){SNAPS=(await snapKeys()).reverse();if(tab==='Settings')go()}
 function loadData(o){D=Object.assign({},DEF,o);D.set=Object.assign({},DEF.set,D.set);fixData();save();SNAPS=null;go()}
-async function restSnap(k){const j=await idbGet(k);let o;try{o=JSON.parse(j)}catch(e){alert('Invalid backup file');return}if(!idsOK(o)){alert('Invalid backup file');return}if(!confirm('Replace the current data with this snapshot? The current data is saved as a snapshot first.'))return;await snapNow();loadData(o)}
+async function restSnap(k){const j=await idbGet(k);let o;try{o=JSON.parse(j)}catch(e){alert('Invalid backup file');return}if(!idsOK(o)){alert('Invalid backup file');return}if(!await uiConfirm('Replace the current data with this snapshot? The current data is saved as a snapshot first.'))return;await snapNow();loadData(o)}
 function snapSec(){if(SNAPS===null)loadSnaps();return `<section><h2>AUTOMATIC SNAPSHOTS</h2><p class="lb">A snapshot of your data is saved automatically once a day on this device (the last ${SNAPMAX} are kept).</p>${SNAPS===null?'<span class="mut">Loading…</span>':SNAPS.map(k=>`<div class="li"><span class="n mono">${esc(k.slice(5).replace('T',' '))}</span><button class="btn" onclick="restSnap('${esc(k)}')">Restore this snapshot</button></div>`).join('')||'<span class="mut">No snapshots yet.</span>'}</section>`}
 function bak(){D.lastBackup=Date.now();dl('backup-'+today()+'.json',JSON.stringify(D),'application/json');save();go()}
-function rest(el){const f=el.files[0];if(!f)return;f.text().then(async x=>{let o;try{o=JSON.parse(x.replace(/^\ufeff/,''))}catch(e){alert('Invalid backup file');return}if(!idsOK(o)){alert('Invalid backup file');return}if(!confirm('Replace the current data with this backup? The current data is saved as a snapshot first.'))return;await snapNow();loadData(o)})}
-function demo(){if(!confirm('Add fictional DEMO students?'))return;['One','Two','Three','Four'].forEach(n=>D.students.push({id:uid(),name:'[DEMO] '+n,code:'D'+n,cls:D.curClass,status:'Active',demo:true}));save();go()}
+function rest(el){const f=el.files[0];if(!f)return;f.text().then(async x=>{let o;try{o=JSON.parse(x.replace(/^\ufeff/,''))}catch(e){alert('Invalid backup file');return}if(!idsOK(o)){alert('Invalid backup file');return}if(!await uiConfirm('Replace the current data with this backup? The current data is saved as a snapshot first.'))return;await snapNow();loadData(o)})}
+async function demo(){if(!await uiConfirm('Add fictional DEMO students?'))return;['One','Two','Three','Four'].forEach(n=>D.students.push({id:uid(),name:'[DEMO] '+n,code:'D'+n,cls:D.curClass,status:'Active',demo:true}));save();go()}
 function rmDemo(){const ids=D.students.filter(s=>s.demo).map(s=>s.id);ids.forEach(i=>['behavior','bonusB','bonusQ','bonusNote'].forEach(k=>{if(D[k])delete D[k][i]}));D.students=D.students.filter(s=>!s.demo);D.events=D.events.filter(e=>!ids.includes(e.stu));D.assess.forEach(a=>ids.forEach(i=>delete a.scores[i]));save();go()}
 let barSig='',curSig='';
 function renderBar(){renderBk();renderSync();const el=document.getElementById('alertbar'),A=tab==='Alerts'?[]:alerts().filter(a=>a.k!=='pos'&&a.st==='new');curSig=A.map(a=>a.s.id+a.m).join('|');
@@ -914,8 +1025,8 @@ function renderBar(){renderBk();renderSync();const el=document.getElementById('a
  el.innerHTML=`<div class="abar" role="alert"><div style="flex:1">${A.slice(0,3).map(a=>`<div><b>${esc(a.s.name)}</b> — ${esc(a.m)}</div>`).join('')}${A.length>3?`<div>+${A.length-3} more</div>`:''}</div><button class="btn" onclick="tab='Alerts';pid=null;go()">View all</button><button class="btn" onclick="barSig=curSig;renderBar()">Dismiss</button></div>`}
 function hero(){const c=D.classes.find(x=>x.id===D.curClass),st=pid&&tab==='Students'?D.students.find(x=>x.id===pid):null;
  document.getElementById('hero').className='';document.getElementById('hero').innerHTML=`<div class="hw"><div class="ht">${esc(t(tab))}</div></div>${RO&&!VIEW?'':`<div class="gl"><span>${esc(c?c.name:'')}</span><b>${act().length}</b><span>students</span></div>`}`}
-function syncLabel(){return RO?'VIEW ONLY · READ-ONLY':!saveOK?'⚠ SAVE FAILED — NOT STORED':SY.st==='synced'?'SAVED · SYNCED ☁':SY.st==='syncing'?'SYNCING…':SY.st==='error'?'SAVED ON DEVICE · SYNC ERROR (retrying)':SY.st==='noaccess'?'SAVED ON DEVICE · NO SYNC ACCESS':'SAVED ON THIS DEVICE ONLY'}
-function stTxt(){const s=document.getElementById('save');if(s)s.textContent=syncLabel()}
+function syncLabel(){return RO?'VIEW ONLY · READ-ONLY':!saveOK?'⚠ SAVE FAILED — NOT STORED':SY.st==='synced'?'SAVED · SYNCED ☁':SY.st==='syncing'?'SYNCING…':SY.st==='offline'?L('OFFLINE · SAVED ON THIS DEVICE — WILL SYNC WHEN ONLINE','بدون إنترنت · محفوظ على الجهاز — هيتزامن لما النت يرجع'):SY.st==='error'?'SAVED ON DEVICE · SYNC ERROR (retrying)':SY.st==='noaccess'?'SAVED ON DEVICE · NO SYNC ACCESS':'SAVED ON THIS DEVICE ONLY'}
+function stTxt(){const s=document.getElementById('save');if(s){s.textContent=syncLabel();s.dataset.st=STANDALONE?'ok':(RO?'view':SY.st)}}
 function engCode(){return 'ENG-'+Math.abs([...String(SY.uid)].reduce((h,c)=>(h*31+c.charCodeAt(0))|0,7)).toString(36).toUpperCase().padStart(6,'0').slice(0,6)}
 let PERSIST=null,idbReady=false,idbT=null,tipHide=false;
 function idb(){return new Promise((res,rej)=>{const r=indexedDB.open('wt_store',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
@@ -940,56 +1051,107 @@ function roGuard(j){
  D=o;lastSnap=JSON.stringify(D);toast(L('View only — changes are not saved','عرض فقط — التعديل غير مسموح'));go()}
 
 // ---- cloud sync (trainer's own workspace row) ----
-function syncSoon(){if(!SY.on||RO||SY.conflict||SY.st==='noaccess')return;SY.dirty=true;if(!SY.first)SY.first=Date.now();clearTimeout(SY.timer);SY.timer=setTimeout(push,Date.now()-SY.first>8000?0:1500)}
+const isNet=e=>(typeof navigator!=='undefined'&&navigator.onLine===false)||/failed to fetch|networkerror|network request|load failed|fetch|timeout|offline|abort/i.test(String((e&&(e.message||e.name))||e||''));
+let offlineMode=false,WO=null,resuming=false;
+function markDirty(){try{if(ME.id&&!RO)localStorage.setItem('wt_dirty_'+ME.id,'1')}catch(e){}}
+function syncSoon(){if(ME.id&&!RO)markDirty();if(!SY.on||RO||SY.conflict||SY.st==='noaccess')return;SY.dirty=true;if(!SY.first)SY.first=Date.now();clearTimeout(SY.timer);SY.timer=setTimeout(push,Date.now()-SY.first>8000?0:1500)}
 function syncNow(){if(SY.on&&!RO&&!SY.conflict){SY.st=SY.st==='noaccess'?'local':SY.st;clearTimeout(SY.timer);push()}}
 async function push(){if(!SY.on||RO||SY.busy||SY.conflict)return;SY.busy=true;SY.dirty=false;SY.first=0;SY.st='syncing';stTxt();
  try{const ts=Date.now();const r=await SB.from('workspaces').upsert({user_id:SY.uid,data:D,ts,device:SY.dev,updated_at:new Date().toISOString()});
   if(r.error)throw r.error;
-  SY.ts=ts;SY.st='synced';try{localStorage.setItem('wt_sync_'+SY.uid,'1')}catch(e){}}
- catch(e){if(e&&(e.code==='42501'||e.status===401||e.status===403)){SY.st='noaccess'}else{SY.st='error';SY.dirty=true;clearTimeout(SY.timer);SY.timer=setTimeout(push,8000)}}
- SY.busy=false;if(SY.dirty&&SY.st!=='error')syncSoon();stTxt();renderSync()}
+  SY.ts=ts;SY.st='synced';try{localStorage.setItem('wt_sync_'+SY.uid,'1');localStorage.setItem('wt_ts_'+SY.uid,String(ts));if(!SY.dirty)localStorage.removeItem('wt_dirty_'+SY.uid)}catch(e){}}
+ catch(e){if(e&&(e.code==='42501'||e.status===403)&&!isNet(e)){SY.st='noaccess'}else{SY.st=isNet(e)?'offline':'error';SY.dirty=true;clearTimeout(SY.timer);SY.timer=setTimeout(push,8000)}}
+ SY.busy=false;if(SY.dirty&&SY.st==='synced')syncSoon();stTxt();renderSync()}
 function pull(row){D=Object.assign({},JSON.parse(JSON.stringify(DEF)),row.data);D.set=Object.assign({},DEF.set,D.set);fixData();
- SY.ts=row.ts;undoStack=[];lastSnap=JSON.stringify(D);try{localStorage.setItem(KEY,lastSnap);localStorage.setItem('wt_sync_'+SY.uid,'1')}catch(e){}SY.st='synced';stTxt();go()}
+ SY.ts=row.ts;undoStack=[];lastSnap=JSON.stringify(D);try{localStorage.setItem(KEY,lastSnap);localStorage.setItem('wt_sync_'+SY.uid,'1');localStorage.setItem('wt_ts_'+SY.uid,String(row.ts));localStorage.removeItem('wt_dirty_'+SY.uid)}catch(e){}SY.st='synced';stTxt();go()}
 async function checkRemote(){if(!SY.on||RO||SY.dirty||SY.busy||SY.conflict)return;
  try{const r=await SB.from('workspaces').select('data,ts,device').eq('user_id',SY.uid).maybeSingle();const m=r.data;if(m&&m.ts>SY.ts&&m.device!==SY.dev&&!SY.dirty&&!SY.busy)pull(m)}catch(e){}}
 function subscribeSync(){if(SY.unsub||!SB)return;try{SY.unsub=SB.channel('ws-'+SY.uid).on('postgres_changes',{event:'*',schema:'public',table:'workspaces',filter:'user_id=eq.'+SY.uid},()=>checkRemote()).subscribe()}catch(e){}}
 function teacherReady(){if(teacherUp)return;teacherUp=true;subscribeSync();clearInterval(POLL);POLL=setInterval(()=>{if(!document.hidden)checkRemote()},60000);protectStorage();snapDaily();stTxt();renderSync()}
-// cloud is always the source of truth. While the server can't be reached the app stays locked, so offline edits can never overwrite cloud data.
-function authWait(msg){const $=id=>document.getElementById(id);document.body.classList.add('locked');$('auth').hidden=false;$('auForm').hidden=true;$('auSwitch').hidden=true;$('auOut').hidden=false;$('auTitle').textContent='جاري التحميل · Loading';authMsg(msg)}
-function authWaitOff(){const $=id=>document.getElementById(id);$('auForm').hidden=false;$('auSwitch').hidden=false;$('auOut').hidden=true;hideAuth()}
+// Cloud is the source of truth, but the app keeps working without internet: everything is written on this device and uploaded automatically when the connection returns.
+function authWait(msg){const $=id=>document.getElementById(id);document.body.classList.add('locked');$('auth').hidden=false;$('auForm').hidden=true;$('auSwitch').hidden=true;$('auOut').hidden=false;$('auSpin').hidden=false;$('auTitle').textContent='جاري التحميل · Loading';authMsg(msg)}
+function authWaitOff(){const $=id=>document.getElementById(id);$('auForm').hidden=false;$('auSwitch').hidden=AUTH_MODE==='newpw';$('auOut').hidden=true;$('auSpin').hidden=true;hideAuth()}
+function trustedLocal(id){let o=null,t=null;try{o=localStorage.getItem('wt_owner');t=localStorage.getItem('wt_ts_'+id)}catch(e){}return o===id&&!!t}
+function cachedIdent(){try{return JSON.parse(localStorage.getItem('wt_ident')||'null')}catch(e){return null}}
+function goOffline(){if(offlineMode)return;offlineMode=true;SY.on=false;SY.st='offline';authWaitOff();stTxt();renderSync();go();clearInterval(WO);WO=setInterval(tryResume,6000)}
+function offlineStart(){const id=cachedIdent();if(!id||!id.id||!trustedLocal(id.id))return false;
+ ME.id=id.id;ME.email=id.email;ME.role=id.role;ME.name=id.name;ME.mode='trainer';RO=false;VIEW=null;tabs=TABS.slice();SY.uid=ME.id;rpDLoad();goOffline();return true}
+function mkClient(){return window.supabase.createClient(SUPABASE_URL.trim().replace(/\/(rest|auth)\/v1.*$/,'').replace(/\/+$/,''),SUPABASE_KEY.trim(),{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})}
+async function tryResume(){if(!offlineMode||resuming||navigator.onLine===false)return;resuming=true;
+ try{if(!SB){if(window.supabase&&window.supabase.createClient)SB=mkClient();else{location.reload();return}}
+  const r=await SB.auth.getSession();
+  if(r.data&&r.data.session){await teacherBoot(true);if(!offlineMode)toast(L('Back online — your changes are syncing','رجع النت — بيتم رفع تعديلاتك'))}}
+ catch(e){}
+ resuming=false}
+window.addEventListener('online',()=>{if(offlineMode)tryResume();else if(SY.on&&!RO&&(SY.dirty||SY.st==='offline'||SY.st==='error'))syncNow()});
+window.addEventListener('offline',()=>{if(SY.on&&!RO&&!offlineMode){SY.st='offline';stTxt();renderSync()}});
+function syncBars(){let h='';
+ if(!STANDALONE&&ME.id&&(offlineMode||SY.st==='offline'))h+=`<div class="abar ofl" role="status"><div style="flex:1">${L('Offline — your work is being saved on this device and will upload automatically when the internet is back.','مفيش إنترنت — شغلك بيتحفظ على الجهاز وهيترفع لوحده لما النت يرجع.')}</div></div>`;
+ let c=null;try{c=ME.id&&localStorage.getItem('wt_conflict_'+ME.id)}catch(e){}
+ if(c)h+=`<div class="abar rb" role="alert"><div style="flex:1">${L('Your offline changes could not be merged: the same data was also changed from another device. The latest cloud version was loaded and your offline copy was kept.','تعديلاتك أوفلاين ما قدرناش ندمجها: نفس البيانات اتغيّرت من جهاز تاني. اتحمّلت آخر نسخة من السحابة ونسختك الأوفلاين اتحفظت.')}</div><button class="btn pri" onclick="dlConflict()">${L('Download my copy','تحميل نسختي')}</button><button class="btn" onclick="clrConflict()">${L('Dismiss','إغلاق')}</button></div>`;
+ return h}
+function dlConflict(){let c=null;try{c=localStorage.getItem('wt_conflict_'+ME.id)}catch(e){}if(c)dl('offline-copy-'+today()+'.json',c,'application/json')}
+async function clrConflict(){if(!await uiConfirm(L('Delete the saved offline copy? Download it first if you need it.','مسح النسخة الأوفلاين المحفوظة؟ نزّلها الأول لو محتاجها.'),{danger:true,ok:L('Delete','مسح')}))return;try{localStorage.removeItem('wt_conflict_'+ME.id)}catch(e){}renderSync()}
 
 // ---- sign-in screen ----
 function showAuth(msg){document.body.classList.add('locked');document.getElementById('auth').hidden=false;setAuthMode(AUTH_MODE);if(msg)authMsg(msg)}
 function hideAuth(){document.getElementById('auth').hidden=true;document.body.classList.remove('locked')}
 function authMsg(m,ok){const e=document.getElementById('authMsg');if(!e)return;e.textContent=m||'';e.className=ok?'ok':''}
-function setAuthMode(m){AUTH_MODE=m;const up=m==='up',$=id=>document.getElementById(id);
- $('auNameL').hidden=!up;$('auTitle').textContent=up?'إنشاء حساب مدرب · Create trainer account':'تسجيل الدخول · Sign in';
- $('auBtn').textContent=up?'إنشاء الحساب · Create account':'دخول · Sign in';
- $('auSwitch').textContent=up?'عندي حساب · I have an account':'مدرب جديد؟ أنشئ حساب · New trainer? Create account';
- $('auPass').autocomplete=up?'new-password':'current-password';authMsg('')}
-async function authSubmit(e){e.preventDefault();const $=id=>document.getElementById(id);
- if(!SB){authMsg('تعذّر تحميل مكتبة الدخول. تأكد من الإنترنت وأعد فتح الصفحة. · Could not load the sign-in library. Check your connection and reload.');return}
- const em=$('auEmail').value.trim(),pw=$('auPass').value,nm=$('auName').value.trim();
- if(!em||!pw){authMsg('اكتب الإيميل وكلمة المرور · Enter email and password');return}
- if(AUTH_MODE==='up'&&pw.length<6){authMsg('كلمة المرور لازم 6 حروف على الأقل · Password must be at least 6 characters');return}
- const b=$('auBtn');b.disabled=true;authMsg('');
+function setAuthMode(m){AUTH_MODE=m;const $=id=>document.getElementById(id),up=m==='up',rs=m==='reset',np=m==='newpw',inn=m==='in';
+ $('auNameL').hidden=!up;$('auEmailL').hidden=np;$('auPassL').hidden=rs;$('auPass2L').hidden=!np;$('auForgot').hidden=!inn;$('auSwitch').hidden=np;
+ $('auTitle').textContent=up?'إنشاء حساب مدرب · Create trainer account':rs?'استعادة كلمة المرور · Reset password':np?'كلمة مرور جديدة · Choose a new password':'تسجيل الدخول · Sign in';
+ $('auBtn').textContent=up?'إنشاء الحساب · Create account':rs?'إرسال رابط الاستعادة · Send reset link':np?'حفظ كلمة المرور · Save password':'دخول · Sign in';
+ $('auSwitch').textContent=rs?'رجوع لتسجيل الدخول · Back to sign in':up?'عندي حساب · I have an account':'مدرب جديد؟ أنشئ حساب · New trainer? Create account';
+ $('auPassT').textContent=np?'كلمة المرور الجديدة · New password':'كلمة المرور · Password';
+ $('auPass').autocomplete=(up||np)?'new-password':'current-password';authMsg('')}
+function authSwitch(){setAuthMode(AUTH_MODE==='in'?'up':'in')}
+async function authSubmit(e){e.preventDefault();const $=id=>document.getElementById(id),m=AUTH_MODE;
+ if(!SB){authMsg('تعذّر تحميل مكتبة الدخول. تأكد من الإنترنت وأعد فتح الصفحة. · Could not load the sign-in library. Check your connection and reload.');return false}
+ const em=$('auEmail').value.trim(),pw=$('auPass').value,nm=$('auName').value.trim(),b=$('auBtn');
+ if(m==='reset'){
+  if(!em){authMsg('اكتب الإيميل · Enter your email');return false}
+  b.disabled=true;authMsg('');
+  try{const r=await SB.auth.resetPasswordForEmail(em,{redirectTo:location.origin+location.pathname});if(r.error)throw r.error;
+   authMsg('لو الإيميل ده مسجّل هيوصلك رابط لتغيير كلمة المرور. شوف الوارد وكمان الـ Spam. · If this email is registered, a reset link is on its way. Check your inbox and spam.',true)}
+  catch(err){authMsg(/rate limit|too many/i.test(String((err&&err.message)||''))?'استنى شوية وجرّب تاني (عدد الرسايل محدود). · Please wait a little and try again (email limit reached).':((err&&err.message)||String(err)))}
+  b.disabled=false;return false}
+ if(m==='newpw'){
+  const p2=$('auPass2').value;
+  if(pw.length<6){authMsg('كلمة المرور لازم 6 حروف على الأقل · Password must be at least 6 characters');return false}
+  if(pw!==p2){authMsg('كلمتين المرور مش متطابقتين · The two passwords do not match');return false}
+  b.disabled=true;authMsg('');
+  try{const r=await SB.auth.updateUser({password:pw});if(r.error)throw r.error;
+   try{history.replaceState(null,'',location.pathname+location.search)}catch(x){}
+   $('auPass').value='';$('auPass2').value='';
+   const g=await SB.auth.getSession();setAuthMode('in');toast(L('Password changed','تم تغيير كلمة المرور'));
+   if(g.data&&g.data.session)await onSignedIn(g.data.session.user);else authMsg('تم تغيير كلمة المرور. سجّل الدخول. · Password changed. Sign in.',true)}
+  catch(err){authMsg((err&&err.message)||String(err))}
+  b.disabled=false;return false}
+ if(!em||!pw){authMsg('اكتب الإيميل وكلمة المرور · Enter email and password');return false}
+ if(m==='up'&&pw.length<6){authMsg('كلمة المرور لازم 6 حروف على الأقل · Password must be at least 6 characters');return false}
+ b.disabled=true;authMsg('');
  try{
-  if(AUTH_MODE==='up'){const r=await SB.auth.signUp({email:em,password:pw,options:{data:{name:nm}}});if(r.error)throw r.error;
+  if(m==='up'){const r=await SB.auth.signUp({email:em,password:pw,options:{data:{name:nm}}});if(r.error)throw r.error;
    if(r.data.session){await onSignedIn(r.data.user)}else{setAuthMode('in');authMsg('تم إنشاء الحساب. أكّد الإيميل من الرسالة اللي وصلتك ثم سجّل الدخول. · Account created. Confirm your email, then sign in.',true)}}
   else{const r=await SB.auth.signInWithPassword({email:em,password:pw});if(r.error)throw r.error;await onSignedIn(r.data.user)}
  }catch(err){authMsg((err&&err.message)||String(err))}
  b.disabled=false;return false}
 async function logout(){
  if(!RO&&SY.on){clearTimeout(SY.timer);if(SY.dirty||SY.st==='error'||SY.st==='local')await push();
-  if(SY.st!=='synced'&&!confirm(L('Some changes are not synced yet and will be erased from this device. Log out anyway?','في تغييرات لسه ما اتزامنتش وهتتمسح من الجهاز ده. تسجّل خروج برضه؟')))return}
+  if(SY.st!=='synced'&&!await uiConfirm(L('Some changes are not synced yet and will be erased from this device. Log out anyway?','في تغييرات لسه ما اتزامنتش وهتتمسح من الجهاز ده. تسجّل خروج برضه؟'),{danger:true,ok:L('Log out','تسجيل الخروج')}))return}
  try{await SB.auth.signOut()}catch(e){}wipeLocal();location.reload()}
 
 // ---- after sign-in: trainer or admin ----
 async function onSignedIn(user){
  ME.id=user.id;ME.email=user.email;
- let p=null;try{const r=await SB.from('profiles').select('role,name').eq('id',user.id).maybeSingle();p=r.data}catch(e){}
- if(!p){ME.id=null;showAuth('الحساب مالوش بروفايل. شغّل ملف supabase.sql ثم سجّل الدخول تاني. · No profile found for this account. Run supabase.sql, then sign in again.');try{await SB.auth.signOut()}catch(e){}return}
+ let p=null,perr=null;try{const r=await SB.from('profiles').select('role,name').eq('id',user.id).maybeSingle();p=r.data;perr=r.error}catch(e){perr=e}
+ if(!p){
+  if(perr&&isNet(perr)&&offlineStart())return;
+  ME.id=null;
+  if(perr){showAuth('تعذّر الاتصال بالسيرفر. جرّب تاني. · Could not reach the server. Try again.');return}
+  showAuth('الحساب مالوش بروفايل. شغّل ملف supabase.sql ثم سجّل الدخول تاني. · No profile found for this account. Run supabase.sql, then sign in again.');try{await SB.auth.signOut()}catch(e){}return}
  ME.role=p.role;ME.name=p.name;
+ try{localStorage.setItem('wt_ident',JSON.stringify({id:ME.id,email:ME.email,role:ME.role,name:ME.name}))}catch(e){}
  // an admin can work in two modes with the same account: 'admin' (read-only view of all trainers) or 'trainer' (own classes, fully editable)
  let m=null;try{m=localStorage.getItem('wt_mode')}catch(e){}
  ME.mode=ME.role==='admin'&&m!=='trainer'?'admin':'trainer';
@@ -1000,24 +1162,30 @@ async function switchMode(){
   if(SY.st!=='synced'){toast(L('Your latest changes are not synced yet. Check your connection, then try again.','آخر تعديلاتك لسه ما اتزامنتش. اتأكد من الإنترنت وجرّب تاني.'),'err');return}}
  try{localStorage.setItem('wt_mode',ME.mode==='admin'?'trainer':'admin')}catch(e){}
  location.reload()}
-async function teacherBoot(){
+async function teacherBoot(silent){
  RO=false;VIEW=null;tabs=TABS.slice();
- authWait('جاري تحميل بياناتك من السيرفر… · Loading your data from the server…');
+ if(!silent)authWait('جاري تحميل بياناتك من السيرفر… · Loading your data from the server…');
  let owner=null;try{owner=localStorage.getItem('wt_owner')}catch(e){}
  if(owner&&owner!==ME.id){wipeLocal();D=blankD();fixData();undoStack=[];lastSnap=null;teacherUp=false}
  try{localStorage.setItem('wt_owner',ME.id)}catch(e){}
  SY.uid=ME.id;rpDLoad();
  let row=null;
  try{const r=await SB.from('workspaces').select('data,ts,device').eq('user_id',ME.id).maybeSingle();if(r.error)throw r.error;row=r.data}
- catch(e){SY.on=false;SY.st='error';authWait('تعذّر الاتصال بالسيرفر. بنحاول تاني تلقائيًا… · Could not reach the server. Retrying automatically…');setTimeout(teacherBoot,8000);return}
- SY.on=true;
+ catch(e){
+  if(trustedLocal(ME.id)){goOffline();return}   // the server can't be reached: keep working from this device's copy
+  SY.on=false;SY.st='error';authWait('تعذّر الاتصال بالسيرفر. بنحاول تاني تلقائيًا… · Could not reach the server. Retrying automatically…');setTimeout(()=>teacherBoot(silent),8000);return}
+ SY.on=true;offlineMode=false;clearInterval(WO);
+ let dirty=false,base=0;try{dirty=localStorage.getItem('wt_dirty_'+ME.id)==='1';base=+localStorage.getItem('wt_ts_'+ME.id)||0}catch(e){}
  if(row){
-  // keep an untouched copy of any old, never-synced data found on this device, then always load the cloud version
-  const localHas=D.students.length>0||D.assess.length>0||D.sessions.length>0;let synced=false;try{synced=!!localStorage.getItem('wt_sync_'+ME.id)}catch(e){}
-  if(localHas&&!synced){try{localStorage.setItem('wt_prev_local',JSON.stringify(D))}catch(e){}}
-  pull(row)}
+  if(dirty&&base){
+   if(row.ts===base){SY.ts=row.ts;await push()}   // nothing changed in the cloud meanwhile: upload what was written on this device
+   else{try{localStorage.setItem('wt_conflict_'+ME.id,JSON.stringify(D))}catch(e){}pull(row)}}   // changed from another device as well: cloud wins, this device's copy is kept
+  else{
+   const localHas=D.students.length>0||D.assess.length>0||D.sessions.length>0;
+   if(localHas&&!base){try{localStorage.setItem('wt_prev_local',JSON.stringify(D))}catch(e){}}   // old data that never reached the cloud: keep an untouched copy
+   pull(row)}}
  else{SY.st='local';await push()}
- authWaitOff();teacherReady();go()}
+ if(!silent)authWaitOff();teacherReady();go();renderSync()}
 function loadRO(row){D=Object.assign({},JSON.parse(JSON.stringify(DEF)),row?row.data:{});D.set=Object.assign({},DEF.set,D.set);if(ROLANG)D.set.lang=ROLANG;fixData();SY.ts=row?row.ts:0;lastSnap=JSON.stringify(D)}
 function adminBoot(){RO=true;VIEW=null;SY.on=false;tabs=['Trainers'];tab='Trainers';D=blankD();fixData();lastSnap=JSON.stringify(D);undoStack=[];pid=null;go();loadTeachers()}
 async function loadTeachers(){TCHbusy=true;try{const r=await SB.rpc('admin_overview');if(r.error)throw r.error;TCH=r.data||[];TCHerr=null}catch(e){TCHerr=(e&&e.message)||String(e)}TCHbusy=false;TCHts=Date.now();if(tab==='Trainers')go()}
@@ -1043,19 +1211,29 @@ function renderSync(){stTxt();const ob=document.getElementById('outBtn');if(ob){
  const mb=document.getElementById('modeBtn');if(mb){mb.hidden=!(ME.id&&ME.role==='admin');const toT=ME.mode==='admin';mb.textContent='⇄ '+(toT?L('Trainer mode','وضع المدرب'):L('Admin mode','وضع الأدمن'));mb.title=toT?L('Switch to trainer mode (your own classes)','التحويل لوضع المدرب (فصولك أنت)'):L('Switch to admin mode (see all trainers)','التحويل لوضع الأدمن (مشاهدة كل المدربين)')}
  const bk=document.getElementById('bkBtn'),ud=document.getElementById('undoAll');if(bk)bk.hidden=RO;if(ud)ud.hidden=RO;
  const el=document.getElementById('synbar');if(!el)return;
- el.innerHTML=RO&&VIEW?`<div class="abar rb" role="status"><div style="flex:1">👁 ${L('View only — you are looking at','عرض فقط — أنت تشاهد بيانات')} <b>${esc(VIEW.name)}</b></div><button class="btn" onclick="refreshRO(true)">${L('Refresh','تحديث')}</button><button class="btn" onclick="backToTeachers()">${L('All trainers','كل المدربين')}</button></div>`
+ el.innerHTML=(RO?'':syncBars())+(RO&&VIEW?`<div class="abar rb" role="status"><div style="flex:1">👁 ${L('View only — you are looking at','عرض فقط — أنت تشاهد بيانات')} <b>${esc(VIEW.name)}</b></div><button class="btn" onclick="refreshRO(true)">${L('Refresh','تحديث')}</button><button class="btn" onclick="backToTeachers()">${L('All trainers','كل المدربين')}</button></div>`
  :SY.st==='noaccess'?`<div class="abar bk" role="status"><div style="flex:1">${L('Sync is not allowed for this account, so data stays on this device. Contact the admin.','المزامنة غير مسموحة لهذا الحساب، فالبيانات هتفضل على الجهاز ده. كلّم الأدمن.')}</div></div>`
- :(iosTip()?`<div class="abar bk" role="status"><div style="flex:1">On iPhone, Safari can erase a website's data after about a week without opening it. To keep your data safe, add this page to the Home Screen (Share, then Add to Home Screen) and open it from there.</div><button class="btn" onclick="tipHide=true;renderSync()">OK</button></div>`:'')}
+ :(iosTip()?`<div class="abar bk" role="status"><div style="flex:1">On iPhone, Safari can erase a website's data after about a week without opening it. To keep your data safe, add this page to the Home Screen (Share, then Add to Home Screen) and open it from there.</div><button class="btn" onclick="tipHide=true;renderSync()">OK</button></div>`:''))}
 
 async function initAuth(){
  if(STANDALONE)return;
  document.body.classList.add('locked');
  await new Promise(r=>{if(document.readyState==='complete')r();else window.addEventListener('load',r,{once:true})});
  showAuth();
- if(!window.supabase||!window.supabase.createClient){authMsg('تعذّر تحميل مكتبة الدخول. تأكد من الإنترنت وأعد فتح الصفحة. · Could not load the sign-in library. Check your connection and reload.');return}
- SB=window.supabase.createClient(SUPABASE_URL.trim().replace(/\/(rest|auth)\/v1.*$/,'').replace(/\/+$/,''),SUPABASE_KEY.trim(),{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
- try{const r=await SB.auth.getSession();if(r.data&&r.data.session)await onSignedIn(r.data.session.user)}catch(e){authMsg((e&&e.message)||String(e))}
- SB.auth.onAuthStateChange(ev=>{if(ev==='SIGNED_OUT'&&ME.id)location.reload()})}
+ if(!window.supabase||!window.supabase.createClient){
+  if(offlineStart())return;
+  authMsg('تعذّر تحميل مكتبة الدخول. تأكد من الإنترنت وأعد فتح الصفحة. · Could not load the sign-in library. Check your connection and reload.');return}
+ const REC=/(^|[#&?])type=recovery\b/.test(location.hash+location.search),URLERR=(location.hash+location.search).match(/error_description=([^&]+)/);
+ SB=mkClient();
+ let r=null;try{r=await SB.auth.getSession()}catch(e){r={error:e}}
+ if(REC||URLERR){
+  const hasS=!!(r&&r.data&&r.data.session);
+  if(REC&&hasS){setAuthMode('newpw');authMsg('اختار كلمة مرور جديدة. · Choose your new password.',true)}
+  else{try{history.replaceState(null,'',location.pathname)}catch(e){}setAuthMode('reset');let em=URLERR?decodeURIComponent(URLERR[1].replace(/\+/g,' ')):'';authMsg((/expired|invalid/i.test(em)||!em?'الرابط منتهي أو غير صالح. اطلب رابط جديد. · This link has expired or is not valid. Request a new one.':em))}
+ }
+ else if(r&&r.data&&r.data.session){try{await onSignedIn(r.data.session.user)}catch(e){authMsg((e&&e.message)||String(e))}}
+ else if(cachedIdent()&&(navigator.onLine===false||(r&&r.error&&isNet(r.error)))){if(!offlineStart())authMsg('محتاج إنترنت لتسجيل الدخول أول مرة على الجهاز ده. · Internet is needed the first time you sign in on this device.')}
+ SB.auth.onAuthStateChange(ev=>{if(ev==='SIGNED_OUT'&&ME.id&&!offlineMode)location.reload();if(ev==='PASSWORD_RECOVERY'&&!ME.id&&AUTH_MODE!=='newpw'){showAuth();setAuthMode('newpw')}})}
 
 // ---- weekly report ----
 const RP_WS=6;        // the week starts on Saturday (0=Sunday ... 6=Saturday)
@@ -1102,13 +1280,13 @@ function rpSave(){
  delete rpDraft[w+'|'+c];rpDFlush();rpErr=[];save();go();toast(L('Report saved','تم حفظ التقرير'))}
 
 V.Report=()=>{
- const w=rpCurWeek(),c=rpClsId(),v=rpVals(),rec=rpFind(w,c),ro=RO,star='<span style="color:#d93025;font-weight:900"> *</span>',loc=rpLoc();
- if(!c)return `<section style="border-color:#ff9f1c"><h2>${L('WEEKLY REPORT','التقرير الأسبوعي')}</h2><p>${L('No classes yet.','لسه مفيش فصول.')}</p></section>`;
+ const w=rpCurWeek(),c=rpClsId(),v=rpVals(),rec=rpFind(w,c),ro=RO,star='<span class="req"> *</span>',loc=rpLoc();
+ if(!c)return `<section><h2>${L('WEEKLY REPORT','التقرير الأسبوعي')}</h2><p>${L('No classes yet.','لسه مفيش فصول.')}</p></section>`;
  const opts=D.classes.map(x=>`<option value="${esc(x.id)}"${x.id===c?' selected':''}>${esc(x.name)}</option>`).join('');
  const fields=RPQ.map(q=>{const bad=rpErr.includes(q.k);return `<div class="rpf${bad?' bad':''}"><label class="rq" for="rp_${q.k}">${esc(L(q.en,q.ar))}${q.req?star:''}</label><textarea id="rp_${q.k}" ${ro?'readonly':''} oninput="rpDr('${q.k}',this.value)">${esc(v[q.k])}</textarea>${bad?`<div class="rr">${L('This question is required','السؤال ده مطلوب')}</div>`:''}</div>`}).join('');
  const rows=D.classes.map(x=>{const r=rpFind(w,x.id),dft=!r&&rpHasDraft(w,x.id);return `<tr><td><b>${esc(x.name)}</b></td><td>${r?'✓ '+L('Submitted','تم التسليم'):dft?'✎ '+L('Draft (not submitted)','مسودة (لم تُسلَّم)'):'✗ '+L('Missing','ناقص')}</td><td>${r?esc(new Date(r.ts).toLocaleString(loc)):'—'}</td><td style="white-space:nowrap"><button class="btn" onclick="rpSetCls('${esc(x.id)}')">${ro?L('View','عرض'):L('Open','فتح')}</button>${r?` <button class="btn" onclick="rpDlOne('${esc(x.id)}')">⬇ Excel</button>`:''}</td></tr>`}).join('');
- return `<section style="border-color:#ff9f1c"><h2>${L('WEEKLY REPORT','التقرير الأسبوعي')}</h2>
- <div class="row" style="align-items:center;gap:8px;flex-wrap:wrap"><button class="btn" onclick="rpShift(-1)" aria-label="${L('Previous week','الأسبوع السابق')}">‹</button><input type="date" value="${esc(w)}" onchange="rpPick(this.value)" aria-label="${L('Pick a date in the week','اختار أي تاريخ في الأسبوع')}"><button class="btn" onclick="rpShift(1)" aria-label="${L('Next week','الأسبوع التالي')}">›</button></div>
+ return `<section><h2>${L('WEEKLY REPORT','التقرير الأسبوعي')}</h2>
+ <div class="row" style="align-items:center;gap:8px;flex-wrap:wrap"><button class="btn" onclick="rpShift(-1)" aria-label="${L('Previous week','الأسبوع السابق')}">${L('‹','›')}</button><input type="date" value="${esc(w)}" onchange="rpPick(this.value)" aria-label="${L('Pick a date in the week','اختار أي تاريخ في الأسبوع')}"><button class="btn" onclick="rpShift(1)" aria-label="${L('Next week','الأسبوع التالي')}">${L('›','‹')}</button></div>
  <p><b>${L('Week','الأسبوع')}:</b> ${esc(rpLabel(w))}</p>
  ${ro?`<p class="lb">${L('View only — you cannot edit this trainer’s reports.','عرض فقط — مينفعش تعدّل تقارير المدرب.')}</p>`:''}
  <div class="rpf"><label class="rq" for="rp_cls">${L('Class','الفصل')}${star}</label><select id="rp_cls" onchange="rpSetCls(this.value)">${opts}</select></div>
@@ -1116,7 +1294,7 @@ V.Report=()=>{
  <div class="row" style="margin-top:12px;gap:8px;flex-wrap:wrap;align-items:center">${ro?'':`<button class="btn pri" onclick="rpSave()">${rec?L('Update report','تحديث التقرير'):L('Save report','حفظ التقرير')}</button><span id="rpds" class="lb">${rpHasDraft(w,c)?L('You have an unsaved draft on this device','عندك مسودة لم تُحفظ كتقرير على الجهاز'):''}</span>`}</div>
  ${rec?`<p class="lb">${L('Last saved','آخر حفظ')}: ${esc(new Date(rec.ts).toLocaleString(loc))}</p>`:''}
  </section>
- <section style="border-color:#ff9f1c"><h2>${L('THIS WEEK’S REPORTS','تقارير الأسبوع ده')}</h2>
+ <section><h2>${L('THIS WEEK’S REPORTS','تقارير الأسبوع ده')}</h2>
  <div class="wrap"><table><thead><tr><th>${L('Class','الفصل')}</th><th>${L('Status','الحالة')}</th><th>${L('Saved at','وقت الحفظ')}</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
  <div class="row" style="margin-top:10px;gap:8px;flex-wrap:wrap"><button class="btn" onclick="rpDlOne()">⬇ ${L('This report (Excel)','التقرير ده (Excel)')}</button><button class="btn" onclick="rpDlAll()">⬇ ${L('All reports of this week (Excel)','كل تقارير الأسبوع (Excel)')}</button></div></section>`};
 
@@ -1124,7 +1302,7 @@ V.Report=()=>{
 function rpNag(){if(RO||!D.classes.length)return '';
  const today=new Date();if((today.getDay()-RP_WS+7)%7<RP_NAG_FROM)return '';
  const w=rpIso(rpStart(today)),miss=D.classes.filter(c=>!rpFind(w,c.id));if(!miss.length)return '';
- return `<div class="abar" role="status" style="border-color:#d93025;background:#fff0ef"><div style="flex:1">⚠ <b>${L('You haven’t submitted this week’s report yet','لسه ما سلّمتش تقرير الأسبوع ده')}</b> — ${esc(miss.map(c=>c.name).join(L(', ','، ')))}</div><button class="btn pri" onclick="rpGo()">${L('Write it now','اكتبه دلوقتي')}</button></div>`}
+ return `<div class="abar rn" role="status"><div style="flex:1">⚠ <b>${L('You haven’t submitted this week’s report yet','لسه ما سلّمتش تقرير الأسبوع ده')}</b> — ${esc(miss.map(c=>c.name).join(L(', ','، ')))}</div><button class="btn pri" onclick="rpGo()">${L('Write it now','اكتبه دلوقتي')}</button></div>`}
 function rpGo(){rpWeek=rpIso(rpStart(new Date()));const m=D.classes.find(c=>!rpFind(rpWeek,c.id));if(m)rpCls=m.id;rpErr=[];tab='Report';go()}
 {const vd=V.Dashboard;V.Dashboard=function(){return rpNag()+vd.apply(this,arguments)}}
 
@@ -1164,7 +1342,7 @@ async function rpDlAll(){
  await dl('reports-'+fname(rpTrainer())+'-'+w+'.xlsx',wbBlob(wb),'')}
 
 // ---- admin: Trainers tab ----
-let TWK={week:null,rows:null,err:null,busy:false,ts:0},trMissing=false;
+let TWK={week:null,rows:null,err:null,busy:false,ts:0},trMissing=false,trQ='',trSort='missing';
 async function loadWeek(){const w=rpCurWeek();TWK.busy=true;
  try{const r=await SB.rpc('admin_week',{wk:w});if(r.error)throw r.error;TWK.rows=r.data||[];TWK.err=null}catch(e){TWK.rows=null;TWK.err=(e&&e.message)||String(e)}
  TWK.week=w;TWK.busy=false;TWK.ts=Date.now();if(tab==='Trainers')go()}
@@ -1180,20 +1358,23 @@ V.Trainers=()=>{
  if(SB&&!TWK.busy&&(TWK.week!==w||Date.now()-TWK.ts>30000))loadWeek();
  const h=`<h2>${L('Trainers','المدربين')}</h2>`;
  if(TCHerr)return `<section>${h}<div class="al neg">${esc(TCHerr)}</div><p class="lb">${L('Check that supabase.sql was run and that this account has the admin role.','تأكد إن ملف supabase.sql اتشغّل وإن الحساب ده دوره أدمن.')}</p><div class="row"><button class="btn" onclick="TCHts=0;loadTeachers()">${L('Retry','إعادة المحاولة')}</button></div></section>`;
- if(!TCH)return `<section>${h}<p>${L('Loading…','جاري التحميل…')}</p></section>`;
+ if(!TCH)return `<section>${h}<div class="spin" role="status" aria-label="${L('Loading…','جاري التحميل…')}"></div></section>`;
  const haveW=TWK.week===w&&!!TWK.rows,byId={};if(haveW)TWK.rows.forEach(x=>{byId[x.tid]=x});
  const all=TCH.map(x=>({x,st:trStat(byId[x.tid])})),nAll=all.filter(s=>s.st.state==='all').length,nPart=all.filter(s=>s.st.state==='part').length;
- const list=trMissing&&haveW?all.filter(s=>s.st.state!=='all'):all;
+ const rk={none:0,part:1,all:2},nmOf=s=>String(s.x.tname||s.x.temail||'').toLowerCase();
+ let list=trMissing&&haveW?all.filter(s=>s.st.state!=='all'):all.slice();
+ list.sort(trSort==='recent'?(a,b)=>(+b.x.last_ts||0)-(+a.x.last_ts||0):trSort==='name'||!haveW?(a,b)=>nmOf(a).localeCompare(nmOf(b)):(a,b)=>rk[a.st.state]-rk[b.st.state]||nmOf(a).localeCompare(nmOf(b)));
+ const qq=trQ.trim().toLowerCase(),shown=qq?list.filter(s=>(nmOf(s)+' '+String(s.x.temail||'').toLowerCase()).includes(qq)):list;
  const sum=k=>TCH.reduce((a,x)=>a+(+x[k]||0),0),fmtT=ts=>ts?new Date(+ts).toLocaleString(rpLoc()):'—';
- const rows=list.map(({x,st})=>`<tr><td style="text-align:center">${haveW?trCircle(st):'…'}</td><td><b>${esc(x.tname||'—')}</b></td><td>${esc(x.temail||'')}</td><td>${+x.n_classes||0}</td><td>${+x.n_students||0}</td><td>${+x.n_sessions||0}</td><td>${esc(fmtT(x.last_ts))}</td><td style="white-space:nowrap"><button class="btn pri" onclick="viewTeacher('${esc(x.tid)}')">${L('Open','فتح')}</button> <button class="btn" onclick="adminExcel('${esc(x.tid)}',this)">⬇ Excel</button></td></tr>`).join('');
+ const rows=list.map(({x,st})=>`<tr data-q="${esc((String(x.tname||'')+' '+String(x.temail||'')).toLowerCase())}"${qq&&!(String(x.tname||'')+' '+String(x.temail||'')).toLowerCase().includes(qq)?' hidden':''}><td style="text-align:center">${haveW?trCircle(st):'…'}</td><td><b>${esc(x.tname||'—')}</b>${x.trole==='admin'?` <span class="lb">(${x.tid===ME.id?L('You · Admin','أنت · أدمن'):L('Admin','أدمن')})</span>`:''}</td><td>${esc(x.temail||'')}</td><td>${+x.n_classes||0}</td><td>${+x.n_students||0}</td><td>${+x.n_sessions||0}</td><td>${esc(fmtT(x.last_ts))}</td><td style="white-space:nowrap">${x.tid===ME.id?`<button class="btn pri" onclick="switchMode()" title="${L('Opens your own classes in trainer mode','بيفتح فصولك أنت في وضع المدرب')}">${L('Open','فتح')}</button>`:`<button class="btn pri" onclick="viewTeacher('${esc(x.tid)}')">${L('Open','فتح')}</button>`} <button class="btn" onclick="adminExcel('${esc(x.tid)}',this)">⬇ Excel</button></td></tr>`).join('');
  return `<div class="stats"><div><div class="big">${TCH.length}</div><div class="lb">${L('Trainers','مدربين')}</div></div><div><div class="big">${sum('n_students')}</div><div class="lb">${L('Students','طلاب')}</div></div><div><div class="big">${sum('n_sessions')}</div><div class="lb">${L('Sessions','حصص')}</div></div></div>
- <section style="border-color:#ff9f1c"><h2>${L('WEEKLY REPORTS','التقارير الأسبوعية')}</h2>
- <div class="row" style="align-items:center;gap:8px;flex-wrap:wrap"><button class="btn" onclick="rpShift(-1)" aria-label="${L('Previous week','الأسبوع السابق')}">‹</button><input type="date" value="${esc(w)}" onchange="rpPick(this.value)" aria-label="${L('Pick a date in the week','اختار أي تاريخ في الأسبوع')}"><button class="btn" onclick="rpShift(1)" aria-label="${L('Next week','الأسبوع التالي')}">›</button></div>
+ <section><h2>${L('WEEKLY REPORTS','التقارير الأسبوعية')}</h2>
+ <div class="row" style="align-items:center;gap:8px;flex-wrap:wrap"><button class="btn" onclick="rpShift(-1)" aria-label="${L('Previous week','الأسبوع السابق')}">${L('‹','›')}</button><input type="date" value="${esc(w)}" onchange="rpPick(this.value)" aria-label="${L('Pick a date in the week','اختار أي تاريخ في الأسبوع')}"><button class="btn" onclick="rpShift(1)" aria-label="${L('Next week','الأسبوع التالي')}">${L('›','‹')}</button></div>
  <p><b>${L('Week','الأسبوع')}:</b> ${esc(rpLabel(w))}</p>
  ${haveW?`<p><b>${nAll}</b> ${L('of','من')} <b>${TCH.length}</b> ${L('trainers submitted this week’s report','مدربين سلّموا تقرير الأسبوع')}${nPart?` · <b>${nPart}</b> ${L('partly','جزئي')}`:''}</p>`:TWK.err?`<div class="al neg">${esc(TWK.err)}</div><p class="lb">${L('Weekly status needs the new SQL block: run supabase_update.sql in Supabase.','حالة التسليم الأسبوعية محتاجة كود SQL الجديد: شغّل ملف supabase_update.sql في Supabase.')}</p>`:`<p class="lb">${L('Loading…','جاري التحميل…')}</p>`}
  <div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn${trMissing?' pri':''}" aria-pressed="${trMissing}" onclick="trMissing=!trMissing;go()">${L('Show only missing','الناقصين بس')}</button><button class="btn" onclick="trWeekXl(this)">⬇ ${L('Week reports of all trainers (Excel)','تقارير الأسبوع لكل المدربين (Excel)')}</button></div>
  <p class="lb" style="display:flex;gap:8px 14px;flex-wrap:wrap;align-items:center"><span><span class="trc ok" aria-hidden="true">✓</span> ${L('all classes submitted','كل الفصول اتسلّمت')}</span><span><span class="trc part" aria-hidden="true">1/2</span> ${L('some classes','بعض الفصول')}</span><span><span class="trc none" aria-hidden="true"></span> ${L('nothing submitted','لم يسلّم أي تقرير')}</span></p></section>
- <section>${h}${list.length?`<div class="wrap"><table><thead><tr><th>${L('Report','التقرير')}</th><th>${L('Name','الاسم')}</th><th>${L('Email','الإيميل')}</th><th>${L('Classes','الفصول')}</th><th>${L('Students','الطلاب')}</th><th>${L('Sessions','الحصص')}</th><th>${L('Last sync','آخر مزامنة')}</th><th></th></tr></thead><tbody>${rows}</tbody></table></div><p class="lb">${L('Admin access is read-only. Open a trainer to browse their data, or press Excel to download all of their classes without opening them.','صلاحية الأدمن قراءة فقط. افتح مدرب عشان تتصفح بياناته، أو اضغط Excel لتحميل كل فصوله من غير ما تفتحها.')}</p>`:`<p class="mut">${TCH.length?L('Everyone has submitted this week’s report.','كل المدربين سلّموا تقرير الأسبوع.'):L('No trainers have signed up yet.','لسه مفيش مدربين سجّلوا.')}</p>`}</section>`};
+ <section>${h}<div class="trq"><input type="search" id="trQ" value="${esc(trQ)}" placeholder="${L('Search trainers (name or email)','دوّر على مدرب (الاسم أو الإيميل)')}" aria-label="${L('Search trainers','بحث في المدربين')}" oninput="trFilter(this.value)" data-enter="1"><select id="trS" aria-label="${L('Sort trainers','ترتيب المدربين')}" onchange="trSort=this.value;go()"><option value="missing"${trSort==='missing'?' selected':''}>${L('Not submitted first','اللي ما سلّمش الأول')}</option><option value="name"${trSort==='name'?' selected':''}>${L('Name A–Z','الاسم أ–ي')}</option><option value="recent"${trSort==='recent'?' selected':''}>${L('Last sync (newest)','آخر مزامنة (الأحدث)')}</option></select><span class="lb" id="trCnt" aria-live="polite">${L('Showing','معروض')} ${shown.length} ${L('of','من')} ${list.length}</span></div>${list.length?`<div class="wrap"><table><thead><tr><th>${L('Report','التقرير')}</th><th>${L('Name','الاسم')}</th><th>${L('Email','الإيميل')}</th><th>${L('Classes','الفصول')}</th><th>${L('Students','الطلاب')}</th><th>${L('Sessions','الحصص')}</th><th>${L('Last sync','آخر مزامنة')}</th><th></th></tr></thead><tbody>${rows}</tbody></table></div><p class="mut" id="trNone"${shown.length?' hidden':''}>${L('No trainer matches your search.','مفيش مدرب مطابق للبحث.')}</p><p class="lb">${L('Admin access is read-only. Open a trainer to browse their data, or press Excel to download all of their classes without opening them. Your own classes and reports appear here too once you have added some in trainer mode.','صلاحية الأدمن قراءة فقط. افتح مدرب عشان تتصفح بياناته، أو اضغط Excel لتحميل كل فصوله من غير ما تفتحها. فصولك وتقاريرك أنت بتظهر هنا كمان أول ما تضيف بيانات في وضع المدرب.')}</p>`:`<p class="mut">${TCH.length?L('Everyone has submitted this week’s report.','كل المدربين سلّموا تقرير الأسبوع.'):L('No trainers have signed up yet.','لسه مفيش مدربين سجّلوا.')}</p>`}</section>`};
 
 async function trWeekXl(btn){
  if(!SB||ME.role!=='admin')return;if(!await rpXl())return;
@@ -1202,7 +1383,7 @@ async function trWeekXl(btn){
   const r=await SB.rpc('admin_week',{wk:w});if(r.error)throw r.error;
   const list=r.data||[];if(!list.length){toast(L('No trainers yet','لسه مفيش مدربين'),'err');return}
   const body=[];let nAll=0;
-  list.forEach(t=>{const cl=t.t_classes||[],rp=t.t_reports||[],name=t.tname||t.temail||'—';
+  list.forEach(t=>{const cl=t.t_classes||[],rp=t.t_reports||[],name=(t.tname||t.temail||'—')+(t.trole==='admin'?' ('+L('Admin','أدمن')+')':'');
    if(!cl.length){body.push(rpMiss([name,'—'],RPQ.length+1));return}
    let ok=0;cl.forEach(c=>{const x=rp.find(y=>y.cls===c.id);if(x){ok++;body.push(rpDone([name,c.name],x))}else body.push(rpMiss([name,c.name],RPQ.length+1))});
    if(ok===cl.length)nAll++});
@@ -1237,6 +1418,12 @@ async function adminExcel(id,btn){
  finally{if(btn)btn.disabled=false}}
 
 
+// live search: hide / show rows in place (no redraw, so typing never loses focus)
+function trFilter(v){trQ=v;const q=String(v).trim().toLowerCase();let n=0;const rows=[...document.querySelectorAll('#app tbody tr[data-q]')];
+ rows.forEach(tr=>{const ok=!q||tr.dataset.q.includes(q);tr.hidden=!ok;if(ok)n++});
+ const c=document.getElementById('trCnt');if(c)c.textContent=L('Showing','معروض')+' '+n+' '+L('of','من')+' '+rows.length;
+ const z=document.getElementById('trNone');if(z)z.hidden=n>0}
+
 // ---- class menu (top-left): pick a class, with a small edit icon and delete icon beside each one ----
 const IC_EDIT='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
 const IC_DEL='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>';
@@ -1265,20 +1452,186 @@ function clsKey(e,id){
  if(!n||!c||n===c.name){clsEdit=null;clsMenuRender();return}
  if(D.classes.some(x=>x.id!==id&&x.name.toLowerCase()===n.toLowerCase())){alert('Class name already exists');return}
  c.name=n;(D.reports||[]).forEach(r=>{if(r.cls===id)r.clsName=n});clsOpen=false;clsEdit=null;save();go()}
-function clsDelete(id){
+async function clsDelete(id){
  if(RO||D.classes.length<2)return;const c=D.classes.find(x=>x.id===id);if(!c)return;
  const ns=D.students.filter(x=>x.cls===id).length,nse=D.sessions.filter(x=>x.cls===id).length,nq=D.assess.filter(x=>x.cls===id).length;
- if(!confirm(L('Delete the class "'+c.name+'"?\n\nThis permanently removes its '+ns+' students, '+nse+' sessions and '+nq+' quizzes.\nYou can still press Undo right after.',
-  'حذف الفصل "'+c.name+'"؟\n\nهتتمسح نهائيًا بياناته: '+ns+' طالب و'+nse+' حصة و'+nq+' كويز.\nتقدر تضغط Undo على طول بعد الحذف.')))return;
+ if(!await uiConfirm(L('Delete the class "'+c.name+'"?\n\nThis permanently removes its '+ns+' students, '+nse+' sessions and '+nq+' quizzes.\nYou can still press Undo right after.',
+  'حذف الفصل "'+c.name+'"؟\n\nهتتمسح نهائيًا بياناته: '+ns+' طالب و'+nse+' حصة و'+nq+' كويز.\nتقدر تضغط Undo على طول بعد الحذف.'),{danger:true,ok:L('Delete','حذف')}))return;
  clsClose();del('class',id,{dataset:{sure:'1'}})}
 function clsAdd(){if(RO)return;clsClose();const cs=document.getElementById('cls'),nc=document.getElementById('newcls');cs.hidden=true;nc.hidden=false;nc.value='';nc.placeholder=L('New class name, then Enter','اسم الفصل الجديد ثم Enter');nc.focus()}
-document.addEventListener('click',e=>{if(!clsOpen)return;const p=e.composedPath?e.composedPath():[];if(!p.includes(document.getElementById('clsBox')))clsClose()});
+document.addEventListener('click',e=>{if(!clsOpen)return;const p=e.composedPath?e.composedPath():[];if(!p.includes(document.getElementById('clsBox'))&&!p.some(n=>n.classList&&n.classList.contains('ui-ov')))clsClose()});
 document.addEventListener('keydown',e=>{if(!clsOpen)return;const t=e.target;
  if(e.key==='Escape'&&!(t&&t.id==='clsIn')){e.preventDefault();clsClose(true);return}
  if((e.key==='ArrowDown'||e.key==='ArrowUp')&&!(t&&t.id==='clsIn')){const bs=[...document.querySelectorAll('#clsMenu button')],i=bs.indexOf(document.activeElement);if(bs.length){e.preventDefault();bs[(i+(e.key==='ArrowDown'?1:-1)+bs.length)%bs.length].focus()}}});
+
+// ---- exams: results of midterms / finals / practical tests (kept apart from the quizzes) ----
+let exOpen=null;
+const EXK=[['midterm','Midterm','نصف الترم'],['final','Final','نهائي'],['theory','Theory','نظري'],['practical','Practical','عملي'],['other','Other','أخرى']];
+const exKind=k=>{const x=EXK.find(y=>y[0]===k)||EXK[4];return L(x[1],x[2])};
+const exList=()=>(D.exams||[]).filter(a=>a.cls===D.curClass);
+const exNum=v=>v!==''&&v!=null&&!isNaN(+v);
+const exKindTxt=a=>String(a.title).trim().toLowerCase()===exKind(a.kind).toLowerCase()?'':exKind(a.kind);
+function exStat(a){
+ const all=act(),ab=a.absent||{},S=all.filter(s=>!ab[s.id]),v=S.map(s=>a.scores[s.id]).filter(exNum).map(Number),sd=v.slice().sort((x,y)=>x-y);
+ const med=v.length?(sd[Math.floor((v.length-1)/2)]+sd[Math.ceil((v.length-1)/2)])/2:null,n=all.length-S.length;
+ return L('GRADED','تم التصحيح')+' '+v.length+'/'+S.length+' · '+L('MEAN','المتوسط')+' '+(v.length?(v.reduce((x,y)=>x+y,0)/v.length).toFixed(1):'—')+' · '+L('MEDIAN','الوسيط')+' '+(med==null?'—':med)+' · '+L('HIGH','الأعلى')+' '+(v.length?Math.max(...v):'—')+' · '+L('LOW','الأدنى')+' '+(v.length?Math.min(...v):'—')+' · '+L('PASS','النجاح')+' '+(v.length?(100*v.filter(x=>100*x/a.max>=D.set.mid).length/v.length).toFixed(0)+'%':'—')+(n?' · '+L('ABSENT','غياب')+' '+n:'')}
+V.Exam=()=>{
+ const list=exList().slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+ const form=RO?'':`<section><h2 style="margin:0 0 8px">${L('NEW EXAM','امتحان جديد')}</h2><div class="row"><input id="exT" placeholder="${L('Exam name','اسم الامتحان')}" aria-label="${L('Exam name','اسم الامتحان')}"><select id="exK" aria-label="${L('Exam type','نوع الامتحان')}">${EXK.map(k=>`<option value="${k[0]}">${L(k[1],k[2])}</option>`).join('')}</select><input type="date" id="exD" value="${today()}" aria-label="${L('Exam date','تاريخ الامتحان')}"><input id="exM" type="number" min="1" step="any" placeholder="${L('Max score','الدرجة النهائية')}" aria-label="${L('Max score','الدرجة النهائية')}" style="width:130px" data-enter="1" onkeydown="if(event.key==='Enter')addEx()"><button class="btn pri" onclick="addEx()">${L('Create','إنشاء')}</button></div></section>`;
+ const cards=list.map((a,i)=>{
+  const op=exOpen===null?i===0:exOpen===a.id,dis=a.closed||RO,ab=a.absent||{};
+  const rows=act().map(s=>{const sc=a.scores[s.id],p=exNum(sc)?100*sc/a.max:null,isA=!!ab[s.id];
+   return `<div class="li exr"><span class="n">${esc(s.name)}</span><label class="lb" style="white-space:nowrap;display:inline-flex;align-items:center;gap:4px"><input type="checkbox" ${isA?'checked':''} ${dis?'disabled':''} onchange="setExAbs('${a.id}','${s.id}',this.checked)" aria-label="${L('Absent','غائب')}: ${esc(s.name)}"> ${L('Absent','غائب')}</label><input type="number" step="any" style="width:80px" ${dis||isA?'disabled':''} value="${exNum(sc)?sc:''}" placeholder="—" aria-label="${L('Score','الدرجة')}: ${esc(s.name)}" onchange="setEx('${a.id}','${s.id}',this)"><span id="exp_${a.id}_${s.id}" class="lb ${p==null?'':p>=D.set.mid?'hi':'lo'}" style="min-width:52px;text-align:end">${p==null?'':p.toFixed(0)+'%'}</span></div>`}).join('');
+  return `<section><div class="row"><button class="qt" aria-expanded="${op}" onclick="exOpen=${op}?'':'${a.id}';go()">${op?'▾':'▸'} ${esc(a.title)} <span class="lb">${exKindTxt(a)?exKindTxt(a)+' · ':''}${dt(a.date)} · ${L('MAX','الدرجة')} ${a.max} · ${a.closed?L('CLOSED','مقفول'):L('OPEN','مفتوح')}</span></button>${RO?'':`<button class="btn ${a.closed?'':'pri'}" onclick="togEx('${a.id}')">${a.closed?L('Edit','تعديل'):L('End','إنهاء')}</button><button class="btn" onclick="del('exam','${a.id}',this)">${L('Delete','حذف')}</button>`}</div>
+  ${op?`<p class="lb" id="exs_${a.id}">${exStat(a)}</p><div class="list">${rows||`<span class="mut">${L('Add students first.','ضيف طلاب الأول.')}</span>`}</div>`:''}</section>`}).join('')||`<section class="mut">${L('No exams yet. A blank score stays missing, never zero.','لسه مفيش امتحانات. الدرجة الفاضية بتفضل غير مسجّلة، مش صفر.')}</section>`;
+ return form+cards};
+function addEx(){
+ if(RO)return;const g=id=>document.getElementById(id),t=g('exT').value.trim(),m=+g('exM').value;
+ if(!t||!(m>0)){alert(L('An exam name and a positive max score are required','اسم الامتحان ودرجة نهائية أكبر من صفر مطلوبين'));return}
+ const id=uid();D.exams=D.exams||[];D.exams.push({id,title:t,kind:g('exK').value,date:g('exD').value||today(),max:m,scores:{},absent:{},cls:D.curClass,closed:false});exOpen=id;save();go();const f=document.querySelector('#app .li input[type=number]:not(:disabled)');if(f)f.focus()}
+function exRefresh(a,s){const x=D.exams.find(e=>e.id===a);if(!x)return;
+ const st=document.getElementById('exs_'+a);if(st)st.textContent=exStat(x);
+ const el=document.getElementById('exp_'+a+'_'+s);if(el){const v=x.scores[s],p=exNum(v)?100*v/x.max:null;el.textContent=p==null?'':p.toFixed(0)+'%';el.className='lb '+(p==null?'':p>=D.set.mid?'hi':'lo')}}
+function setEx(a,s,el){
+ if(RO)return;const x=D.exams.find(e=>e.id===a);if(!x)return;
+ if(el.value===''){delete x.scores[s]}
+ else{const v=+el.value;if(!(v>=0&&v<=x.max)){alert(L('Score must be between 0 and '+x.max,'الدرجة لازم تكون بين 0 و '+x.max));el.value=exNum(x.scores[s])?x.scores[s]:'';return}
+  D.audit.push({ts:Date.now(),act:'exam',a,s,old:x.scores[s],v});x.scores[s]=v}
+ save();exRefresh(a,s)}
+function setExAbs(a,s,on){
+ if(RO)return;const x=D.exams.find(e=>e.id===a);if(!x)return;x.absent=x.absent||{};
+ if(on){x.absent[s]=true;delete x.scores[s]}else delete x.absent[s];
+ save();go()}
+function togEx(id){if(RO)return;const x=D.exams.find(e=>e.id===id);if(!x)return;x.closed=!x.closed;save();go()}
+
+// the class workbook gets an "Exams" sheet: one row per student, one column per exam (same look as the other sheets)
+function exAddSheet(wb){
+ const ex=exList().slice().sort((a,b)=>String(a.date).localeCompare(String(b.date)));if(!ex.length)return;
+ const S=act(),head=[L('Student','الطالب')].concat(ex.map(a=>a.title+' ('+a.date+' · /'+a.max+')'),[L('Average %','المتوسط %')]);
+ const body=S.map(s=>{const ps=[],st={},cells=ex.map((a,j)=>{const v=a.scores[s.id];if((a.absent||{})[s.id])return L('Absent','غائب');if(!exNum(v))return '—';const p=100*v/a.max;ps.push(p);st[j+1]=p>=D.set.mid?'C6EFCE':'FFC7CE';return +v});
+  const avg=ps.length?ps.reduce((x,y)=>x+y,0)/ps.length:null;
+  return{c:[s.name].concat(cells,[avg==null?'—':avg.toFixed(1)+'%']),st,cen:cells.map((_,j)=>j+1).concat([cells.length+1]),bold:[0]}});
+ XLSX.utils.book_append_sheet(wb,rpTable(L('Exams','الامتحانات'),[[L('Class','الفصل'),rpCn(D.curClass)],[L('Pass mark','درجة النجاح'),D.set.mid+'%']],head,body,[28].concat(ex.map(()=>22),[14])),L('Exams','الامتحانات'))}
+{const bx=buildXlsx;buildXlsx=function(){const wb=bx.apply(this,arguments);try{exAddSheet(wb)}catch(e){}return wb}}
+
+// ---- exams inside the Dashboard, the student's record and the student's Excel file ----
+const exPct=(a,sid)=>{const v=a.scores[sid];return(!(a.absent||{})[sid]&&exNum(v))?100*v/a.max:null};
+function exAvg(a){const p=act().map(s=>exPct(a,s.id)).filter(x=>x!=null);return p.length?p.reduce((x,y)=>x+y,0)/p.length:null}
+function exPassRate(a){const p=act().map(s=>exPct(a,s.id)).filter(x=>x!=null);return p.length?100*p.filter(x=>x>=D.set.mid).length/p.length:null}
+function exDashHTML(){
+ const ex=exList().slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));if(!ex.length)return '';
+ const S=act(),last=ex[0];
+ const low=S.map(s=>({s,p:exPct(last,s.id)})).filter(x=>x.p!=null&&x.p<D.set.mid).sort((a,b)=>a.p-b.p);
+ const rows=ex.slice(0,5).map(a=>{const av=exAvg(a),pr=exPassRate(a),ab=a.absent||{},n=S.filter(s=>exPct(a,s.id)!=null).length,tot=S.filter(s=>!ab[s.id]).length;
+  return `<tr><td><b>${esc(a.title)}</b><div class="lb">${exKindTxt(a)?exKindTxt(a)+' · ':''}${dt(a.date)}</div></td><td>${n}/${tot}</td><td>${av==null?'—':av.toFixed(0)+'%'}</td><td>${pr==null?'—':`<span class="tg ${pr>=50?'hi':'lo'}">${pr.toFixed(0)}%</span>`}</td></tr>`}).join('');
+ const chart=cols(ex.slice(0,6).reverse().map(a=>{const av=exAvg(a);return av==null?null:{l:a.date,v:av,t:Math.round(av)+'%'}}).filter(Boolean),0,100);
+ return `<div class="ch"><section><h2>${L('EXAMS','الامتحانات')} <a class="nm" onclick="tab='Exam';q='';pid=null;go()">${L('open','فتح')}</a></h2><div class="wrap"><table><tr><th>${L('EXAM','الامتحان')}</th><th>${L('GRADED','تم التصحيح')}</th><th>${L('AVG','المتوسط')}</th><th>${L('PASS','نجاح')}</th></tr>${rows}</table></div></section><section><h2>${L('Exam average (%)','متوسط الامتحانات (%)')}</h2>${chart}</section></div>`
+  +(low.length?`<section><h2>${L('BELOW THE PASS MARK IN','تحت درجة النجاح في')} ${esc(last.title).toUpperCase()}</h2>${low.map(x=>`<div class="li"><span class="n">${nm(x.s)}</span><b class="lo">${x.p.toFixed(0)}%</b></div>`).join('')}</section>`:'')}
+{const vd2=V.Dashboard;V.Dashboard=function(){const h=vd2.apply(this,arguments);if(typeof h!=='string')return h;const ex=exDashHTML();if(!ex)return h;const mk='<div class="ch"><section><h2>TOP 5',i=h.indexOf(mk);return i<0?h+ex:h.slice(0,i)+ex+h.slice(i)}}
+function exProfHTML(id){
+ const s=D.students.find(x=>x.id===id);if(!s)return '';
+ const ex=(D.exams||[]).filter(a=>a.cls===s.cls).sort((a,b)=>String(a.date).localeCompare(String(b.date)));if(!ex.length)return '';
+ const rows=ex.map(a=>{const ab=!!(a.absent||{})[id],v=a.scores[id],p=exPct(a,id),cav=exAvg(a);
+  const res=ab?`<span class="tg lo">${L('Absent','غائب')}</span>`:p==null?'<span class="mut">—</span>':`<span class="tg ${p>=D.set.mid?'hi':'lo'}">${p>=D.set.mid?L('Pass','نجح'):L('Fail','رسب')}</span>`;
+  return `<tr><td><b>${esc(a.title)}</b>${exKindTxt(a)?`<div class="lb">${exKindTxt(a)}</div>`:''}</td><td class="mono">${dt(a.date)}</td><td>${!ab&&exNum(v)?v+'/'+a.max:'—'}</td><td>${p==null?'—':p.toFixed(0)+'%'}</td><td class="mut">${cav==null?'—':cav.toFixed(0)+'%'}</td><td>${res}</td></tr>`}).join('');
+ const pts=ex.map(a=>({l:a.title,v:exPct(a,id)})).filter(x=>x.v!=null),pp=pts.map(x=>x.v),avg=pp.length?pp.reduce((x,y)=>x+y,0)/pp.length:null,nAb=ex.filter(a=>(a.absent||{})[id]).length;
+ return `<section><h2>${L('EXAMS','الامتحانات')} <span class="lb">(${L('kept separate from the quizzes','منفصلة عن الكويزات')})</span></h2><div class="stats"><div><div class="lb">${L('EXAM AVERAGE','متوسط الامتحانات')}</div><div class="big">${avg==null?'—':avg.toFixed(0)+'%'}</div></div><div><div class="lb">${L('EXAMS TAKEN','امتحانات اتعملت')}</div><div class="big">${pp.length}/${ex.length}</div></div><div><div class="lb">${L('ABSENT','غياب')}</div><div class="big">${nAb}</div></div></div><div class="ch"><div class="wrap"><table><tr><th>${L('EXAM','الامتحان')}</th><th>${L('DATE','التاريخ')}</th><th>${L('SCORE','الدرجة')}</th><th>%</th><th>${L('CLASS AVG','متوسط الفصل')}</th><th></th></tr>${rows}</table></div><div>${line(pts)}</div></div></section>`}
+{const pf=profile;profile=function(id){const h=pf.apply(this,arguments);if(typeof h!=='string')return h;const ex=exProfHTML(id);if(!ex)return h;const mk='<section><h2>NOTES</h2>',i=h.indexOf(mk);return i<0?h+ex:h.slice(0,i)+ex+h.slice(i)}}
+function exAddStuSheet(wb,id){
+ const s=D.students.find(x=>x.id===id);if(!s)return;
+ const ex=(D.exams||[]).filter(a=>a.cls===s.cls).sort((a,b)=>String(a.date).localeCompare(String(b.date)));if(!ex.length)return;
+ const body=ex.map(a=>{const ab=!!(a.absent||{})[id],v=a.scores[id],p=exPct(a,id),cav=exAvg(a);
+  return{c:[a.title,exKind(a.kind),a.date,ab?L('Absent','غائب'):exNum(v)?+v:'—',a.max,p==null?'—':p.toFixed(1)+'%',cav==null?'—':cav.toFixed(1)+'%',ab?L('Absent','غائب'):p==null?'—':(p>=D.set.mid?L('Pass','نجح'):L('Fail','رسب'))],st:p==null?{}:{7:p>=D.set.mid?'C6EFCE':'FFC7CE'},cen:[2,3,4,5,6,7],bold:[0]}});
+ XLSX.utils.book_append_sheet(wb,rpTable(L('Exams','الامتحانات'),[[L('Student','الطالب'),s.name],[L('Class','الفصل'),rpCn(s.cls)]],[L('Exam','الامتحان'),L('Type','النوع'),L('Date','التاريخ'),L('Score','الدرجة'),L('Max','من'),'%',L('Class avg','متوسط الفصل'),L('Result','النتيجة')],body,[26,14,12,10,8,10,14,12]),L('Exams','الامتحانات'))}
+{const bs=buildStuXlsx;buildStuXlsx=function(id){const wb=bs.apply(this,arguments);try{exAddStuSheet(wb,id)}catch(e){}return wb}}
+
+// ---- small UX helpers ----
+// controls that only had a placeholder get a real accessible name
+function a11yFix(){document.querySelectorAll('#app input,#app select,#app textarea').forEach(e=>{
+ if(e.type==='hidden'||e.getAttribute('aria-label')||e.getAttribute('aria-labelledby')||(e.labels&&e.labels.length)||e.title)return;
+ const nm=e.placeholder||(e.type==='date'?L('Date','التاريخ'):'');if(nm)e.setAttribute('aria-label',nm)})}
+// on a phone the tab row scrolls sideways: keep the open tab in view
+function ovfFix(){document.querySelectorAll('.hact,#nav').forEach(e=>e.classList.toggle('ovf',innerWidth<=700&&e.scrollWidth>e.clientWidth+2))}
+addEventListener('resize',ovfFix);
+function navFix(){ovfFix();if(innerWidth>700)return;const a=document.querySelector('#nav button[aria-current="true"]');if(a&&a.scrollIntoView)a.scrollIntoView({inline:'center',block:'nearest'})}
+function togPw(){const i=document.getElementById('auPass'),b=document.getElementById('auEye'),on=i.type==='password';i.type=on?'text':'password';b.setAttribute('aria-pressed',on?'true':'false');b.textContent=on?'إخفاء · Hide':'إظهار · Show'}
+// phones: the header slides away while you scroll down and comes back when you scroll up
+{const h=document.querySelector('header');let last=scrollY,tick=false;
+ addEventListener('scroll',()=>{if(tick)return;tick=true;requestAnimationFrame(()=>{const y=scrollY;
+  if(innerWidth<=700){if(y>last+6&&y>140){h.classList.add('hide');if(clsOpen)clsClose()}else if(y<last-6||y<=80)h.classList.remove('hide')}else h.classList.remove('hide');
+  last=y;tick=false})},{passive:true});
+ h.addEventListener('focusin',()=>h.classList.remove('hide'))}
+
+// ---- in-app dialogs (these replace the browser's own alert / confirm pop-ups) ----
+const uiQ=[];let uiBusy=false;
+const uiReduced=()=>!!(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches);
+function uiInert(on){[...document.body.children].forEach(el=>{if(el.classList.contains('ui-ov')||el.id==='toast'||el.tagName==='SCRIPT')return;if(on)el.setAttribute('inert','');else el.removeAttribute('inert')})}
+function uiDialog(o){return new Promise(res=>{uiQ.push({o,res});if(!uiBusy)uiNext()})}
+function uiNext(){
+ const it=uiQ.shift();if(!it){uiBusy=false;return}uiBusy=true;
+ const o=it.o,prev=document.activeElement,root=document.createElement('div');
+ root.className='ui-ov';
+ root.innerHTML=`<div class="ui-dlg" role="${o.cancel?'dialog':'alertdialog'}" aria-modal="true" aria-labelledby="uiT" aria-describedby="uiM" tabindex="-1"><h2 id="uiT"></h2><p id="uiM" class="ui-m"></p><div class="ui-b">${o.cancel?'<button type="button" class="btn" data-r="0"></button>':''}<button type="button" class="btn ${o.danger?'danger':'pri'}" data-r="1"></button></div></div>`;
+ root.querySelector('#uiT').textContent=o.title;root.querySelector('#uiM').textContent=o.msg;
+ root.querySelector('[data-r="1"]').textContent=o.ok;if(o.cancel)root.querySelector('[data-r="0"]').textContent=o.cancel;
+ let closed=false;
+ const done=v=>{if(closed)return;closed=true;document.removeEventListener('keydown',kd,true);root.classList.add('out');
+  uiInert(false);document.body.classList.remove('ui-open');if(prev&&prev.focus&&document.contains(prev)){try{prev.focus()}catch(e){}}
+  setTimeout(()=>{root.remove();it.res(v);uiNext()},uiReduced()?0:150)};
+ const kd=e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();done(o.cancel?false:true)}
+  else if(e.key==='Tab'){const f=[...root.querySelectorAll('button')],i=f.indexOf(document.activeElement);e.preventDefault();f[(i+(e.shiftKey?-1:1)+f.length)%f.length].focus()}};
+ root.addEventListener('mousedown',e=>{if(e.target===root)done(o.cancel?false:true)});
+ root.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>done(b.dataset.r==='1')));
+ document.addEventListener('keydown',kd,true);
+ document.body.appendChild(root);document.body.classList.add('ui-open');uiInert(true);
+ const first=o.cancel&&o.danger?root.querySelector('[data-r="0"]'):root.querySelector('[data-r="1"]');first.focus()}
+function uiAlert(m){return uiDialog({title:L('Notice','تنبيه'),msg:String(m),ok:L('OK','تمام')})}
+function uiConfirm(m,o){o=o||{};return uiDialog({title:o.title||L('Please confirm','تأكيد'),msg:String(m),ok:o.ok||L('OK','تمام'),cancel:L('Cancel','إلغاء'),danger:!!o.danger})}
+window.alert=function(m){uiAlert(m)};
+
+// ---- phones: the less-used tabs live under "More" (a bottom sheet) ----
+const SEC=['Behavior','Bonus','Live','Practical Skills','Alerts'];
+function moreBtn(){if(!SEC.some(x=>tabs.includes(x)))return '';const on=SEC.includes(tab);return `<button type="button" class="moreBtn" aria-haspopup="dialog" aria-current="${on}" onclick="openMore()">${on?t(tab):L('More','المزيد')} ▾</button>`}
+function openMore(){
+ const prev=document.activeElement,root=document.createElement('div');root.className='ui-ov sheetov';
+ root.innerHTML=`<div class="ui-sheet" role="dialog" aria-modal="true" aria-label="${L('More sections','أقسام أخرى')}" tabindex="-1"><div class="grab" aria-hidden="true"></div>${SEC.filter(x=>tabs.includes(x)).map(x=>`<button type="button" class="sh-i" data-t="${x}" aria-current="${x===tab}">${t(x)}<span aria-hidden="true">${x===tab?'✓':''}</span></button>`).join('')}</div>`;
+ let closed=false;
+ const done=go_=>{if(closed)return;closed=true;document.removeEventListener('keydown',kd,true);root.classList.add('out');
+  uiInert(false);document.body.classList.remove('ui-open');
+  if(go_){tab=go_;q='';pid=null;go()}else if(prev&&prev.focus&&document.contains(prev)){try{prev.focus()}catch(e){}}
+  setTimeout(()=>root.remove(),uiReduced()?0:190)};
+ const kd=e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();done(null)}
+  else if(e.key==='Tab'||e.key==='ArrowDown'||e.key==='ArrowUp'){const f=[...root.querySelectorAll('button')],i=f.indexOf(document.activeElement),d=(e.key==='ArrowUp'||(e.key==='Tab'&&e.shiftKey))?-1:1;e.preventDefault();f[(i+d+f.length)%f.length].focus()}};
+ root.addEventListener('mousedown',e=>{if(e.target===root)done(null)});
+ root.querySelectorAll('.sh-i').forEach(b=>b.addEventListener('click',()=>done(b.dataset.t)));
+ document.addEventListener('keydown',kd,true);
+ document.body.appendChild(root);document.body.classList.add('ui-open');uiInert(true);
+ (root.querySelector('[aria-current="true"]')||root.querySelector('.sh-i')).focus()}
+
+// ---- motion: a view change fades/slides in, numbers count up, charts draw. Nothing replays when you just type or tick a box. ----
+let lastView='',motionT=null,cuTok=0;
+function motionFix(){
+ const k=tab+'|'+pid+'|'+D.curClass+'|'+(VIEW?VIEW.id:'');
+ if(k===lastView)return;lastView=k;if(uiReduced())return;
+ const els=['app','hero'].map(id=>document.getElementById(id)).filter(Boolean);
+ els.forEach(e=>{e.classList.remove('enter');void e.offsetWidth;e.classList.add('enter')});
+ document.querySelectorAll('#app svg polyline').forEach(p=>p.setAttribute('pathLength','1'));
+ clearTimeout(motionT);motionT=setTimeout(()=>els.forEach(e=>e.classList.remove('enter')),1200);
+ countUp()}
+function countUp(){
+ const tok=++cuTok;
+ document.querySelectorAll('#app .big').forEach(e=>{
+  const m=e.textContent.trim().match(/^(\d+(?:\.\d+)?)(%?)$/);if(!m||e.children.length)return;
+  const to=+m[1],dec=(m[1].split('.')[1]||'').length,suf=m[2],t0=performance.now(),dur=520;if(!(to>0))return;
+  e.textContent=(0).toFixed(dec)+suf;
+  const step=now=>{if(tok!==cuTok)return;const p=Math.min(1,(now-t0)/dur);e.textContent=p<1?(to*(1-Math.pow(1-p,3))).toFixed(dec)+suf:m[1]+suf;if(p<1)requestAnimationFrame(step)};
+  requestAnimationFrame(step)})}
+// banners slide in only when they actually change (not on every redraw)
+let barKey='';
+function barFx(){const el=document.getElementById('synbar');if(!el)return;const k=el.innerHTML;if(k===barKey)return;const had=barKey!=='';barKey=k;if(!had||!k||uiReduced())return;el.classList.remove('anim');void el.offsetWidth;el.classList.add('anim');setTimeout(()=>el.classList.remove('anim'),500)}
 // ---- shell ----
-function go(keep){document.getElementById('nav').innerHTML=tabs.map(x=>`<button${x==='Report'?' class="rpt"':''} aria-current="${x===tab}" onclick="tab='${x}';q='';pid=null;go()">${t(x)}</button>`).join('');
- const f=document.activeElement,pos=f&&f.selectionStart;document.getElementById('app').innerHTML=V[tab]();document.getElementById('app').setAttribute('data-ok','1');document.documentElement.dir=D.set.lang==='ar'?'rtl':'ltr';document.getElementById('cls').innerHTML=D.classes.map(c=>`<option value="${c.id}" ${c.id===D.curClass?'selected':''}>${esc(c.name)}</option>`).join('')+(RO?'':'<option value="__new">+ Add class</option>');{const s=document.getElementById('cls');s.hidden=!document.getElementById('newcls').hidden||(RO&&!VIEW)}clsMenuRender();hero();renderBar();trApply();
+function go(keep){document.getElementById('nav').innerHTML=tabs.map(x=>`<button${(x==='Report'||SEC.includes(x))?' class="'+(x==='Report'?'rpt':'sec')+'"':''} aria-current="${x===tab}" onclick="tab='${x}';q='';pid=null;go()">${t(x)}</button>`).join('')+moreBtn();
+ const f=document.activeElement,pos=f&&f.selectionStart;document.getElementById('app').innerHTML=V[tab]();document.getElementById('app').setAttribute('data-ok','1');document.documentElement.dir=D.set.lang==='ar'?'rtl':'ltr';document.getElementById('cls').innerHTML=D.classes.map(c=>`<option value="${c.id}" ${c.id===D.curClass?'selected':''}>${esc(c.name)}</option>`).join('')+(RO?'':'<option value="__new">+ Add class</option>');{const s=document.getElementById('cls');s.hidden=!document.getElementById('newcls').hidden||(RO&&!VIEW)}clsMenuRender();hero();renderBar();trApply();a11yFix();navFix();motionFix();barFx();
  if(keep&&f&&f.placeholder==='Search'){const i=document.querySelector('input[placeholder="Search"]');if(i){i.focus();i.setSelectionRange(pos,pos)}}}
 document.getElementById('lang').onclick=()=>{D.set.lang=D.set.lang==='ar'?'en':'ar';save();go()};
 document.addEventListener('keydown',e=>{
@@ -1298,4 +1651,5 @@ nc.onblur=()=>{if(!nc.hidden)done()};
 save();go();
 if(STANDALONE){protectStorage();snapDaily();rpDLoad()}
 initAuth();
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script></body></html>

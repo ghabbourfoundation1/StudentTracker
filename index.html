@@ -139,7 +139,16 @@ body.ui-open{overflow:hidden}
 .ui-dlg h2{margin:0 0 8px}
 .ui-m{white-space:pre-line;margin:0 0 16px;line-height:1.5;overflow-wrap:anywhere}
 .ui-b{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
-.btn.danger{background:var(--bad);border-color:var(--bad);color:#fff}
+.btn.danger,.btn[onclick^="del("],.btn[onclick^="rmDemo"],.btn[onclick^="clrConflict"],.btn[onclick*="wipe"]{background:var(--bad);border-color:var(--bad);color:#fff}
+.set-d{padding:0}.set-d>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:16px;min-height:24px;border-radius:22px}
+.set-d>summary::-webkit-details-marker{display:none}.set-d>summary h2{margin:0}
+.set-d>summary::after{content:"▾";font-size:16px;transition:transform .18s ease}.set-d[open]>summary::after{transform:rotate(180deg)}
+.set-d>summary:focus-visible{outline:3px solid var(--blue);outline-offset:-3px}
+.set-d>.set-b{padding:0 16px 16px}
+.onb{border-inline-start:8px solid var(--lime)}.onb ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.onb li{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fff;border-radius:14px;padding:10px 12px}
+.onb li .n{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--ink);color:#fff;font-weight:800;flex:none}
+.onb li.done .n{background:var(--good)}.onb li.done .t{text-decoration:line-through;opacity:.6}.onb li .t{flex:1;min-width:140px;font-weight:700}
 .ui-sheet{width:100%;max-height:80vh;overflow:auto;background:#fff;color:var(--ink);border-radius:24px 24px 0 0;padding:10px 12px calc(14px + env(safe-area-inset-bottom,0px));box-shadow:0 -12px 40px rgba(0,0,0,.3);outline:0}
 .ui-sheet .grab{width:42px;height:4px;border-radius:2px;background:var(--line);margin:2px auto 8px}
 .ui-sheet .sh-i{display:flex;width:100%;align-items:center;justify-content:space-between;min-height:50px;padding:0 14px;border:0;background:none;color:#000;font:700 16px "Archivo","Noto Sans Arabic",sans-serif;text-align:start;border-radius:14px;cursor:pointer}
@@ -154,7 +163,7 @@ body.ui-open{overflow:hidden}
 .ahead .lnk{align-self:center}
 .trq{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 10px}
 .trq input[type=search]{flex:1 1 220px;min-width:0}
-@media(max-width:700px){nav button.sec{display:none}.moreBtn{display:inline-flex;align-items:center;flex:none;white-space:nowrap}}
+@media(max-width:900px){nav button.sec{display:none}.moreBtn{display:inline-flex;align-items:center;flex:none;white-space:nowrap}}
 #save::before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;margin-inline-end:6px;vertical-align:1px;background:var(--lime)}
 :root{--dot-warn:#ffd166;--dot-bad:#ff7a6b}
 #save[data-st=offline]::before,#save[data-st=local]::before{background:var(--dot-warn)}
@@ -492,7 +501,7 @@ V.Students=()=>{if(pid)return profile(pid);const val=s=>stuSort==='avg'?avg(resu
  <div class="row"><label class="lb">SMART IMPORT (Excel / CSV: names, attendance, quiz grades) <input type="file" accept=".xlsx,.xls,.csv,.txt" onchange="imp(this)"></label><button class="btn" onclick="expStu()">Export CSV (this class)</button><button class="btn" onclick="expAllStu()">Export all classes (file per class)</button>${DA('allstudents','Delete all students')}</div></section>
  <section><h2>STUDENTS (${S.length})</h2><div class="row"><input data-enter="1" placeholder="Search" value="${esc(q)}" oninput="q=this.value;go(true)"><select aria-label="Sort" onchange="stuSort=this.value;go()">${[['name','Sort: list order'],['avg','Sort: quiz average'],['att','Sort: attendance']].map(o=>`<option value="${o[0]}" ${stuSort===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select><button class="btn" onclick="resetOrd()">Reset order (A→Z)</button></div><p class="lb noexp">Drag the ⠿ handle to reorder (or focus it and press ↑ ↓). The order is used everywhere: attendance, quizzes, live and exports.</p><div class="wrap"><table><tr><th>#</th><th>NAME</th><th>AVG</th><th>TREND</th><th>ATT.</th><th></th></tr>
  ${S.map((s,i)=>{const m=avg(results(s.id));return `<tr data-id="${s.id}"><td class="noexp" style="white-space:nowrap">${ordCtl(s,i,S.length)}</td><td>${nm(s)}</td><td>${m==null?'—':m.toFixed(1)+'%'}</td><td>${trend(s.id).c}</td><td>${(()=>{const p=attStats(s.id).pct;return p==null?'—':p.toFixed(0)+'%'})()}</td><td><button class="btn" onclick="del('student','${s.id}',this)">Delete</button></td></tr>`}).join('')||'<tr><td class="mut">No students yet.</td></tr>'}</table></div></section>`};
-let attSid=null,attMon=null,qOpen=null,stuSort='name',bkHide=false,impP=null,lvSess='all';
+let attSid=null,attMon=null,qOpen=null,stuSort='name',bkHide=(()=>{try{return Date.now()-(+localStorage.getItem('wt_bkLater')||0)<864e5}catch(e){return false}})(),impP=null,lvSess='all';
 V.Attendance=()=>{const ss=D.sessions.filter(x=>x.cls===D.curClass).sort((a,b)=>b.date.localeCompare(a.date));const ok=id=>id&&D.sessions.find(x=>x.id===id&&x.cls===D.curClass);const sid=ok(attSid)?attSid:ok(D.cur)?D.cur:(ss[0]||{}).id;const cs=D.sessions.find(x=>x.id===sid);const m=D.att[sid]||{};
  const cb=(s,v)=>`<td style="text-align:center"><input type="checkbox" aria-label="${v} ${esc(s.name)}" ${m[s.id]===v||(v==='Present'&&m[s.id]==='Late')?'checked':''} onchange="setAtt(this,'${sid}','${s.id}','${v}')"></td>`;
  return `<section><h2>NEW SESSION</h2><div class="row"><input type="date" id="sd" value="${today()}"><input id="st" data-enter="1" placeholder="Topic (optional)" onkeydown="if(event.key==='Enter')newSess()"><button class="btn pri" onclick="newSess()">New session</button></div></section>
@@ -543,12 +552,12 @@ V.Alerts=()=>{const A=alerts();window.alv=A;const I=A.map((a,i)=>[a,i]);
  pr=I.filter(x=>live_(x)&&x[0].k!=='pos').sort((x,y)=>(so[x[0].sev]??1)-(so[y[0].sev]??1)),im=I.filter(x=>live_(x)&&x[0].k==='pos'),rs=I.filter(x=>x[0].st==='resolved');
  return `<section style="border-inline-start:8px solid var(--bad)"><h2>NEEDS ATTENTION (${pr.length})</h2>${pr.map(row).join('')||'<span class="mut">No problems right now.</span>'}</section>
  <section style="border-inline-start:8px solid var(--good)"><h2>IMPROVEMENT (${im.length})</h2>${im.map(row).join('')||'<span class="mut">No improvements detected yet.</span>'}</section>${rs.length?`<section><h2>RESOLVED</h2>${rs.map(row).join('')}</section>`:''}`};
-V.Settings=()=>{const f=(k,l,h)=>`<label class="row"><span style="width:250px">${l}</span><input type="number" value="${D.set[k]}" onchange="D.set.${k}=+this.value;save()"><span class="lb">${h}</span></label>`;
+V.Settings=()=>{const f=(k,l,h)=>`<label class="row"><span style="width:250px">${l}</span><input type="number" value="${D.set[k]}" onchange="D.set.${k}=+this.value;save();toast(L('Saved','تم الحفظ'))"><span class="lb">${h}</span></label>`;
  return `${acctSection()}
  <section><h2>CLASSES</h2>${D.classes.map(c=>`<div class="li"><input value="${esc(c.name)}" style="flex:1" aria-label="Class name" onchange="renCls('${c.id}',this.value)">${D.classes.length>1?`<button class="btn" onclick="del('class','${c.id}',this)">Delete</button>`:''}</div>`).join('')}</section>
  <section><h2>RULES</h2>${f('hi','High level from (%)','80 and above')}${f('mid','Medium level from (%)','also the pass mark')}${f('drop','Sudden-drop (points)','latest vs previous 3')}${f('low','Persistent-low (%)','average below this')}${f('minN','Minimum quizzes','for trend and alerts')}${f('bonus','Bonus value','per +')}${f('pen','Penalty value','per −, negative')}${f('absN','Consecutive absences','alert at')}${f('lowEng','Low engagement net avg','last 3 sessions')}</section>
  <section><h2>DATA PROTECTION</h2><p>Storage status: <b>${PERSIST===true?'Protected (the browser promised not to clear it)':'Not guaranteed by the browser'}</b></p><p class="lb">Your data is saved twice on this device, in two separate browser stores. Safari on iPhone can still erase a website's data after about a week without opening it. To avoid that, add this page to the Home Screen and open it from there, or open the app at least once a week. Chrome and Edge keep the data unless the device is very low on space.</p><div class="row"><button class="btn" onclick="protectStorage().then(()=>go())">Request protection</button></div></section>
- <section><h2>EXCEL</h2><div class="row"><button class="btn pri" onclick="exportXlsx()">Export to Excel now</button><label class="btn">Update my existing file<input type="file" accept=".xlsx" hidden onchange="mergeXlsx(this)"></label><button class="btn" onclick="linkFile()">Link a file (auto-save, Chrome/Edge on a laptop)</button></div><label class="row"><input type="checkbox" ${D.set.autoXls!==false?'checked':''} onchange="D.set.autoXls=this.checked;save()"> Also download the Excel file automatically when I end a session or a quiz</label><p class="lb">The class file has two sheets: "Class data" (each student with attendance and quiz grades) and "Dashboard" (class totals). For one student, open the profile and press Export Excel. "Update my existing file" refreshes only these two sheets inside your own workbook and keeps any other sheets you added.</p></section>
+ <section><h2>EXCEL</h2><div class="row"><button class="btn pri" onclick="exportXlsx()">Export to Excel now</button><label class="btn">Update my existing file<input type="file" accept=".xlsx" hidden onchange="mergeXlsx(this)"></label><button class="btn" onclick="linkFile()">Link a file (auto-save, Chrome/Edge on a laptop)</button></div><label class="row"><input type="checkbox" ${D.set.autoXls!==false?'checked':''} onchange="D.set.autoXls=this.checked;save();toast(L('Saved','تم الحفظ'))"> Also download the Excel file automatically when I end a session or a quiz</label><p class="lb">The class file has two sheets: "Class data" (each student with attendance and quiz grades) and "Dashboard" (class totals). For one student, open the profile and press Export Excel. "Update my existing file" refreshes only these two sheets inside your own workbook and keeps any other sheets you added.</p></section>
  ${snapSec()}
  <section><h2>BACKUP</h2><div class="row"><button class="btn pri" onclick="bak()">Download backup (JSON)</button><label class="lb">RESTORE <input type="file" accept=".json" onchange="rest(this)"></label><button class="btn" onclick="demo()">Load demo data</button><button class="btn" onclick="rmDemo()">Remove demo data</button></div><p class="lb">Data lives in this browser only. Download backups regularly.</p></section>`};
 // ---- actions ----
@@ -593,7 +602,7 @@ function renStu(id,v){v=v.trim();if(v){D.students.find(x=>x.id===id).name=v;save
 function setNoteS(id,v){D.students.find(x=>x.id===id).notes=v;save()}
 function renderBk(){const el=document.getElementById('bkbar');if(!el)return;if(RO){el.innerHTML='';return}const age=D.lastBackup?(Date.now()-D.lastBackup)/864e5:null;
  if(!D.students.length||bkHide||(age!==null&&age<3)||(!STANDALONE&&ME.id)){el.innerHTML='';return}
- el.innerHTML=`<div class="abar bk" role="status"><div style="flex:1">${age===null?'No backup yet.':'Last backup '+Math.floor(age)+' days ago.'} Your data lives only in this browser, so download a backup file.</div><button class="btn pri" onclick="bak()">Download backup</button><button class="btn" onclick="bkHide=true;renderBk()">Later</button></div>`}
+ el.innerHTML=`<div class="abar bk" role="status"><div style="flex:1">${age===null?'No backup yet.':'Last backup '+Math.floor(age)+' days ago.'} Your data lives only in this browser, so download a backup file.</div><button class="btn pri" onclick="bak()">Download backup</button><button class="btn" onclick="bkHide=true;try{localStorage.setItem('wt_bkLater',Date.now())}catch(e){};renderBk()">Later</button></div>`}
 const XT='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 const wbBlob=wb=>new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:XT});
 const xlsxBlob=()=>wbBlob(buildXlsx());
@@ -993,7 +1002,7 @@ function buildHold(stu){const cs=getComputedStyle(document.body),h=document.crea
  const hero=document.getElementById('hero').cloneNode(true),main=document.getElementById('app').cloneNode(true);
  if(stu){const t=hero.querySelector('.ht');if(t)t.textContent=stu.name}
  h.appendChild(hero);h.appendChild(main);
- h.querySelectorAll('.noexp,input[type=file]').forEach(e=>e.remove());
+ h.querySelectorAll('.noexp,input[type=file]').forEach(e=>e.remove());h.querySelectorAll('details').forEach(d=>d.setAttribute('open',''));
  // Arabic letters only join when the browser draws a whole word: html2canvas splits text into single letters whenever letter-spacing is set, so switch it off in the capture copy
  h.querySelectorAll('*').forEach(e=>{e.style.setProperty('letter-spacing','normal','important');e.style.setProperty('word-break','normal','important')});h.querySelectorAll('.wrap').forEach(e=>{e.style.overflow='visible'});if(D.set.lang==='ar')trDom(h);return h}
 // html2canvas draws an inline <svg> as a standalone image, so CSS variables and the page stylesheet are lost: resolve them first
@@ -1048,7 +1057,7 @@ function hero(){const c=D.classes.find(x=>x.id===D.curClass),st=pid&&tab==='Stud
 function syncLabel(){return RO?'VIEW ONLY · READ-ONLY':!saveOK?'⚠ SAVE FAILED — NOT STORED':SY.st==='synced'?'SAVED · SYNCED ☁':SY.st==='syncing'?'SYNCING…':SY.st==='offline'?L('OFFLINE · SAVED ON THIS DEVICE — WILL SYNC WHEN ONLINE','بدون إنترنت · محفوظ على الجهاز — هيتزامن لما النت يرجع'):SY.st==='error'?'SAVED ON DEVICE · SYNC ERROR (retrying)':SY.st==='noaccess'?'SAVED ON DEVICE · NO SYNC ACCESS':'SAVED ON THIS DEVICE ONLY'}
 function stTxt(){const s=document.getElementById('save');if(s){s.textContent=syncLabel();s.title=s.textContent;s.dataset.st=STANDALONE?'ok':(RO?'view':SY.st)}}
 function engCode(){return 'ENG-'+Math.abs([...String(SY.uid)].reduce((h,c)=>(h*31+c.charCodeAt(0))|0,7)).toString(36).toUpperCase().padStart(6,'0').slice(0,6)}
-let PERSIST=null,idbReady=false,idbT=null,tipHide=false;
+let PERSIST=null,idbReady=false,idbT=null,tipHide=(()=>{try{return localStorage.getItem('wt_tipHide')==='1'}catch(e){return false}})();
 function idb(){return new Promise((res,rej)=>{const r=indexedDB.open('wt_store',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
 async function idbSet(k,v){try{const d=await idb();await new Promise((res,rej)=>{const t=d.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=res;t.onerror=()=>rej(t.error)});d.close()}catch(e){}}
 async function idbGet(k){try{const d=await idb();const v=await new Promise((res,rej)=>{const q=d.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)});d.close();return v}catch(e){return undefined}}
@@ -1265,7 +1274,7 @@ function renderSync(){stTxt();const ob=document.getElementById('outBtn');if(ob){
  const el=document.getElementById('synbar');if(!el)return;
  el.innerHTML=(RO?'':syncBars())+(RO&&VIEW?`<div class="abar rb" role="status"><div style="flex:1">👁 ${L('View only — you are looking at','عرض فقط — أنت تشاهد بيانات')} <b>${esc(VIEW.name)}</b></div><button class="btn" onclick="refreshRO(true)">${L('Refresh','تحديث')}</button><button class="btn" onclick="backToTeachers()">${L('All trainers','كل المدربين')}</button></div>`
  :SY.st==='noaccess'?`<div class="abar bk" role="status"><div style="flex:1">${L('Sync is not allowed for this account, so data stays on this device. Contact the admin.','المزامنة غير مسموحة لهذا الحساب، فالبيانات هتفضل على الجهاز ده. كلّم الأدمن.')}</div></div>`
- :(iosTip()?`<div class="abar bk" role="status"><div style="flex:1">On iPhone, Safari can erase a website's data after about a week without opening it. To keep your data safe, add this page to the Home Screen (Share, then Add to Home Screen) and open it from there.</div><button class="btn" onclick="tipHide=true;renderSync()">OK</button></div>`:''))}
+ :(iosTip()?`<div class="abar bk" role="status"><div style="flex:1">On iPhone, Safari can erase a website's data after about a week without opening it. To keep your data safe, add this page to the Home Screen (Share, then Add to Home Screen) and open it from there.</div><button class="btn" onclick="tipHide=true;try{localStorage.setItem('wt_tipHide','1')}catch(e){};renderSync()">OK</button></div>`:''))}
 
 async function initAuth(){
  if(STANDALONE)return;
@@ -1522,14 +1531,14 @@ const EXK=[['midterm','Midterm','نصف الترم'],['final','Final','نهائ�
 const exKind=k=>{const x=EXK.find(y=>y[0]===k)||EXK[4];return L(x[1],x[2])};
 const exList=()=>(D.exams||[]).filter(a=>a.cls===D.curClass);
 const exNum=v=>v!==''&&v!=null&&!isNaN(+v);
-const exKindTxt=a=>String(a.title).trim().toLowerCase()===exKind(a.kind).toLowerCase()?'':exKind(a.kind);
+const exKindTxt=a=>'';
 function exStat(a){
  const all=act(),ab=a.absent||{},S=all.filter(s=>!ab[s.id]),v=S.map(s=>a.scores[s.id]).filter(exNum).map(Number),sd=v.slice().sort((x,y)=>x-y);
  const med=v.length?(sd[Math.floor((v.length-1)/2)]+sd[Math.ceil((v.length-1)/2)])/2:null,n=all.length-S.length;
  return L('GRADED','تم التصحيح')+' '+v.length+'/'+S.length+' · '+L('MEAN','المتوسط')+' '+(v.length?(v.reduce((x,y)=>x+y,0)/v.length).toFixed(1):'—')+' · '+L('MEDIAN','الوسيط')+' '+(med==null?'—':med)+' · '+L('HIGH','الأعلى')+' '+(v.length?Math.max(...v):'—')+' · '+L('LOW','الأدنى')+' '+(v.length?Math.min(...v):'—')+' · '+L('PASS','النجاح')+' '+(v.length?(100*v.filter(x=>100*x/a.max>=D.set.mid).length/v.length).toFixed(0)+'%':'—')+(n?' · '+L('ABSENT','غياب')+' '+n:'')}
 V.Exam=()=>{
  const list=exList().slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
- const form=RO?'':`<section><h2 style="margin:0 0 8px">${L('NEW EXAM','امتحان جديد')}</h2><div class="row"><input id="exT" placeholder="${L('Exam name','اسم الامتحان')}" aria-label="${L('Exam name','اسم الامتحان')}"><select id="exK" aria-label="${L('Exam type','نوع الامتحان')}">${EXK.map(k=>`<option value="${k[0]}">${L(k[1],k[2])}</option>`).join('')}</select><input type="date" id="exD" value="${today()}" aria-label="${L('Exam date','تاريخ الامتحان')}"><input id="exM" type="number" min="1" step="any" placeholder="${L('Max score','الدرجة النهائية')}" aria-label="${L('Max score','الدرجة النهائية')}" style="width:130px" data-enter="1" onkeydown="if(event.key==='Enter')addEx()"><button class="btn pri" onclick="addEx()">${L('Create','إنشاء')}</button></div></section>`;
+ const form=RO?'':`<section><h2 style="margin:0 0 8px">${L('NEW EXAM','امتحان جديد')}</h2><div class="row"><input id="exT" placeholder="${L('Exam name','اسم الامتحان')}" aria-label="${L('Exam name','اسم الامتحان')}"><input type="date" id="exD" value="${today()}" aria-label="${L('Exam date','تاريخ الامتحان')}"><input id="exM" type="number" min="1" step="any" placeholder="${L('Max score','الدرجة النهائية')}" aria-label="${L('Max score','الدرجة النهائية')}" style="width:130px" data-enter="1" onkeydown="if(event.key==='Enter')addEx()"><button class="btn pri" onclick="addEx()">${L('Create','إنشاء')}</button></div></section>`;
  const cards=list.map((a,i)=>{
   const op=exOpen===null?i===0:exOpen===a.id,dis=a.closed||RO,ab=a.absent||{};
   const rows=act().map(s=>{const sc=a.scores[s.id],p=exNum(sc)?100*sc/a.max:null,isA=!!ab[s.id];
@@ -1540,7 +1549,7 @@ V.Exam=()=>{
 function addEx(){
  if(RO)return;const g=id=>document.getElementById(id),t=g('exT').value.trim(),m=+g('exM').value;
  if(!t||!(m>0)){alert(L('An exam name and a positive max score are required','اسم الامتحان ودرجة نهائية أكبر من صفر مطلوبين'));return}
- const id=uid();D.exams=D.exams||[];D.exams.push({id,title:t,kind:g('exK').value,date:g('exD').value||today(),max:m,scores:{},absent:{},cls:D.curClass,closed:false});exOpen=id;save();go();const f=document.querySelector('#app .li input[type=number]:not(:disabled)');if(f)f.focus()}
+ const id=uid();D.exams=D.exams||[];D.exams.push({id,title:t,kind:'other',date:g('exD').value||today(),max:m,scores:{},absent:{},cls:D.curClass,closed:false});exOpen=id;save();go();const f=document.querySelector('#app .li input[type=number]:not(:disabled)');if(f)f.focus()}
 function exRefresh(a,s){const x=D.exams.find(e=>e.id===a);if(!x)return;
  const st=document.getElementById('exs_'+a);if(st)st.textContent=exStat(x);
  const el=document.getElementById('exp_'+a+'_'+s);if(el){const v=x.scores[s],p=exNum(v)?100*v/x.max:null;el.textContent=p==null?'':p.toFixed(0)+'%';el.className='lb '+(p==null?'':p>=D.set.mid?'hi':'lo')}}
@@ -1580,6 +1589,45 @@ function exDashHTML(){
  return `<div class="ch"><section><h2>${L('EXAMS','الامتحانات')} <a class="nm" onclick="tab='Exam';q='';pid=null;go()">${L('open','فتح')}</a></h2><div class="wrap"><table><tr><th>${L('EXAM','الامتحان')}</th><th>${L('GRADED','تم التصحيح')}</th><th>${L('AVG','المتوسط')}</th><th>${L('PASS','نجاح')}</th></tr>${rows}</table></div></section><section><h2>${L('Exam average (%)','متوسط الامتحانات (%)')}</h2>${chart}</section></div>`
   +(low.length?`<section><h2>${L('BELOW THE PASS MARK IN','تحت درجة النجاح في')} ${esc(last.title).toUpperCase()}</h2>${low.map(x=>`<div class="li"><span class="n">${nm(x.s)}</span><b class="lo">${x.p.toFixed(0)}%</b></div>`).join('')}</section>`:'')}
 {const vd2=V.Dashboard;V.Dashboard=function(){const h=vd2.apply(this,arguments);if(typeof h!=='string')return h;const ex=exDashHTML();if(!ex)return h;const mk='<div class="ch"><section><h2>TOP 5',i=h.indexOf(mk);return i<0?h+ex:h.slice(0,i)+ex+h.slice(i)}}
+
+// ---- Settings: collapsible sections (open/closed state is remembered) ----
+const SETOPEN={};
+function setTog(el){SETOPEN[el.dataset.k]=el.open}
+{const vs=V.Settings;V.Settings=function(){const h=vs.apply(this,arguments);if(typeof h!=='string')return h;
+ return h.replace(/<section([^>]*)><h2>([^<]*)<\/h2>([\s\S]*?)<\/section>/g,(m,at,t,b)=>{const k=t.replace(/[^A-Za-z]/g,'').toLowerCase()||'x',open=(k in SETOPEN)?SETOPEN[k]:/^(account|rules)/.test(k);
+  return `<section${at}><details class="set-d" data-k="${k}"${open?' open':''} ontoggle="setTog(this)"><summary><h2>${t}</h2></summary><div class="set-b">${b}</div></details></section>`})}}
+// ---- first use: a short checklist while the class is still empty ----
+{const vd3=V.Dashboard;V.Dashboard=function(){const h=vd3.apply(this,arguments);if(typeof h!=='string'||RO)return h;
+ const hasS=D.students.some(s=>s.cls===D.curClass),hasSes=D.sessions.some(x=>x.cls===undefined||x.cls===D.curClass),hasQ=(D.assess||[]).some(x=>x.cls===undefined||x.cls===D.curClass);
+ if(hasS&&hasSes&&hasQ)return h;
+ const go_=(n,tb,lbl)=>`<button class="btn${n}" onclick="tab='${tb}';q='';pid=null;go()">${lbl}</button>`;
+ const st=[[hasS,L('Add your students','أضف الطلاب'),go_(hasS?'':' pri','Students',L('Open Students','افتح الطلاب'))],[hasSes,L('Start a session and take attendance','ابدأ حصة وسجّل الحضور'),go_(hasSes?'':' pri','Attendance',L('Open Attendance','افتح الحضور'))],[hasQ,L('Create your first quiz','أنشئ أول كويز'),go_(hasQ?'':' pri','Quiz',L('Open Quiz','افتح الكويزات'))]];
+ return `<section class="onb"><h2>${L('Getting started','ابدأ من هنا')}</h2><ol>${st.map((x,i)=>`<li class="${x[0]?'done':''}"><span class="n">${x[0]?'✓':i+1}</span><span class="t">${x[1]}</span>${x[0]?'':x[2]}</li>`).join('')}</ol></section>`+h}}
+
+// exam scores also go into the main class sheet ("Class data"): one column per exam + the exam average
+function exAddCols(wb){
+ const ex=exList().slice().sort((a,b)=>String(a.date).localeCompare(String(b.date)));if(!ex.length)return;
+ const ws=wb.Sheets['Class data'];if(!ws||!ws['!ref'])return;
+ const{ST,tf,cs,C,PCT0}=xk(),S=act(),rg=XLSX.utils.decode_range(ws['!ref']),c0=rg.e.c+1,E=XLSX.utils.encode_cell;
+ ex.forEach((a,j)=>{ws[E({r:0,c:c0+j})]=C(a.title+' (/'+a.max+')',ST.th)});
+ ws[E({r:0,c:c0+ex.length})]=C(L('Exam avg %','متوسط الامتحانات %'),ST.th);
+ S.forEach((s,i)=>{const ps=[];
+  ex.forEach((a,j)=>{const v=a.scores[s.id],ab=(a.absent||{})[s.id];let cell;
+   if(ab)cell=C(L('Absent','غائب'),cs(ST.cen,'FFC7CE'));
+   else if(exNum(v)){const pp=100*v/a.max;ps.push(pp);cell=C(+v,cs(ST.cen,tf(pp)))}
+   else cell=C('',ST.cen);
+   ws[E({r:i+1,c:c0+j})]=cell});
+  ws[E({r:i+1,c:c0+ex.length})]=C(ps.length?Math.round(ps.reduce((x,y)=>x+y,0)/ps.length):'',cs(ST.cen,ps.length?tf(ps.reduce((x,y)=>x+y,0)/ps.length):null,true),PCT0)});
+ const last=c0+ex.length;rg.e.c=last;ws['!ref']=XLSX.utils.encode_range(rg);
+ ws['!cols']=(ws['!cols']||[]).concat(ex.map(()=>({wch:16})),[{wch:16}]);
+ if(ws['!autofilter'])ws['!autofilter']={ref:XLSX.utils.encode_range({s:{r:0,c:0},e:{r:rg.e.r,c:last}})}}
+{const bx2=buildXlsx;buildXlsx=function(){const wb=bx2.apply(this,arguments);try{exAddCols(wb)}catch(e){}return wb}}
+// ---- Dashboard: lists of the whole class fold away (tap the title to open) ----
+{const vd4=V.Dashboard;V.Dashboard=function(){const h=vd4.apply(this,arguments);if(typeof h!=='string')return h;
+ const FOLD=/^(TOP 5|BOTTOM 5|ALL STUDENTS|.*LEVEL STUDENTS|BELOW THE PASS MARK|تحت درجة النجاح)/i;
+ return h.replace(/<section([^>]*)><h2>([\s\S]*?)<\/h2>([\s\S]*?)<\/section>/g,(m,at,t,b)=>{const plain=t.replace(/<[^>]*>/g,'').trim();if(!FOLD.test(plain))return m;
+  const k='d_'+plain.replace(/[^A-Za-z0-9]/g,'').toLowerCase().slice(0,40),open=(k in SETOPEN)?SETOPEN[k]:/LEVEL STUDENTS/i.test(plain);
+  return `<section${at}><details class="set-d" data-k="${k}"${open?' open':''} ontoggle="setTog(this)"><summary><h2>${t}</h2></summary><div class="set-b">${b}</div></details></section>`})}}
 function exProfHTML(id){
  const s=D.students.find(x=>x.id===id);if(!s)return '';
  const ex=(D.exams||[]).filter(a=>a.cls===s.cls).sort((a,b)=>String(a.date).localeCompare(String(b.date)));if(!ex.length)return '';
@@ -1593,8 +1641,8 @@ function exAddStuSheet(wb,id){
  const s=D.students.find(x=>x.id===id);if(!s)return;
  const ex=(D.exams||[]).filter(a=>a.cls===s.cls).sort((a,b)=>String(a.date).localeCompare(String(b.date)));if(!ex.length)return;
  const body=ex.map(a=>{const ab=!!(a.absent||{})[id],v=a.scores[id],p=exPct(a,id),cav=exAvg(a);
-  return{c:[a.title,exKind(a.kind),a.date,ab?L('Absent','غائب'):exNum(v)?+v:'—',a.max,p==null?'—':p.toFixed(1)+'%',cav==null?'—':cav.toFixed(1)+'%',ab?L('Absent','غائب'):p==null?'—':(p>=D.set.mid?L('Pass','نجح'):L('Fail','رسب'))],st:p==null?{}:{7:p>=D.set.mid?'C6EFCE':'FFC7CE'},cen:[2,3,4,5,6,7],bold:[0]}});
- XLSX.utils.book_append_sheet(wb,rpTable(L('Exams','الامتحانات'),[[L('Student','الطالب'),s.name],[L('Class','الفصل'),rpCn(s.cls)]],[L('Exam','الامتحان'),L('Type','النوع'),L('Date','التاريخ'),L('Score','الدرجة'),L('Max','من'),'%',L('Class avg','متوسط الفصل'),L('Result','النتيجة')],body,[26,14,12,10,8,10,14,12]),L('Exams','الامتحانات'))}
+  return{c:[a.title,a.date,ab?L('Absent','غائب'):exNum(v)?+v:'—',a.max,p==null?'—':p.toFixed(1)+'%',cav==null?'—':cav.toFixed(1)+'%',ab?L('Absent','غائب'):p==null?'—':(p>=D.set.mid?L('Pass','نجح'):L('Fail','رسب'))],st:p==null?{}:{6:p>=D.set.mid?'C6EFCE':'FFC7CE'},cen:[1,2,3,4,5,6],bold:[0]}});
+ XLSX.utils.book_append_sheet(wb,rpTable(L('Exams','الامتحانات'),[[L('Student','الطالب'),s.name],[L('Class','الفصل'),rpCn(s.cls)]],[L('Exam','الامتحان'),L('Date','التاريخ'),L('Score','الدرجة'),L('Max','من'),'%',L('Class avg','متوسط الفصل'),L('Result','النتيجة')],body,[26,12,10,8,10,14,12]),L('Exams','الامتحانات'))}
 {const bs=buildStuXlsx;buildStuXlsx=function(id){const wb=bs.apply(this,arguments);try{exAddStuSheet(wb,id)}catch(e){}return wb}}
 
 // ---- small UX helpers ----

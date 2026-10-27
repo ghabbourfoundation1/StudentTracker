@@ -1056,7 +1056,7 @@ async function protectStorage(){try{if(navigator.storage&&navigator.storage.pers
  const had=D.students.length||D.assess.length||D.sessions.length,m=await idbGet(KEY);
  if(!had&&m){try{const x=JSON.parse(m);if(x&&((x.students||[]).length||(x.assess||[]).length)){D=Object.assign({},DEF,x);D.set=Object.assign({},DEF.set,D.set);fixData();idbReady=true;save();go();return}}catch(e){}}
  idbReady=true;idbSoon()}
-function iosTip(){if(tipHide||typeof navigator==='undefined')return false;const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);const sa=navigator.standalone===true||(typeof matchMedia!=='undefined'&&matchMedia('(display-mode: standalone)').matches);return ios&&!sa}
+function iosTip(){if(tipHide||!STANDALONE||typeof navigator==='undefined')return false;const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);const sa=navigator.standalone===true||(typeof matchMedia!=='undefined'&&matchMedia('(display-mode: standalone)').matches);return ios&&!sa}
 // ---- accounts & sync (Supabase) ----
 const L=(en,ar)=>D.set.lang==='ar'?ar:en;
 // the sign-in screen speaks ONE language at a time: English by default, Arabic on request (remembered on this device)

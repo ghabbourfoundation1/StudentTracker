@@ -93,23 +93,34 @@ body.locked>*:not(#auth){display:none!important}
 .pw{display:flex;gap:8px;align-items:center}.pw input{flex:1;min-width:0}.pw .btn{flex:none;padding:6px 12px;font-size:13px}
 .abar{flex-wrap:wrap}.abar>div:first-child{min-width:min(240px,100%)}
 :root{--bad-ink:#b42318}.lo{color:var(--bad-ink)}
-.hact{display:contents}
+.hact{display:flex;align-items:center;gap:6px;margin-inline-start:auto}
+.hact #save{margin-inline-start:0;margin-inline-end:6px}
+header .tool{width:38px;height:38px;min-width:0;padding:0;display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1.5px solid transparent;border-radius:50%;background:rgba(255,255,255,.12);color:#fff}
+header .tool.wide{width:auto;padding:0 14px 0 12px;border-radius:999px;font-size:13px;font-weight:700}
+header .tool svg{width:19px;height:19px;flex:none}
+header .tool:hover:not(:disabled){background:rgba(255,255,255,.24)}
+header .tool:disabled{opacity:.35}
+header .tool.out:hover:not(:disabled){background:color-mix(in srgb,var(--bad) 60%,transparent)}
+.hact .sep{width:1px;height:22px;background:rgba(255,255,255,.28);margin:0 2px}
+#clsBtn{border-radius:12px;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.4)}
+#clsBtn svg{width:16px;height:16px;flex:none}
+.ib{display:inline-flex;align-items:center;justify-content:center;flex:none;width:44px;height:44px;padding:0;border:2px solid var(--ink);border-radius:50%;background:#fff;color:var(--ink);cursor:pointer}
+.ib:hover{background:var(--tan)}.ib svg{width:20px;height:20px}
 @media(max-width:700px){
  header{padding:8px 12px;gap:6px 8px;transition:transform .22s ease}
  header.hide{transform:translateY(-100%)}
  header h1{font-size:12px;padding:4px 10px;margin:0}
- .hact{display:flex;gap:6px;align-items:center;width:100%;overflow-x:auto;scrollbar-width:none;order:5;padding:1px 0 2px}
- .hact>*{flex:none;white-space:nowrap}
- #lang{order:1}#modeBtn{order:2}#outBtn{order:3}#undoAll{order:4}#bkBtn{order:5}#save{order:6;font-size:11px}
+ .hact{width:100%;order:5;margin-inline-start:0}
+ .hact #save{font-size:0;margin-inline-end:auto}
  nav{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x proximity;padding:1px 0 2px}
  nav button{flex:none;scroll-snap-align:center;white-space:nowrap}
- .hact::-webkit-scrollbar,nav::-webkit-scrollbar{display:none}
- .hact.ovf,nav.ovf{-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 30px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 30px),transparent)}
- html[dir=rtl] .hact.ovf,html[dir=rtl] nav.ovf{-webkit-mask-image:linear-gradient(to left,#000 calc(100% - 30px),transparent);mask-image:linear-gradient(to left,#000 calc(100% - 30px),transparent)}
+ nav::-webkit-scrollbar{display:none}
+ nav.ovf{-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 30px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 30px),transparent)}
+ html[dir=rtl] nav.ovf{-webkit-mask-image:linear-gradient(to left,#000 calc(100% - 30px),transparent);mask-image:linear-gradient(to left,#000 calc(100% - 30px),transparent)}
 }
 @media(max-width:480px){.li.exr{flex-wrap:wrap}.li.exr .n{flex:1 1 100%}}
 @media(prefers-reduced-motion:reduce){header{transition:none}}
-@media(pointer:coarse){nav button,header .tb{min-height:40px}.btn{min-height:40px}input[type=checkbox]{width:26px;height:26px}}
+@media(pointer:coarse){nav button,header .tb{min-height:40px}.btn{min-height:40px}input[type=checkbox]{width:26px;height:26px}header .tool{width:42px;height:42px;min-height:42px}header .tool.wide{width:auto}}
 .abar.rn{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 8%,#fff)}
 .abar.ofl{border-color:var(--warn)}
 
@@ -132,6 +143,8 @@ body.ui-open{overflow:hidden}
 .lnk{background:none;border:0;padding:4px 0;color:var(--blue);text-decoration:underline;font:600 13px "Archivo","Noto Sans Arabic",sans-serif;cursor:pointer;align-self:flex-start}
 .spin{width:30px;height:30px;box-sizing:border-box;border:3px solid color-mix(in srgb,var(--ink) 14%,transparent);border-top-color:var(--olive);border-radius:50%;margin:8px auto;animation:spin .8s linear infinite}
 .spin[hidden]{display:none}
+.ahead{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ahead .lnk{align-self:center}
 .trq{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 10px}
 .trq input[type=search]{flex:1 1 220px;min-width:0}
 @media(max-width:700px){nav button.sec{display:none}.moreBtn{display:inline-flex;align-items:center;flex:none;white-space:nowrap}}
@@ -228,22 +241,22 @@ try{new Function('a','return a??1;')}catch(e){document.addEventListener('DOMCont
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
 </head><body>
 <div id="auth" hidden><div class="acard">
-<div class="achip">Workshop Tracker</div>
+<div class="ahead"><div class="achip">Workshop Tracker</div><button type="button" class="lnk" id="auLang" onclick="authLangToggle()" lang="ar">العربية</button></div>
 <div class="spin" id="auSpin" hidden></div>
 <h2 id="auTitle"></h2>
 <form id="auForm" onsubmit="authSubmit(event);return false" novalidate>
-<label id="auNameL" hidden>الاسم · Name<input id="auName" data-enter="1" autocomplete="name"></label>
-<label id="auEmailL">الإيميل · Email<input id="auEmail" type="email" data-enter="1" autocomplete="email" inputmode="email"></label>
-<label id="auPassL"><span id="auPassT">كلمة المرور · Password</span><span class="pw"><input id="auPass" type="password" data-enter="1" autocomplete="current-password"><button type="button" class="btn" id="auEye" aria-pressed="false" onclick="togPw()">إظهار · Show</button></span></label>
-<label id="auPass2L" hidden>تأكيد كلمة المرور · Confirm password<input id="auPass2" type="password" data-enter="1" autocomplete="new-password"></label>
-<button type="button" class="lnk" id="auForgot" onclick="setAuthMode('reset')">نسيت كلمة المرور؟ · Forgot password?</button>
+<label id="auNameL" hidden><span id="auNameT"></span><input id="auName" data-enter="1" autocomplete="name"></label>
+<label id="auEmailL"><span id="auEmailT"></span><input id="auEmail" type="email" data-enter="1" autocomplete="email" inputmode="email"></label>
+<label id="auPassL"><span id="auPassT"></span><span class="pw"><input id="auPass" type="password" data-enter="1" autocomplete="current-password"><button type="button" class="ib" id="auEye" aria-pressed="false" onclick="togPw()"></button></span></label>
+<label id="auPass2L" hidden><span id="auPass2T"></span><input id="auPass2" type="password" data-enter="1" autocomplete="new-password"></label>
+<button type="button" class="lnk" id="auForgot" onclick="setAuthMode('reset')"></button>
 <div id="authMsg" role="alert"></div>
 <button class="btn pri" id="auBtn" type="submit"></button>
 </form>
 <button class="btn" id="auSwitch" type="button" onclick="authSwitch()"></button>
-<button class="btn" id="auOut" type="button" onclick="logout()" hidden>خروج · Log out</button>
+<button class="btn" id="auOut" type="button" onclick="logout()" hidden></button>
 </div></div>
-<header><h1>Workshop Tracker</h1><div id="clsBox"><button type="button" class="tb" id="clsBtn" aria-haspopup="true" aria-expanded="false" aria-controls="clsMenu" onclick="clsToggle(event)"><span id="clsName"></span><span aria-hidden="true">▾</span></button><div id="clsMenu" role="group" aria-label="Classes" hidden></div></div><select id="cls" aria-hidden="true" tabindex="-1" style="display:none"></select><input id="newcls" data-enter="1" placeholder="New class name, then Enter" hidden style="width:210px"><span class="lb">AUTOMOTIVE ELECTRICAL · TRAINING RECORD</span><div class="hact"><span id="save" class="lb"></span><button class="tb" id="bkBtn" onclick="bak()" title="Download a backup file">⬇ Backup</button><button class="tb" id="undoAll" disabled title="Undo the last change (Ctrl+Z)">↶ Undo</button><button class="tb" id="lang">عربي</button><button class="tb" id="modeBtn" onclick="switchMode()" hidden></button><button class="tb" id="outBtn" onclick="logout()" hidden>Log out</button></div><nav id="nav"></nav></header>
+<header><h1>Workshop Tracker</h1><div id="clsBox"><button type="button" class="tb" id="clsBtn" aria-haspopup="true" aria-expanded="false" aria-controls="clsMenu" onclick="clsToggle(event)"><span id="clsName"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="6 9 12 15 18 9"/></svg></button><div id="clsMenu" role="group" aria-label="Classes" hidden></div></div><select id="cls" aria-hidden="true" tabindex="-1" style="display:none"></select><input id="newcls" data-enter="1" placeholder="New class name, then Enter" hidden style="width:210px"><span class="lb">AUTOMOTIVE ELECTRICAL · TRAINING RECORD</span><div class="hact"><span id="save" class="lb"></span><button type="button" class="tb tool wide" id="lang"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span class="tl">عربي</span></button><button type="button" class="tb tool wide" id="modeBtn" onclick="switchMode()" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg><span class="tl"></span></button><button type="button" class="tb tool" id="undoAll" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5 5.5 5.5 0 0 1-5.5 5.5H11"/></svg></button><button type="button" class="tb tool" id="bkBtn" onclick="bak()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button><span class="sep" aria-hidden="true"></span><button type="button" class="tb tool out" id="outBtn" onclick="logout()" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button></div><nav id="nav"></nav></header>
 <div id="alertbar"></div>
 <div id="bkbar"></div>
 <div id="synbar"></div>
@@ -351,7 +364,7 @@ function trHTML(h){return h.replace(/>([^<>]+)</g,(m,t)=>'>'+trs(t)+'<')}
 const TROPT={childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:TRATT};let trObs=null;
 function trStart(){if(trObs||typeof MutationObserver==='undefined')return;trObs=new MutationObserver(recs=>{if(D.set.lang!=='ar')return;trObs.disconnect();try{recs.forEach(r=>{if(r.type==='childList')r.addedNodes.forEach(trDom);else if(r.type==='characterData')trNode(r.target);else if(r.type==='attributes')trAttrs(r.target)})}finally{trObs.takeRecords();trObs.observe(document.body,TROPT)}});trObs.observe(document.body,TROPT)}
 ['alert','confirm','prompt'].forEach(k=>{const o=window[k].bind(window);window[k]=(m,...a)=>o(D&&D.set&&D.set.lang==='ar'?trMsg(m):m,...a)});
-function trApply(){document.documentElement.lang=D.set.lang==='ar'?'ar':'en';const lb=document.getElementById('lang');if(lb)lb.textContent=D.set.lang==='ar'?'English':'عربي';if(D.set.lang==='ar'){trStart();trDom(document.body)}else trRestore(document.body)}
+function trApply(){document.documentElement.lang=D.set.lang==='ar'?'ar':'en';const lb=document.getElementById('lang');if(lb){const t=lb.querySelector('.tl');if(t)t.textContent=D.set.lang==='ar'?'EN':'عربي'}if(D.set.lang==='ar'){trStart();trDom(document.body)}else trRestore(document.body)}
 
 const TABS=['Dashboard','Students','Attendance','Quiz','Exam','Behavior','Bonus','Live','Practical Skills','Alerts','Report','Settings'];
 let tabs=TABS.slice();
@@ -1026,7 +1039,7 @@ function renderBar(){renderBk();renderSync();const el=document.getElementById('a
 function hero(){const c=D.classes.find(x=>x.id===D.curClass),st=pid&&tab==='Students'?D.students.find(x=>x.id===pid):null;
  document.getElementById('hero').className='';document.getElementById('hero').innerHTML=`<div class="hw"><div class="ht">${esc(t(tab))}</div></div>${RO&&!VIEW?'':`<div class="gl"><span>${esc(c?c.name:'')}</span><b>${act().length}</b><span>students</span></div>`}`}
 function syncLabel(){return RO?'VIEW ONLY · READ-ONLY':!saveOK?'⚠ SAVE FAILED — NOT STORED':SY.st==='synced'?'SAVED · SYNCED ☁':SY.st==='syncing'?'SYNCING…':SY.st==='offline'?L('OFFLINE · SAVED ON THIS DEVICE — WILL SYNC WHEN ONLINE','بدون إنترنت · محفوظ على الجهاز — هيتزامن لما النت يرجع'):SY.st==='error'?'SAVED ON DEVICE · SYNC ERROR (retrying)':SY.st==='noaccess'?'SAVED ON DEVICE · NO SYNC ACCESS':'SAVED ON THIS DEVICE ONLY'}
-function stTxt(){const s=document.getElementById('save');if(s){s.textContent=syncLabel();s.dataset.st=STANDALONE?'ok':(RO?'view':SY.st)}}
+function stTxt(){const s=document.getElementById('save');if(s){s.textContent=syncLabel();s.title=s.textContent;s.dataset.st=STANDALONE?'ok':(RO?'view':SY.st)}}
 function engCode(){return 'ENG-'+Math.abs([...String(SY.uid)].reduce((h,c)=>(h*31+c.charCodeAt(0))|0,7)).toString(36).toUpperCase().padStart(6,'0').slice(0,6)}
 let PERSIST=null,idbReady=false,idbT=null,tipHide=false;
 function idb(){return new Promise((res,rej)=>{const r=indexedDB.open('wt_store',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
@@ -1040,6 +1053,36 @@ async function protectStorage(){try{if(navigator.storage&&navigator.storage.pers
 function iosTip(){if(tipHide||typeof navigator==='undefined')return false;const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);const sa=navigator.standalone===true||(typeof matchMedia!=='undefined'&&matchMedia('(display-mode: standalone)').matches);return ios&&!sa}
 // ---- accounts & sync (Supabase) ----
 const L=(en,ar)=>D.set.lang==='ar'?ar:en;
+// the sign-in screen speaks ONE language at a time: English by default, Arabic on request (remembered on this device)
+let AUTH_LANG=(()=>{try{return localStorage.getItem('ui_lang')==='ar'?'ar':'en'}catch(e){return 'en'}})();
+const AL=(en,ar)=>AUTH_LANG==='ar'?ar:en;
+const IC_EYE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
+const IC_EYEOFF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/></svg>';
+function eyeState(on){const b=document.getElementById('auEye');if(!b)return;b.innerHTML=on?IC_EYEOFF:IC_EYE;const t=on?AL('Hide password','إخفاء كلمة المرور'):AL('Show password','إظهار كلمة المرور');b.setAttribute('aria-label',t);b.title=t;b.setAttribute('aria-pressed',on?'true':'false')}
+const AUTH_STATIC={auNameT:['Name','الاسم'],auEmailT:['Email','الإيميل'],auPass2T:['Confirm password','تأكيد كلمة المرور'],auForgot:['Forgot password?','نسيت كلمة المرور؟'],auOut:['Log out','خروج']};
+// readable, one-language messages for the usual sign-in problems (anything unknown is shown as the server wrote it)
+function authErr(e){const m=String((e&&(e.message||e.name))||e||'');
+ const T=[[/invalid login credentials/i,'Wrong email or password.','الإيميل أو كلمة المرور غلط.'],
+  [/email not confirmed/i,'Please confirm your email first (check your inbox).','لازم تأكّد الإيميل الأول (شوف الرسايل عندك).'],
+  [/already (been )?registered|already exists/i,'This email already has an account. Sign in instead.','الإيميل ده عنده حساب بالفعل. سجّل دخول.'],
+  [/signups? (are )?(not allowed|disabled)|signup is disabled/i,'New accounts are closed. Ask the admin to add you.','التسجيل الجديد مقفول. اطلب من الأدمن يضيفك.'],
+  [/rate limit|too many|over_email|over_request/i,'Too many attempts. Please wait a little and try again.','محاولات كتير. استنى شوية وجرّب تاني.'],
+  [/failed to fetch|networkerror|network request|load failed|fetch/i,"Can't reach the server. Check your internet.",'مش قادر يوصل للسيرفر. اتأكد من النت.'],
+  [/password should be at least|weak password/i,'Password must be at least 6 characters.','كلمة المرور لازم 6 حروف على الأقل.'],
+  [/different from the old|same password/i,'Choose a password different from the old one.','اختار كلمة مرور مختلفة عن القديمة.']];
+ for(const t of T)if(t[0].test(m))return AL(t[1],t[2]);return m}
+function applyAuthLang(){
+ const $=id=>document.getElementById(id),a=$('auth');if(!a)return;
+ a.dir=AUTH_LANG==='ar'?'rtl':'ltr';a.lang=AUTH_LANG;
+ Object.keys(AUTH_STATIC).forEach(id=>{const e=$(id);if(e)e.textContent=AL(AUTH_STATIC[id][0],AUTH_STATIC[id][1])});
+ $('auLang').textContent=AUTH_LANG==='ar'?'English':'العربية';
+ eyeState($('auPass').type==='text');
+ setAuthMode(AUTH_MODE)}
+function authLangToggle(){AUTH_LANG=AUTH_LANG==='ar'?'en':'ar';try{localStorage.setItem('ui_lang',AUTH_LANG)}catch(e){}applyAuthLang()}
+// after sign-in the app follows the language last chosen on this device (and remembers it if none was chosen yet)
+function applyUiLang(){let u=null;try{u=localStorage.getItem('ui_lang')}catch(e){}
+ if(u!=='ar'&&u!=='en'){try{localStorage.setItem('ui_lang',D.set.lang==='ar'?'ar':'en')}catch(e){}return}
+ if(D.set.lang!==u){D.set.lang=u;if(!RO)save()}}
 let SB=null,AUTH_MODE='in',TCH=null,TCHerr=null,TCHts=0,TCHbusy=false,ROT=null,teacherUp=false,POLL=null,ROLANG=null;
 function blankD(){const d=JSON.parse(JSON.stringify(DEF));d.set.lang=ROLANG||(D&&D.set&&D.set.lang)||'en';return d}
 function wipeLocal(){try{Object.keys(localStorage).filter(k=>k.startsWith('wt_')).forEach(k=>localStorage.removeItem(k))}catch(e){}try{indexedDB.deleteDatabase('wt_store')}catch(e){}}
@@ -1069,11 +1112,11 @@ async function checkRemote(){if(!SY.on||RO||SY.dirty||SY.busy||SY.conflict)retur
 function subscribeSync(){if(SY.unsub||!SB)return;try{SY.unsub=SB.channel('ws-'+SY.uid).on('postgres_changes',{event:'*',schema:'public',table:'workspaces',filter:'user_id=eq.'+SY.uid},()=>checkRemote()).subscribe()}catch(e){}}
 function teacherReady(){if(teacherUp)return;teacherUp=true;subscribeSync();clearInterval(POLL);POLL=setInterval(()=>{if(!document.hidden)checkRemote()},60000);protectStorage();snapDaily();stTxt();renderSync()}
 // Cloud is the source of truth, but the app keeps working without internet: everything is written on this device and uploaded automatically when the connection returns.
-function authWait(msg){const $=id=>document.getElementById(id);document.body.classList.add('locked');$('auth').hidden=false;$('auForm').hidden=true;$('auSwitch').hidden=true;$('auOut').hidden=false;$('auSpin').hidden=false;$('auTitle').textContent='جاري التحميل · Loading';authMsg(msg)}
-function authWaitOff(){const $=id=>document.getElementById(id);$('auForm').hidden=false;$('auSwitch').hidden=AUTH_MODE==='newpw';$('auOut').hidden=true;$('auSpin').hidden=true;hideAuth()}
+function authWait(msg){const $=id=>document.getElementById(id);document.body.classList.add('locked');$('auth').hidden=false;$('auForm').hidden=true;$('auSwitch').hidden=true;$('auOut').hidden=false;$('auLang').hidden=true;$('auSpin').hidden=false;$('auTitle').textContent=AL('Loading','جاري التحميل');authMsg(msg)}
+function authWaitOff(){const $=id=>document.getElementById(id);$('auForm').hidden=false;$('auSwitch').hidden=AUTH_MODE==='newpw';$('auOut').hidden=true;$('auLang').hidden=false;$('auSpin').hidden=true;hideAuth()}
 function trustedLocal(id){let o=null,t=null;try{o=localStorage.getItem('wt_owner');t=localStorage.getItem('wt_ts_'+id)}catch(e){}return o===id&&!!t}
 function cachedIdent(){try{return JSON.parse(localStorage.getItem('wt_ident')||'null')}catch(e){return null}}
-function goOffline(){if(offlineMode)return;offlineMode=true;SY.on=false;SY.st='offline';authWaitOff();stTxt();renderSync();go();clearInterval(WO);WO=setInterval(tryResume,6000)}
+function goOffline(){if(offlineMode)return;offlineMode=true;SY.on=false;SY.st='offline';applyUiLang();authWaitOff();stTxt();renderSync();go();clearInterval(WO);WO=setInterval(tryResume,6000)}
 function offlineStart(){const id=cachedIdent();if(!id||!id.id||!trustedLocal(id.id))return false;
  ME.id=id.id;ME.email=id.email;ME.role=id.role;ME.name=id.name;ME.mode='trainer';RO=false;VIEW=null;tabs=TABS.slice();SY.uid=ME.id;rpDLoad();goOffline();return true}
 function mkClient(){return window.supabase.createClient(SUPABASE_URL.trim().replace(/\/(rest|auth)\/v1.*$/,'').replace(/\/+$/,''),SUPABASE_KEY.trim(),{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})}
@@ -1094,47 +1137,47 @@ function dlConflict(){let c=null;try{c=localStorage.getItem('wt_conflict_'+ME.id
 async function clrConflict(){if(!await uiConfirm(L('Delete the saved offline copy? Download it first if you need it.','مسح النسخة الأوفلاين المحفوظة؟ نزّلها الأول لو محتاجها.'),{danger:true,ok:L('Delete','مسح')}))return;try{localStorage.removeItem('wt_conflict_'+ME.id)}catch(e){}renderSync()}
 
 // ---- sign-in screen ----
-function showAuth(msg){document.body.classList.add('locked');document.getElementById('auth').hidden=false;setAuthMode(AUTH_MODE);if(msg)authMsg(msg)}
+function showAuth(msg){document.body.classList.add('locked');document.getElementById('auth').hidden=false;applyAuthLang();if(msg)authMsg(msg)}
 function hideAuth(){document.getElementById('auth').hidden=true;document.body.classList.remove('locked')}
 function authMsg(m,ok){const e=document.getElementById('authMsg');if(!e)return;e.textContent=m||'';e.className=ok?'ok':''}
 function setAuthMode(m){AUTH_MODE=m;const $=id=>document.getElementById(id),up=m==='up',rs=m==='reset',np=m==='newpw',inn=m==='in';
  $('auNameL').hidden=!up;$('auEmailL').hidden=np;$('auPassL').hidden=rs;$('auPass2L').hidden=!np;$('auForgot').hidden=!inn;$('auSwitch').hidden=np;
- $('auTitle').textContent=up?'إنشاء حساب مدرب · Create trainer account':rs?'استعادة كلمة المرور · Reset password':np?'كلمة مرور جديدة · Choose a new password':'تسجيل الدخول · Sign in';
- $('auBtn').textContent=up?'إنشاء الحساب · Create account':rs?'إرسال رابط الاستعادة · Send reset link':np?'حفظ كلمة المرور · Save password':'دخول · Sign in';
- $('auSwitch').textContent=rs?'رجوع لتسجيل الدخول · Back to sign in':up?'عندي حساب · I have an account':'مدرب جديد؟ أنشئ حساب · New trainer? Create account';
- $('auPassT').textContent=np?'كلمة المرور الجديدة · New password':'كلمة المرور · Password';
+ $('auTitle').textContent=up?AL('Create trainer account','إنشاء حساب مدرب'):rs?AL('Reset password','استعادة كلمة المرور'):np?AL('Choose a new password','كلمة مرور جديدة'):AL('Sign in','تسجيل الدخول');
+ $('auBtn').textContent=up?AL('Create account','إنشاء الحساب'):rs?AL('Send reset link','إرسال رابط الاستعادة'):np?AL('Save password','حفظ كلمة المرور'):AL('Sign in','دخول');
+ $('auSwitch').textContent=rs?AL('Back to sign in','رجوع لتسجيل الدخول'):up?AL('I have an account','عندي حساب'):AL('New trainer? Create account','مدرب جديد؟ أنشئ حساب');
+ $('auPassT').textContent=np?AL('New password','كلمة المرور الجديدة'):AL('Password','كلمة المرور');
  $('auPass').autocomplete=(up||np)?'new-password':'current-password';authMsg('')}
 function authSwitch(){setAuthMode(AUTH_MODE==='in'?'up':'in')}
 async function authSubmit(e){e.preventDefault();const $=id=>document.getElementById(id),m=AUTH_MODE;
- if(!SB){authMsg('تعذّر تحميل مكتبة الدخول. تأكد من الإنترنت وأعد فتح الصفحة. · Could not load the sign-in library. Check your connection and reload.');return false}
+ if(!SB){authMsg(AL('Could not load the sign-in library. Check your connection and reload.','تعذّر تحميل مكتبة الدخول. تأكد من الإنترنت وأعد فتح الصفحة.'));return false}
  const em=$('auEmail').value.trim(),pw=$('auPass').value,nm=$('auName').value.trim(),b=$('auBtn');
  if(m==='reset'){
-  if(!em){authMsg('اكتب الإيميل · Enter your email');return false}
+  if(!em){authMsg(AL('Enter your email','اكتب الإيميل'));return false}
   b.disabled=true;authMsg('');
   try{const r=await SB.auth.resetPasswordForEmail(em,{redirectTo:location.origin+location.pathname});if(r.error)throw r.error;
-   authMsg('لو الإيميل ده مسجّل هيوصلك رابط لتغيير كلمة المرور. شوف الوارد وكمان الـ Spam. · If this email is registered, a reset link is on its way. Check your inbox and spam.',true)}
-  catch(err){authMsg(/rate limit|too many/i.test(String((err&&err.message)||''))?'استنى شوية وجرّب تاني (عدد الرسايل محدود). · Please wait a little and try again (email limit reached).':((err&&err.message)||String(err)))}
+   authMsg(AL('If this email is registered, a reset link is on its way. Check your inbox and spam.','لو الإيميل ده مسجّل هيوصلك رابط لتغيير كلمة المرور. شوف الوارد وكمان الـ Spam.'),true)}
+  catch(err){authMsg(/rate limit|too many/i.test(String((err&&err.message)||''))?AL('Please wait a little and try again (email limit reached).','استنى شوية وجرّب تاني (عدد الرسايل محدود).'):((err&&err.message)||String(err)))}
   b.disabled=false;return false}
  if(m==='newpw'){
   const p2=$('auPass2').value;
-  if(pw.length<6){authMsg('كلمة المرور لازم 6 حروف على الأقل · Password must be at least 6 characters');return false}
-  if(pw!==p2){authMsg('كلمتين المرور مش متطابقتين · The two passwords do not match');return false}
+  if(pw.length<6){authMsg(AL('Password must be at least 6 characters','كلمة المرور لازم 6 حروف على الأقل'));return false}
+  if(pw!==p2){authMsg(AL('The two passwords do not match','كلمتين المرور مش متطابقتين'));return false}
   b.disabled=true;authMsg('');
   try{const r=await SB.auth.updateUser({password:pw});if(r.error)throw r.error;
    try{history.replaceState(null,'',location.pathname+location.search)}catch(x){}
    $('auPass').value='';$('auPass2').value='';
    const g=await SB.auth.getSession();setAuthMode('in');toast(L('Password changed','تم تغيير كلمة المرور'));
-   if(g.data&&g.data.session)await onSignedIn(g.data.session.user);else authMsg('تم تغيير كلمة المرور. سجّل الدخول. · Password changed. Sign in.',true)}
-  catch(err){authMsg((err&&err.message)||String(err))}
+   if(g.data&&g.data.session)await onSignedIn(g.data.session.user);else authMsg(AL('Password changed. Sign in.','تم تغيير كلمة المرور. سجّل الدخول.'),true)}
+  catch(err){authMsg(authErr(err))}
   b.disabled=false;return false}
- if(!em||!pw){authMsg('اكتب الإيميل وكلمة المرور · Enter email and password');return false}
- if(m==='up'&&pw.length<6){authMsg('كلمة المرور لازم 6 حروف على الأقل · Password must be at least 6 characters');return false}
+ if(!em||!pw){authMsg(AL('Enter email and password','اكتب الإيميل وكلمة المرور'));return false}
+ if(m==='up'&&pw.length<6){authMsg(AL('Password must be at least 6 characters','كلمة المرور لازم 6 حروف على الأقل'));return false}
  b.disabled=true;authMsg('');
  try{
   if(m==='up'){const r=await SB.auth.signUp({email:em,password:pw,options:{data:{name:nm}}});if(r.error)throw r.error;
-   if(r.data.session){await onSignedIn(r.data.user)}else{setAuthMode('in');authMsg('تم إنشاء الحساب. أكّد الإيميل من الرسالة اللي وصلتك ثم سجّل الدخول. · Account created. Confirm your email, then sign in.',true)}}
+   if(r.data.session){await onSignedIn(r.data.user)}else{setAuthMode('in');authMsg(AL('Account created. Confirm your email, then sign in.','تم إنشاء الحساب. أكّد الإيميل من الرسالة اللي وصلتك ثم سجّل الدخول.'),true)}}
   else{const r=await SB.auth.signInWithPassword({email:em,password:pw});if(r.error)throw r.error;await onSignedIn(r.data.user)}
- }catch(err){authMsg((err&&err.message)||String(err))}
+ }catch(err){authMsg(authErr(err))}
  b.disabled=false;return false}
 async function logout(){
  if(!RO&&SY.on){clearTimeout(SY.timer);if(SY.dirty||SY.st==='error'||SY.st==='local')await push();
@@ -1148,8 +1191,8 @@ async function onSignedIn(user){
  if(!p){
   if(perr&&isNet(perr)&&offlineStart())return;
   ME.id=null;
-  if(perr){showAuth('تعذّر الاتصال بالسيرفر. جرّب تاني. · Could not reach the server. Try again.');return}
-  showAuth('الحساب مالوش بروفايل. شغّل ملف supabase.sql ثم سجّل الدخول تاني. · No profile found for this account. Run supabase.sql, then sign in again.');try{await SB.auth.signOut()}catch(e){}return}
+  if(perr){showAuth(AL('Could not reach the server. Try again.','تعذّر الاتصال بالسيرفر. جرّب تاني.'));return}
+  showAuth(AL('No profile found for this account. Run supabase.sql, then sign in again.','الحساب مالوش بروفايل. شغّل ملف supabase.sql ثم سجّل الدخول تاني.'));try{await SB.auth.signOut()}catch(e){}return}
  ME.role=p.role;ME.name=p.name;
  try{localStorage.setItem('wt_ident',JSON.stringify({id:ME.id,email:ME.email,role:ME.role,name:ME.name}))}catch(e){}
  // an admin can work in two modes with the same account: 'admin' (read-only view of all trainers) or 'trainer' (own classes, fully editable)
@@ -1164,7 +1207,7 @@ async function switchMode(){
  location.reload()}
 async function teacherBoot(silent){
  RO=false;VIEW=null;tabs=TABS.slice();
- if(!silent)authWait('جاري تحميل بياناتك من السيرفر… · Loading your data from the server…');
+ if(!silent)authWait(AL('Loading your data from the server…','جاري تحميل بياناتك من السيرفر…'));
  let owner=null;try{owner=localStorage.getItem('wt_owner')}catch(e){}
  if(owner&&owner!==ME.id){wipeLocal();D=blankD();fixData();undoStack=[];lastSnap=null;teacherUp=false}
  try{localStorage.setItem('wt_owner',ME.id)}catch(e){}
@@ -1173,7 +1216,7 @@ async function teacherBoot(silent){
  try{const r=await SB.from('workspaces').select('data,ts,device').eq('user_id',ME.id).maybeSingle();if(r.error)throw r.error;row=r.data}
  catch(e){
   if(trustedLocal(ME.id)){goOffline();return}   // the server can't be reached: keep working from this device's copy
-  SY.on=false;SY.st='error';authWait('تعذّر الاتصال بالسيرفر. بنحاول تاني تلقائيًا… · Could not reach the server. Retrying automatically…');setTimeout(()=>teacherBoot(silent),8000);return}
+  SY.on=false;SY.st='error';authWait(AL('Could not reach the server. Retrying automatically…','تعذّر الاتصال بالسيرفر. بنحاول تاني تلقائيًا…'));setTimeout(()=>teacherBoot(silent),8000);return}
  SY.on=true;offlineMode=false;clearInterval(WO);
  let dirty=false,base=0;try{dirty=localStorage.getItem('wt_dirty_'+ME.id)==='1';base=+localStorage.getItem('wt_ts_'+ME.id)||0}catch(e){}
  if(row){
@@ -1185,9 +1228,10 @@ async function teacherBoot(silent){
    if(localHas&&!base){try{localStorage.setItem('wt_prev_local',JSON.stringify(D))}catch(e){}}   // old data that never reached the cloud: keep an untouched copy
    pull(row)}}
  else{SY.st='local';await push()}
+ applyUiLang();
  if(!silent)authWaitOff();teacherReady();go();renderSync()}
 function loadRO(row){D=Object.assign({},JSON.parse(JSON.stringify(DEF)),row?row.data:{});D.set=Object.assign({},DEF.set,D.set);if(ROLANG)D.set.lang=ROLANG;fixData();SY.ts=row?row.ts:0;lastSnap=JSON.stringify(D)}
-function adminBoot(){RO=true;VIEW=null;SY.on=false;tabs=['Trainers'];tab='Trainers';D=blankD();fixData();lastSnap=JSON.stringify(D);undoStack=[];pid=null;go();loadTeachers()}
+function adminBoot(){RO=true;VIEW=null;SY.on=false;try{const u=localStorage.getItem('ui_lang');if(u==='ar'||u==='en')ROLANG=u}catch(e){}tabs=['Trainers'];tab='Trainers';D=blankD();fixData();lastSnap=JSON.stringify(D);undoStack=[];pid=null;go();loadTeachers()}
 async function loadTeachers(){TCHbusy=true;try{const r=await SB.rpc('admin_overview');if(r.error)throw r.error;TCH=r.data||[];TCHerr=null}catch(e){TCHerr=(e&&e.message)||String(e)}TCHbusy=false;TCHts=Date.now();if(tab==='Trainers')go()}
 async function viewTeacher(id){const T=(TCH||[]).find(x=>x.tid===id);
  try{const r=await SB.from('workspaces').select('data,ts,device').eq('user_id',id).maybeSingle();if(r.error)throw r.error;
@@ -1207,8 +1251,9 @@ function acctSection(){
  ${RO?`<p>${VIEW?L('Viewing','تشاهد بيانات')+' <b>'+esc(VIEW.name)+'</b> — '+L('read only','قراءة فقط'):L('Read-only admin account','حساب أدمن (قراءة فقط)')}</p>`:`<p>${L('Status','الحالة')}: <b>${esc(syncLabel())}</b></p><p>${L('Engineer code','كود المهندس')}: <b class="mono">${engCode()}</b></p><p class="lb">${L('Sign in with the same account on any phone or laptop and you get the same data.','سجّل الدخول بنفس الحساب من أي موبايل أو لابتوب وهتلاقي نفس البيانات.')}</p>`}
  <div class="row">${RO?'':`<button class="btn" onclick="syncNow()">${L('Sync now','مزامنة الآن')}</button>`}${ME.role==='admin'?`<button class="btn" onclick="switchMode()">⇄ ${ME.mode==='admin'?L('Switch to trainer mode','التحويل لوضع المدرب'):L('Switch to admin mode','التحويل لوضع الأدمن')}</button>`:''}<button class="btn" onclick="logout()">${L('Log out','تسجيل الخروج')}</button></div></section>`}
 
-function renderSync(){stTxt();const ob=document.getElementById('outBtn');if(ob){ob.hidden=!ME.id;ob.textContent=L('Log out','خروج');ob.title=ME.email||''}
- const mb=document.getElementById('modeBtn');if(mb){mb.hidden=!(ME.id&&ME.role==='admin');const toT=ME.mode==='admin';mb.textContent='⇄ '+(toT?L('Trainer mode','وضع المدرب'):L('Admin mode','وضع الأدمن'));mb.title=toT?L('Switch to trainer mode (your own classes)','التحويل لوضع المدرب (فصولك أنت)'):L('Switch to admin mode (see all trainers)','التحويل لوضع الأدمن (مشاهدة كل المدربين)')}
+function renderSync(){stTxt();const ob=document.getElementById('outBtn');if(ob){ob.hidden=!ME.id;const lo=L('Log out','تسجيل الخروج');ob.setAttribute('aria-label',lo);ob.title=lo+(ME.email?' — '+ME.email:'')}
+ [['bkBtn','Download a backup file','تحميل ملف نسخة احتياطية'],['undoAll','Undo the last change (Ctrl+Z)','تراجع عن آخر تغيير (Ctrl+Z)'],['lang','Switch language','تغيير اللغة']].forEach(a=>{const e=document.getElementById(a[0]);if(e){const t=L(a[1],a[2]);e.title=t;e.setAttribute('aria-label',t)}})
+ const mb=document.getElementById('modeBtn');if(mb){mb.hidden=!(ME.id&&ME.role==='admin');const toT=ME.mode==='admin';mb.querySelector('.tl').textContent=toT?L('Trainer mode','وضع المدرب'):L('Admin mode','وضع الأدمن');mb.title=toT?L('Switch to trainer mode (your own classes)','التحويل لوضع المدرب (فصولك أنت)'):L('Switch to admin mode (see all trainers)','التحويل لوضع الأدمن (مشاهدة كل المدربين)')}
  const bk=document.getElementById('bkBtn'),ud=document.getElementById('undoAll');if(bk)bk.hidden=RO;if(ud)ud.hidden=RO;
  const el=document.getElementById('synbar');if(!el)return;
  el.innerHTML=(RO?'':syncBars())+(RO&&VIEW?`<div class="abar rb" role="status"><div style="flex:1">👁 ${L('View only — you are looking at','عرض فقط — أنت تشاهد بيانات')} <b>${esc(VIEW.name)}</b></div><button class="btn" onclick="refreshRO(true)">${L('Refresh','تحديث')}</button><button class="btn" onclick="backToTeachers()">${L('All trainers','كل المدربين')}</button></div>`
@@ -1222,17 +1267,17 @@ async function initAuth(){
  showAuth();
  if(!window.supabase||!window.supabase.createClient){
   if(offlineStart())return;
-  authMsg('تعذّر تحميل مكتبة الدخول. تأكد من الإنترنت وأعد فتح الصفحة. · Could not load the sign-in library. Check your connection and reload.');return}
+  authMsg(AL('Could not load the sign-in library. Check your connection and reload.','تعذّر تحميل مكتبة الدخول. تأكد من الإنترنت وأعد فتح الصفحة.'));return}
  const REC=/(^|[#&?])type=recovery\b/.test(location.hash+location.search),URLERR=(location.hash+location.search).match(/error_description=([^&]+)/);
  SB=mkClient();
  let r=null;try{r=await SB.auth.getSession()}catch(e){r={error:e}}
  if(REC||URLERR){
   const hasS=!!(r&&r.data&&r.data.session);
-  if(REC&&hasS){setAuthMode('newpw');authMsg('اختار كلمة مرور جديدة. · Choose your new password.',true)}
-  else{try{history.replaceState(null,'',location.pathname)}catch(e){}setAuthMode('reset');let em=URLERR?decodeURIComponent(URLERR[1].replace(/\+/g,' ')):'';authMsg((/expired|invalid/i.test(em)||!em?'الرابط منتهي أو غير صالح. اطلب رابط جديد. · This link has expired or is not valid. Request a new one.':em))}
+  if(REC&&hasS){setAuthMode('newpw');authMsg(AL('Choose your new password.','اختار كلمة مرور جديدة.'),true)}
+  else{try{history.replaceState(null,'',location.pathname)}catch(e){}setAuthMode('reset');let em=URLERR?decodeURIComponent(URLERR[1].replace(/\+/g,' ')):'';authMsg((/expired|invalid/i.test(em)||!em?AL('This link has expired or is not valid. Request a new one.','الرابط منتهي أو غير صالح. اطلب رابط جديد.'):em))}
  }
- else if(r&&r.data&&r.data.session){try{await onSignedIn(r.data.session.user)}catch(e){authMsg((e&&e.message)||String(e))}}
- else if(cachedIdent()&&(navigator.onLine===false||(r&&r.error&&isNet(r.error)))){if(!offlineStart())authMsg('محتاج إنترنت لتسجيل الدخول أول مرة على الجهاز ده. · Internet is needed the first time you sign in on this device.')}
+ else if(r&&r.data&&r.data.session){try{await onSignedIn(r.data.session.user)}catch(e){authMsg(authErr(e))}}
+ else if(cachedIdent()&&(navigator.onLine===false||(r&&r.error&&isNet(r.error)))){if(!offlineStart())authMsg(AL('Internet is needed the first time you sign in on this device.','محتاج إنترنت لتسجيل الدخول أول مرة على الجهاز ده.'))}
  SB.auth.onAuthStateChange(ev=>{if(ev==='SIGNED_OUT'&&ME.id&&!offlineMode)location.reload();if(ev==='PASSWORD_RECOVERY'&&!ME.id&&AUTH_MODE!=='newpw'){showAuth();setAuthMode('newpw')}})}
 
 // ---- weekly report ----
@@ -1551,10 +1596,10 @@ function a11yFix(){document.querySelectorAll('#app input,#app select,#app textar
  if(e.type==='hidden'||e.getAttribute('aria-label')||e.getAttribute('aria-labelledby')||(e.labels&&e.labels.length)||e.title)return;
  const nm=e.placeholder||(e.type==='date'?L('Date','التاريخ'):'');if(nm)e.setAttribute('aria-label',nm)})}
 // on a phone the tab row scrolls sideways: keep the open tab in view
-function ovfFix(){document.querySelectorAll('.hact,#nav').forEach(e=>e.classList.toggle('ovf',innerWidth<=700&&e.scrollWidth>e.clientWidth+2))}
+function ovfFix(){document.querySelectorAll('#nav').forEach(e=>e.classList.toggle('ovf',innerWidth<=700&&e.scrollWidth>e.clientWidth+2))}
 addEventListener('resize',ovfFix);
 function navFix(){ovfFix();if(innerWidth>700)return;const a=document.querySelector('#nav button[aria-current="true"]');if(a&&a.scrollIntoView)a.scrollIntoView({inline:'center',block:'nearest'})}
-function togPw(){const i=document.getElementById('auPass'),b=document.getElementById('auEye'),on=i.type==='password';i.type=on?'text':'password';b.setAttribute('aria-pressed',on?'true':'false');b.textContent=on?'إخفاء · Hide':'إظهار · Show'}
+function togPw(){const i=document.getElementById('auPass'),on=i.type==='password';i.type=on?'text':'password';eyeState(on)}
 // phones: the header slides away while you scroll down and comes back when you scroll up
 {const h=document.querySelector('header');let last=scrollY,tick=false;
  addEventListener('scroll',()=>{if(tick)return;tick=true;requestAnimationFrame(()=>{const y=scrollY;
@@ -1633,7 +1678,7 @@ function barFx(){const el=document.getElementById('synbar');if(!el)return;const 
 function go(keep){document.getElementById('nav').innerHTML=tabs.map(x=>`<button${(x==='Report'||SEC.includes(x))?' class="'+(x==='Report'?'rpt':'sec')+'"':''} aria-current="${x===tab}" onclick="tab='${x}';q='';pid=null;go()">${t(x)}</button>`).join('')+moreBtn();
  const f=document.activeElement,pos=f&&f.selectionStart;document.getElementById('app').innerHTML=V[tab]();document.getElementById('app').setAttribute('data-ok','1');document.documentElement.dir=D.set.lang==='ar'?'rtl':'ltr';document.getElementById('cls').innerHTML=D.classes.map(c=>`<option value="${c.id}" ${c.id===D.curClass?'selected':''}>${esc(c.name)}</option>`).join('')+(RO?'':'<option value="__new">+ Add class</option>');{const s=document.getElementById('cls');s.hidden=!document.getElementById('newcls').hidden||(RO&&!VIEW)}clsMenuRender();hero();renderBar();trApply();a11yFix();navFix();motionFix();barFx();
  if(keep&&f&&f.placeholder==='Search'){const i=document.querySelector('input[placeholder="Search"]');if(i){i.focus();i.setSelectionRange(pos,pos)}}}
-document.getElementById('lang').onclick=()=>{D.set.lang=D.set.lang==='ar'?'en':'ar';save();go()};
+document.getElementById('lang').onclick=()=>{D.set.lang=D.set.lang==='ar'?'en':'ar';try{localStorage.setItem('ui_lang',D.set.lang);AUTH_LANG=D.set.lang}catch(e){}save();go()};
 document.addEventListener('keydown',e=>{
  if(e.key==='z'&&(e.ctrlKey||e.metaKey)&&!/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)){e.preventDefault();globalUndo();return}
  if(e.key!=='Enter')return;const el=e.target;if(!/^(INPUT|SELECT)$/.test(el.tagName)||el.type==='file'||el.type==='checkbox'||el.dataset.enter)return;

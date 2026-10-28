@@ -209,7 +209,7 @@ body.ui-open{overflow:hidden}
 .ui-dlg h2{margin:0 0 8px}
 .ui-m{white-space:pre-line;margin:0 0 16px;line-height:1.5;overflow-wrap:anywhere}
 .ui-b{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
-.dz h2{color:var(--bad)}
+.dz{background:none;padding:0;margin-top:4px;display:flex;flex-direction:column;align-items:flex-end;gap:10px}.dz .cf-b{width:100%;margin:0;background:var(--paper);border-radius:22px;padding:12px}.dz .cf-b .row{margin:0}
 .btn.danger,.btn[onclick^="del("],.btn[onclick^="rmDemo"],.btn[onclick^="clrConflict"],.btn[onclick*="wipe"]{background:var(--bad);border-color:var(--bad);color:#fff}
 .set-d{padding:0}.set-d>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:16px;min-height:24px;border-radius:22px}
 .set-d>summary::-webkit-details-marker{display:none}.set-d>summary h2{margin:0}
@@ -576,7 +576,7 @@ let attSid=null,attMon=null,qOpen=null,stuSort='name',bkHide=(()=>{try{return Da
 V.Attendance=()=>{const ss=D.sessions.filter(x=>x.cls===D.curClass).sort((a,b)=>b.date.localeCompare(a.date));const ok=id=>id&&D.sessions.find(x=>x.id===id&&x.cls===D.curClass);const sid=ok(attSid)?attSid:ok(D.cur)?D.cur:(ss[0]||{}).id;const cs=D.sessions.find(x=>x.id===sid);const m=D.att[sid]||{};
  const cb=(s,v)=>`<td style="text-align:center"><input type="checkbox" aria-label="${v} ${esc(s.name)}" ${m[s.id]===v||(v==='Present'&&m[s.id]==='Late')?'checked':''} onchange="setAtt(this,'${sid}','${s.id}','${v}')"></td>`;
  return `<section data-cf="ses"><h2>NEW SESSION</h2><div class="row"><input type="date" id="sd" value="${today()}"><input id="st" data-enter="1" onkeydown="if(event.key==='Enter')newSess()" placeholder="Topic (optional)"><button class="btn pri" onclick="newSess()">New session</button></div></section>
- ${cs?`<section><div class="row"><h2 style="margin:0;flex:1">Attendance — ${dt(cs.date)} ${esc(cs.topic||'')}</h2><button class="btn" onclick="allP('${sid}')">Mark everyone present</button><button class="btn" onclick="del('session','${sid}',this)">Delete day</button>${DA('allsessions','Delete all days')}</div>
+ ${cs?`<section><div class="row"><h2 style="margin:0;flex:1">${dt(cs.date)}${cs.topic&&cs.topic.trim()?' · '+esc(cs.topic.trim()):''}</h2><button class="btn" onclick="allP('${sid}')">Mark everyone present</button><button class="btn" onclick="del('session','${sid}',this)">Delete day</button>${DA('allsessions','Delete all days')}</div>
  <div class="wrap"><table style="max-width:560px"><tr><th>Name</th><th style="text-align:center">Absent</th><th style="text-align:center">Present</th></tr>${act().map(s=>`<tr><td>${esc(s.name)}</td>${cb(s,'Absent')}${cb(s,'Present')}</tr>`).join('')||'<tr><td class="mut" colspan="3">Add students first.</td></tr>'}</table></div></section>
  <section><h2>Other days</h2>${(()=>{const mons=[...new Set(ss.map(x=>x.date.slice(0,7)))],mo=attMon&&mons.includes(attMon)?attMon:cs.date.slice(0,7);return `<div class="row"><select aria-label="Month" onchange="attMon=this.value;go()">${mons.map(m=>`<option ${m===mo?'selected':''}>${m}</option>`).join('')}</select><span class="lb">${ss.filter(x=>x.date.slice(0,7)===mo).length} days</span></div><div class="row" style="flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px">${ss.filter(x=>x.id!==sid&&x.date.slice(0,7)===mo).map(x=>`<button class="btn" style="flex:none" onclick="attSid='${x.id}';go()">${x.date.slice(8)} ${esc(x.topic||'')}</button>`).join('')||'<span class="mut">No other days this month.</span>'}</div>`})()}</section>`:'<section class="mut">Create a session to take attendance.</section>'}`};
 V.Quiz=()=>`<section data-cf="quiz"><div class="row"><h2 style="margin:0;flex:1">NEW QUIZ</h2>${DA('allquiz','Delete all quizzes')}</div><div class="row"><input id="at" placeholder="Title"><input type="date" id="ad" value="${today()}"><input id="am" type="number" placeholder="Max score" style="width:110px" data-enter="1" onkeydown="if(event.key==='Enter')addAs()"><button class="btn pri" onclick="addAs()">Create</button></div></section>
@@ -1728,11 +1728,17 @@ function navM3(){const n=document.getElementById('nav');if(!n)return;
 {let wasMob=innerWidth<=700;addEventListener('resize',()=>{const m=innerWidth<=700;if(m!==wasMob){wasMob=m;go(true)}})}
 try{navM3()}catch(e){}
 // ---- the screen-level Delete buttons (Delete day / all days / all students ...) sit together at the bottom of the page ----
+let DZOPEN=false,dzTab='',dzCnt=-1;
 function moveDel(){const app=document.getElementById('app');if(!app)return;
  const bs=[...app.querySelectorAll('.row>.btn[onclick^="del("]')];if(!bs.length)return;
- const sec=document.createElement('section');sec.id='dz';sec.className='dz';sec.dataset.cf='del';
- sec.innerHTML='<h2>'+L('Delete','حذف')+'</h2><div class="row"></div>';
- const row=sec.querySelector('.row');bs.forEach(b=>row.appendChild(b));app.appendChild(sec)}
+ const c=D.sessions.length+D.students.length+(D.assess||[]).length+(D.exams||[]).length+(D.skills||[]).length;
+ if(dzTab!==tab||dzCnt!==c)DZOPEN=false;dzTab=tab;dzCnt=c;
+ const sec=document.createElement('section');sec.id='dz';sec.className='dz';
+ sec.innerHTML='<button type="button" class="cf-plus del" aria-expanded="'+DZOPEN+'" aria-label="'+L('Delete options','خيارات الحذف')+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button><div class="cf-b"'+(DZOPEN?'':' hidden')+'><div class="row"></div></div>';
+ const row=sec.querySelector('.row'),btn=sec.querySelector('button'),body=sec.querySelector('.cf-b');
+ bs.forEach(b=>row.appendChild(b));
+ btn.addEventListener('click',()=>{DZOPEN=body.hidden;body.hidden=!DZOPEN;btn.setAttribute('aria-expanded',DZOPEN)});
+ app.appendChild(sec)}
 {const go1=go;go=function(){const r=go1.apply(this,arguments);try{moveDel()}catch(e){}return r}}
 try{moveDel()}catch(e){}
 // ---- phones: "create" forms (new session / add student / new quiz / add skill / new exam) fold behind a + button ----

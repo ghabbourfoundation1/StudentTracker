@@ -127,20 +127,25 @@ header .tool.out:hover:not(:disabled){background:color-mix(in srgb,var(--bad) 60
 }
 @media(max-width:480px){.li.exr{flex-wrap:wrap}.li.exr .n{flex:1 1 100%}}
 @media(max-width:700px){
- body.bnav{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
- body.bnav nav{position:fixed;inset-inline:0;bottom:0;width:auto;z-index:20;background:#fff;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));gap:8px;border-top:3px solid var(--ink);box-shadow:0 -6px 20px rgba(0,0,0,.25)}
- body.bnav nav button{border-color:var(--ink);color:var(--ink);min-height:44px;padding:8px 16px;font-size:14px;font-weight:700}
- body.bnav nav button.rpt{background:var(--blue);border-color:var(--blue);color:#fff}
- body.bnav nav button[aria-current=true]{background:var(--lime);border-color:var(--ink);color:#000;font-weight:800}
+ body.bnav{padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
+ body.bnav nav{position:fixed;inset-inline:0;bottom:0;width:auto;z-index:20;display:flex;flex-wrap:nowrap;overflow:visible;justify-content:space-around;gap:0;background:#fff;padding:12px 8px calc(16px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);box-shadow:0 -2px 12px rgba(0,0,0,.18)}
+ body.bnav nav .nb{flex:1 1 0;min-width:0;min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:4px;padding:0;border:0;border-radius:0;background:none;color:var(--ink);font:600 12px/16px "Archivo","Noto Sans Arabic",sans-serif;white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent}
+ body.bnav nav .nb .ni{width:64px;height:32px;border-radius:16px;display:flex;align-items:center;justify-content:center;transition:background .2s ease,transform .1s ease}
+ body.bnav nav .nb svg{width:24px;height:24px;flex:none}
+ body.bnav nav .nb .nl{max-width:100%;overflow:hidden;text-overflow:ellipsis}
+ body.bnav nav .nb[aria-current=true] .ni{background:var(--lime)}
+ body.bnav nav .nb[aria-current=true]{font-weight:800}
+ body.bnav nav .nb:active .ni{transform:scale(.92)}
+ body.bnav nav .nb:focus-visible{outline:3px solid var(--blue);outline-offset:-3px;border-radius:12px}
  body.bnav nav.ovf,html[dir=rtl] body.bnav nav.ovf{-webkit-mask-image:none!important;mask-image:none!important}
- body.bnav #toast{bottom:calc(env(safe-area-inset-bottom,0px) + 88px)}
+ body.bnav #toast{bottom:calc(env(safe-area-inset-bottom,0px) + 104px)}
  .wrap table th:first-child,.wrap table td:first-child{position:sticky;inset-inline-start:0;z-index:1;background:var(--paper);box-shadow:1px 0 0 var(--line)}
  td{padding:10px 8px}
  section{padding:14px}
 }
 @media(pointer:coarse){
- .btn,.tb,header .tb{min-height:44px}
- input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),select{min-height:44px;font-size:16px}
+ .btn,.tb,header .tb{min-height:48px}
+ input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),select{min-height:48px;font-size:16px}
  textarea{font-size:16px}
  header select,header input{font-size:16px}
 }
@@ -1656,6 +1661,24 @@ function navPlace(){const n=document.getElementById('nav'),h=document.querySelec
  if(mob&&n.parentNode!==document.body)document.body.appendChild(n);else if(!mob&&n.parentNode!==h)h.appendChild(n);
  document.body.classList.toggle('bnav',mob);if(typeof ovfFix==='function')ovfFix()}
 addEventListener('resize',navPlace);navPlace();
+// ---- phones: Material Design 3 "navigation bar" (4 main destinations + More, icon + label) ----
+let MORELIST=null;
+const NB_MAIN=['Dashboard','Students','Attendance','Quiz'];
+const NB_ICO={Dashboard:'<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',
+ Students:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+ Attendance:'<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/>',
+ Quiz:'<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+ More:'<line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/>'};
+function navM3(){const n=document.getElementById('nav');if(!n)return;
+ if(innerWidth>700){MORELIST=null;return}
+ const main=NB_MAIN.filter(x=>tabs.includes(x)),rest=tabs.filter(x=>!NB_MAIN.includes(x));MORELIST=rest;
+ const ic=k=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${NB_ICO[k]}</svg>`;
+ n.classList.remove('ovf');
+ n.innerHTML=main.map(x=>`<button type="button" class="nb" aria-current="${x===tab}" onclick="tab='${x}';q='';pid=null;go()"><span class="ni">${ic(x)}</span><span class="nl">${t(x)}</span></button>`).join('')
+  +(rest.length?`<button type="button" class="nb" aria-haspopup="dialog" aria-current="${rest.includes(tab)}" onclick="openMore()"><span class="ni">${ic('More')}</span><span class="nl">${L('More','المزيد')}</span></button>`:'')}
+{const go0=go;go=function(){const r=go0.apply(this,arguments);try{navM3()}catch(e){}return r}}
+{let wasMob=innerWidth<=700;addEventListener('resize',()=>{const m=innerWidth<=700;if(m!==wasMob){wasMob=m;go(true)}})}
+try{navM3()}catch(e){}
 function exProfHTML(id){
  const s=D.students.find(x=>x.id===id);if(!s)return '';
  const ex=(D.exams||[]).filter(a=>a.cls===s.cls).sort((a,b)=>String(a.date).localeCompare(String(b.date)));if(!ex.length)return '';
@@ -1722,7 +1745,7 @@ const SEC=['Behavior','Bonus','Live','Practical Skills','Alerts'];
 function moreBtn(){if(!SEC.some(x=>tabs.includes(x)))return '';const on=SEC.includes(tab);return `<button type="button" class="moreBtn" aria-haspopup="dialog" aria-current="${on}" onclick="openMore()">${on?t(tab):L('More','المزيد')} ▾</button>`}
 function openMore(){
  const prev=document.activeElement,root=document.createElement('div');root.className='ui-ov sheetov';
- root.innerHTML=`<div class="ui-sheet" role="dialog" aria-modal="true" aria-label="${L('More sections','أقسام أخرى')}" tabindex="-1"><div class="grab" aria-hidden="true"></div>${SEC.filter(x=>tabs.includes(x)).map(x=>`<button type="button" class="sh-i" data-t="${x}" aria-current="${x===tab}">${t(x)}<span aria-hidden="true">${x===tab?'✓':''}</span></button>`).join('')}</div>`;
+ root.innerHTML=`<div class="ui-sheet" role="dialog" aria-modal="true" aria-label="${L('More sections','أقسام أخرى')}" tabindex="-1"><div class="grab" aria-hidden="true"></div>${(MORELIST||SEC).filter(x=>tabs.includes(x)).map(x=>`<button type="button" class="sh-i" data-t="${x}" aria-current="${x===tab}">${t(x)}<span aria-hidden="true">${x===tab?'✓':''}</span></button>`).join('')}</div>`;
  let closed=false;
  const done=go_=>{if(closed)return;closed=true;document.removeEventListener('keydown',kd,true);root.classList.add('out');
   uiInert(false);document.body.classList.remove('ui-open');

@@ -126,6 +126,24 @@ header .tool.out:hover:not(:disabled){background:color-mix(in srgb,var(--bad) 60
  html[dir=rtl] nav.ovf{-webkit-mask-image:linear-gradient(to left,#000 calc(100% - 30px),transparent);mask-image:linear-gradient(to left,#000 calc(100% - 30px),transparent)}
 }
 @media(max-width:480px){.li.exr{flex-wrap:wrap}.li.exr .n{flex:1 1 100%}}
+@media(max-width:700px){
+ body.bnav{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+ body.bnav nav{position:fixed;inset-inline:0;bottom:0;width:auto;z-index:20;background:#fff;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));gap:8px;border-top:3px solid var(--ink);box-shadow:0 -6px 20px rgba(0,0,0,.25)}
+ body.bnav nav button{border-color:var(--ink);color:var(--ink);min-height:44px;padding:8px 16px;font-size:14px;font-weight:700}
+ body.bnav nav button.rpt{background:var(--blue);border-color:var(--blue);color:#fff}
+ body.bnav nav button[aria-current=true]{background:var(--lime);border-color:var(--ink);color:#000;font-weight:800}
+ body.bnav nav.ovf,html[dir=rtl] body.bnav nav.ovf{-webkit-mask-image:none!important;mask-image:none!important}
+ body.bnav #toast{bottom:calc(env(safe-area-inset-bottom,0px) + 88px)}
+ .wrap table th:first-child,.wrap table td:first-child{position:sticky;inset-inline-start:0;z-index:1;background:var(--paper);box-shadow:1px 0 0 var(--line)}
+ td{padding:10px 8px}
+ section{padding:14px}
+}
+@media(pointer:coarse){
+ .btn,.tb,header .tb{min-height:44px}
+ input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),select{min-height:44px;font-size:16px}
+ textarea{font-size:16px}
+ header select,header input{font-size:16px}
+}
 @media(prefers-reduced-motion:reduce){header{transition:none}}
 @media(pointer:coarse){nav button,header .tb{min-height:40px}.btn{min-height:40px}input[type=checkbox]{width:26px;height:26px}header .tool{width:42px;height:42px;min-height:42px}header .tool.wide{width:auto}}
 .abar.rn{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 8%,#fff)}
@@ -1633,6 +1651,11 @@ function exAddCols(wb){
  return h.replace(/<section([^>]*)><h2>([\s\S]*?)<\/h2>([\s\S]*?)<\/section>/g,(m,at,t,b)=>{const plain=t.replace(/<[^>]*>/g,'').trim();if(!/^(Top 10|No interaction at all|Full ranking)/i.test(plain))return m;
   const k='lv_'+plain.replace(/[^A-Za-z0-9]/g,'').toLowerCase().slice(0,30),open=(k in SETOPEN)?SETOPEN[k]:false;
   return `<section${at}><details class="set-d" data-k="${k}"${open?' open':''} ontoggle="setTog(this)"><summary><h2>${t}</h2></summary><div class="set-b">${b}</div></details></section>`})}}
+// phones: the tab bar lives at the bottom (thumb reach); wider screens keep it in the header
+function navPlace(){const n=document.getElementById('nav'),h=document.querySelector('header');if(!n||!h)return;const mob=innerWidth<=700;
+ if(mob&&n.parentNode!==document.body)document.body.appendChild(n);else if(!mob&&n.parentNode!==h)h.appendChild(n);
+ document.body.classList.toggle('bnav',mob);if(typeof ovfFix==='function')ovfFix()}
+addEventListener('resize',navPlace);navPlace();
 function exProfHTML(id){
  const s=D.students.find(x=>x.id===id);if(!s)return '';
  const ex=(D.exams||[]).filter(a=>a.cls===s.cls).sort((a,b)=>String(a.date).localeCompare(String(b.date)));if(!ex.length)return '';

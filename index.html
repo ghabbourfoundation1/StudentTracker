@@ -193,7 +193,9 @@ header .tool.out:hover:not(:disabled){background:color-mix(in srgb,var(--bad) 60
  main section>.btn{display:flex;width:100%;justify-content:center;margin-top:8px}
  main section .row>label,main section>label{flex:1 1 100%}
  main section .lb{line-height:1.4}
- main .row>.btn[onclick^="allP("]{flex:1 1 100%}
+ main .row:has(>.btn[onclick^="allP("]){flex-wrap:nowrap;align-items:center}
+ main .row:has(>.btn[onclick^="allP("])>h2{flex:1 1 0!important;min-width:0;margin:0!important}
+ main .row>.btn[onclick^="allP("]{flex:0 0 auto;padding:10px 16px}
  main .row>.btn[onclick^="del("]{flex:1 1 calc(50% - 4px)}
  main .row>label input[type=file]{display:block;width:100%;margin-top:6px;box-sizing:border-box}
  main section input[type=file]{width:100%;box-sizing:border-box}
@@ -209,7 +211,7 @@ body.ui-open{overflow:hidden}
 .ui-dlg h2{margin:0 0 8px}
 .ui-m{white-space:pre-line;margin:0 0 16px;line-height:1.5;overflow-wrap:anywhere}
 .ui-b{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
-.dz{background:none;padding:0;margin-top:4px;display:flex;flex-direction:column;align-items:flex-end;gap:10px}.dz .cf-b{width:100%;margin:0;background:var(--paper);border-radius:22px;padding:12px}.dz .cf-b .row{margin:0}
+.dz{background:none;padding:0;margin-top:4px;display:flex;flex-direction:column;align-items:center;gap:10px}.dz .cf-b{width:100%;margin:0;background:var(--paper);border-radius:22px;padding:12px}.dz .cf-b .row{margin:0}
 .btn.danger,.btn[onclick^="del("],.btn[onclick^="rmDemo"],.btn[onclick^="clrConflict"],.btn[onclick*="wipe"]{background:var(--bad);border-color:var(--bad);color:#fff}
 .set-d{padding:0}.set-d>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:16px;min-height:24px;border-radius:22px}
 .set-d>summary::-webkit-details-marker{display:none}.set-d>summary h2{margin:0}
@@ -576,7 +578,7 @@ let attSid=null,attMon=null,qOpen=null,stuSort='name',bkHide=(()=>{try{return Da
 V.Attendance=()=>{const ss=D.sessions.filter(x=>x.cls===D.curClass).sort((a,b)=>b.date.localeCompare(a.date));const ok=id=>id&&D.sessions.find(x=>x.id===id&&x.cls===D.curClass);const sid=ok(attSid)?attSid:ok(D.cur)?D.cur:(ss[0]||{}).id;const cs=D.sessions.find(x=>x.id===sid);const m=D.att[sid]||{};
  const cb=(s,v)=>`<td style="text-align:center"><input type="checkbox" aria-label="${v} ${esc(s.name)}" ${m[s.id]===v||(v==='Present'&&m[s.id]==='Late')?'checked':''} onchange="setAtt(this,'${sid}','${s.id}','${v}')"></td>`;
  return `<section data-cf="ses"><h2>NEW SESSION</h2><div class="row"><input type="date" id="sd" value="${today()}"><input id="st" data-enter="1" onkeydown="if(event.key==='Enter')newSess()" placeholder="Topic (optional)"><button class="btn pri" onclick="newSess()">New session</button></div></section>
- ${cs?`<section><div class="row"><h2 style="margin:0;flex:1">${dt(cs.date)}${cs.topic&&cs.topic.trim()?' · '+esc(cs.topic.trim()):''}</h2><button class="btn" onclick="allP('${sid}')">Mark everyone present</button><button class="btn" onclick="del('session','${sid}',this)">Delete day</button>${DA('allsessions','Delete all days')}</div>
+ ${cs?`<section><div class="row"><h2 style="margin:0;flex:1">${dt(cs.date)}${cs.topic&&cs.topic.trim()?' · '+esc(cs.topic.trim()):''}</h2><button class="btn" onclick="allP('${sid}')">All present</button><button class="btn" onclick="del('session','${sid}',this)">Delete day</button>${DA('allsessions','Delete all days')}</div>
  <div class="wrap"><table style="max-width:560px"><tr><th>Name</th><th style="text-align:center">Absent</th><th style="text-align:center">Present</th></tr>${act().map(s=>`<tr><td>${esc(s.name)}</td>${cb(s,'Absent')}${cb(s,'Present')}</tr>`).join('')||'<tr><td class="mut" colspan="3">Add students first.</td></tr>'}</table></div></section>
  <section><h2>Other days</h2>${(()=>{const mons=[...new Set(ss.map(x=>x.date.slice(0,7)))],mo=attMon&&mons.includes(attMon)?attMon:cs.date.slice(0,7);return `<div class="row"><select aria-label="Month" onchange="attMon=this.value;go()">${mons.map(m=>`<option ${m===mo?'selected':''}>${m}</option>`).join('')}</select><span class="lb">${ss.filter(x=>x.date.slice(0,7)===mo).length} days</span></div><div class="row" style="flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px">${ss.filter(x=>x.id!==sid&&x.date.slice(0,7)===mo).map(x=>`<button class="btn" style="flex:none" onclick="attSid='${x.id}';go()">${x.date.slice(8)} ${esc(x.topic||'')}</button>`).join('')||'<span class="mut">No other days this month.</span>'}</div>`})()}</section>`:'<section class="mut">Create a session to take attendance.</section>'}`};
 V.Quiz=()=>`<section data-cf="quiz"><div class="row"><h2 style="margin:0;flex:1">NEW QUIZ</h2>${DA('allquiz','Delete all quizzes')}</div><div class="row"><input id="at" placeholder="Title"><input type="date" id="ad" value="${today()}"><input id="am" type="number" placeholder="Max score" style="width:110px" data-enter="1" onkeydown="if(event.key==='Enter')addAs()"><button class="btn pri" onclick="addAs()">Create</button></div></section>
@@ -1759,6 +1761,7 @@ function cfInit(){if(innerWidth>700)return;const app=document.getElementById('ap
   btn.addEventListener('click',()=>{const o=body.hidden;body.hidden=!o;btn.setAttribute('aria-expanded',o);CFOPEN[k]=o;if(o){const f=body.querySelector('input:not([type=checkbox]):not([type=file]):not([type=date])');if(f&&k!=='ses')try{f.focus()}catch(e){}}})})}
 {const go2=go;go=function(){const r=go2.apply(this,arguments);try{cfInit()}catch(e){}return r}}
 try{cfInit()}catch(e){}
+if(typeof TRD==='object')TRD['All present']='الكل حاضر';
 function exProfHTML(id){
  const s=D.students.find(x=>x.id===id);if(!s)return '';
  const ex=(D.exams||[]).filter(a=>a.cls===s.cls).sort((a,b)=>String(a.date).localeCompare(String(b.date)));if(!ex.length)return '';

@@ -201,6 +201,7 @@ body.ui-open{overflow:hidden}
 .ui-dlg h2{margin:0 0 8px}
 .ui-m{white-space:pre-line;margin:0 0 16px;line-height:1.5;overflow-wrap:anywhere}
 .ui-b{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.dz h2{color:var(--bad)}
 .btn.danger,.btn[onclick^="del("],.btn[onclick^="rmDemo"],.btn[onclick^="clrConflict"],.btn[onclick*="wipe"]{background:var(--bad);border-color:var(--bad);color:#fff}
 .set-d{padding:0}.set-d>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:16px;min-height:24px;border-radius:22px}
 .set-d>summary::-webkit-details-marker{display:none}.set-d>summary h2{margin:0}
@@ -1718,6 +1719,14 @@ function navM3(){const n=document.getElementById('nav');if(!n)return;
 {const go0=go;go=function(){const r=go0.apply(this,arguments);try{navM3()}catch(e){}return r}}
 {let wasMob=innerWidth<=700;addEventListener('resize',()=>{const m=innerWidth<=700;if(m!==wasMob){wasMob=m;go(true)}})}
 try{navM3()}catch(e){}
+// ---- the screen-level Delete buttons (Delete day / all days / all students ...) sit together at the bottom of the page ----
+function moveDel(){const app=document.getElementById('app');if(!app)return;
+ const bs=[...app.querySelectorAll('.row>.btn[onclick^="del("]')];if(!bs.length)return;
+ const sec=document.createElement('section');sec.id='dz';sec.className='dz';
+ sec.innerHTML='<h2>'+L('Delete','حذف')+'</h2><div class="row"></div>';
+ const row=sec.querySelector('.row');bs.forEach(b=>row.appendChild(b));app.appendChild(sec)}
+{const go1=go;go=function(){const r=go1.apply(this,arguments);try{moveDel()}catch(e){}return r}}
+try{moveDel()}catch(e){}
 function exProfHTML(id){
  const s=D.students.find(x=>x.id===id);if(!s)return '';
  const ex=(D.exams||[]).filter(a=>a.cls===s.cls).sort((a,b)=>String(a.date).localeCompare(String(b.date)));if(!ex.length)return '';

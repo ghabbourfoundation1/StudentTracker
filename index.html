@@ -151,6 +151,29 @@ header .tool.out:hover:not(:disabled){background:color-mix(in srgb,var(--bad) 60
 }
 @media(prefers-reduced-motion:reduce){header{transition:none}}
 @media(pointer:coarse){nav button,header .tb{min-height:40px}.btn{min-height:40px}input[type=checkbox]{width:26px;height:26px}header .tool{width:42px;height:42px;min-height:42px}header .tool.wide{width:auto}}
+/* phones: one clear top bar (title + icon actions), then the class selector; one 16px side margin everywhere */
+@media(max-width:700px){
+ header{padding:8px 16px 10px;gap:8px 4px;align-items:center}
+ header h1{order:1;flex:1 1 0;min-width:0;margin:0;padding:0;background:none;border:0;border-radius:0;color:#fff;font-size:17px;font-weight:800;letter-spacing:.2px;text-transform:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ header .hact{order:2;width:auto;flex:none;margin:0;gap:4px}
+ header .hact .sep{display:none}
+ header .hact #save{margin:0 4px 0 0}
+ header .tool{width:44px;height:44px;min-height:44px;background:transparent}
+ header .tool.wide{width:auto;min-height:44px;padding:0 12px;background:rgba(255,255,255,.14)}
+ header #lang.tool.wide{width:44px;padding:0;background:transparent}
+ header #lang .tl{display:none}
+ header .tool:hover:not(:disabled){background:rgba(255,255,255,.18)}
+ #clsBox{order:3;width:100%;display:block}
+ #clsBtn{width:100%;max-width:none;min-height:48px;justify-content:space-between;padding:0 16px;border-radius:14px;background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.55);font-size:16px;font-weight:700}
+ #clsBtn svg{width:20px;height:20px}
+ #clsMenu{width:100%}
+ #newcls{order:4;width:100%!important;min-height:48px}
+ #hero{padding:4px 16px 14px}
+ main{margin-inline:4px;padding:12px}
+ h2{font-size:14px;margin-bottom:12px}
+ .row{gap:8px}
+ .stats{gap:8px}
+}
 .abar.rn{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 8%,#fff)}
 .abar.ofl{border-color:var(--warn)}
 

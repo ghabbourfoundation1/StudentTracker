@@ -182,9 +182,37 @@ header .tool.out:hover:not(:disabled){background:color-mix(in srgb,var(--bad) 60
 .cf-plus:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 .cf-plus.del{background:var(--bad);border-color:var(--bad);color:#fff}.cf-plus.del svg{width:22px;height:22px}.cf-plus.del[aria-expanded=true]{transform:none;background:#fff;color:var(--bad)}
 .cf-b{margin-top:12px}.cf-b[hidden]{display:none}
+.ico-del{flex:none;width:44px;height:44px;padding:0;border-radius:50%;border:2px solid var(--bad);background:var(--bad);color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s ease,color .15s ease,transform .1s ease}
+.ico-del svg{width:20px;height:20px}.ico-del:active{transform:scale(.92)}
+.ico-del.sure{background:#fff;color:var(--bad);animation:pulse 1s ease-in-out infinite}
+.ico-del:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+/* alerts: same layout for every name */
+.al-h{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.al-h b{flex:1;min-width:0;overflow-wrap:anywhere}
+.al-t{display:inline-flex;gap:6px;flex:none;align-items:center}
+.al .tg{min-width:78px;text-align:center;padding:2px 10px;white-space:nowrap;background:#fff;box-sizing:border-box}
+.al .tg.hi{color:var(--bad)}.al .tg.med{color:#8a5a00}.al.pos .tg{color:var(--good)}
+.al-m{line-height:1.45}
+.al-a{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+/* delete-all icon at the end of a list */
+.dall{display:flex;justify-content:center;margin:10px 0 4px}
+.dall .ico-del{background:#fff;color:var(--bad)}
+.dall .ico-del.sure{background:var(--bad);color:#fff}
+.li.exr>span[id^=exp_]{flex:1;text-align:end}
+/* bonus: one - / + per name + a switch for what it is given to */
+.bontg{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0 10px}
+.seg2{display:inline-flex;border:2px solid var(--ink);border-radius:999px;overflow:hidden;background:#fff}
+.seg2 button{border:0;background:none;color:var(--ink);padding:0 18px;min-height:44px;font:700 14px "Archivo","Noto Sans Arabic",sans-serif;cursor:pointer}
+.seg2 button.on{background:var(--lime)}
+.seg2 button:focus-visible{outline:3px solid var(--blue);outline-offset:-3px}
+.bonrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;align-items:center;padding:10px 0}
+.bonrow .n{grid-column:1}.bonrow .bx{grid-column:2}
+.bonrow .bot{grid-column:1/-1}
+.bonrow .bnote{grid-column:1/-1;width:100%;box-sizing:border-box;min-width:0}
+.bonrow .bx input{width:64px;text-align:center}
 /* phones: forms and action rows - heading on its own line, fields and buttons share the full width evenly */
 @media(max-width:700px){
- main .row{gap:8px;align-items:stretch}
+ main .row{gap:8px;align-items:center}
  main .row>h2{flex:1 1 100%!important;margin:0 0 2px!important}
  main .row>.btn{flex:1 1 auto;display:inline-flex;align-items:center;justify-content:center;text-align:center;padding:10px 18px;line-height:1.2}
  main .row>input:not([type=checkbox]):not([type=radio]):not([type=file]),main .row>select{flex:1 1 150px;min-width:0;width:auto}
@@ -193,6 +221,14 @@ header .tool.out:hover:not(:disabled){background:color-mix(in srgb,var(--bad) 60
  main section>.btn{display:flex;width:100%;justify-content:center;margin-top:8px}
  main section .row>label,main section>label{flex:1 1 100%}
  main section .lb{line-height:1.4}
+ main .row>.qt{flex:1 1 100%;min-width:0}
+ main .row.livebar{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+ main .row.livebar>b{grid-column:1/-1;font-size:16px}
+ main .row.livebar>input{grid-column:1/-1;width:100%!important;box-sizing:border-box}
+ main .row.livebar>select{display:none}
+ main .row.livebar>.btn{width:100%}
+ main .lg{grid-template-columns:minmax(0,1fr)!important;gap:0}
+ .al-a .btn{flex:1 1 auto}
  main .row:has(>.btn[onclick^="allP("]){flex-wrap:nowrap;align-items:center}
  main .row:has(>.btn[onclick^="allP("])>h2{flex:1 1 0!important;min-width:0;margin:0!important}
  main .row>.btn[onclick^="allP("]{flex:0 0 auto;padding:10px 16px}
@@ -578,29 +614,33 @@ let attSid=null,attMon=null,qOpen=null,stuSort='name',bkHide=(()=>{try{return Da
 V.Attendance=()=>{const ss=D.sessions.filter(x=>x.cls===D.curClass).sort((a,b)=>b.date.localeCompare(a.date));const ok=id=>id&&D.sessions.find(x=>x.id===id&&x.cls===D.curClass);const sid=ok(attSid)?attSid:ok(D.cur)?D.cur:(ss[0]||{}).id;const cs=D.sessions.find(x=>x.id===sid);const m=D.att[sid]||{};
  const cb=(s,v)=>`<td style="text-align:center"><input type="checkbox" aria-label="${v} ${esc(s.name)}" ${m[s.id]===v||(v==='Present'&&m[s.id]==='Late')?'checked':''} onchange="setAtt(this,'${sid}','${s.id}','${v}')"></td>`;
  return `<section data-cf="ses"><h2>NEW SESSION</h2><div class="row"><input type="date" id="sd" value="${today()}"><input id="st" data-enter="1" onkeydown="if(event.key==='Enter')newSess()" placeholder="Topic (optional)"><button class="btn pri" onclick="newSess()">New session</button></div></section>
- ${cs?`<section><div class="row"><h2 style="margin:0;flex:1">${dt(cs.date)}${cs.topic&&cs.topic.trim()?' · '+esc(cs.topic.trim()):''}</h2><button class="btn" onclick="allP('${sid}')">All present</button><button class="btn" onclick="del('session','${sid}',this)">Delete day</button>${DA('allsessions','Delete all days')}</div>
+ ${cs?`<section><div class="row"><h2 style="margin:0;flex:1">${dt(cs.date)}${cs.topic&&cs.topic.trim()?' · '+esc(cs.topic.trim()):''}</h2><button class="btn" onclick="allP('${sid}')">All present</button><button type="button" class="ico-del" aria-label="${L('Delete this day','حذف اليوم')}" title="${L('Delete this day','حذف اليوم')}" onclick="delI('session','${sid}',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></div>
  <div class="wrap"><table style="max-width:560px"><tr><th>Name</th><th style="text-align:center">Absent</th><th style="text-align:center">Present</th></tr>${act().map(s=>`<tr><td>${esc(s.name)}</td>${cb(s,'Absent')}${cb(s,'Present')}</tr>`).join('')||'<tr><td class="mut" colspan="3">Add students first.</td></tr>'}</table></div></section>
- <section><h2>Other days</h2>${(()=>{const mons=[...new Set(ss.map(x=>x.date.slice(0,7)))],mo=attMon&&mons.includes(attMon)?attMon:cs.date.slice(0,7);return `<div class="row"><select aria-label="Month" onchange="attMon=this.value;go()">${mons.map(m=>`<option ${m===mo?'selected':''}>${m}</option>`).join('')}</select><span class="lb">${ss.filter(x=>x.date.slice(0,7)===mo).length} days</span></div><div class="row" style="flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px">${ss.filter(x=>x.id!==sid&&x.date.slice(0,7)===mo).map(x=>`<button class="btn" style="flex:none" onclick="attSid='${x.id}';go()">${x.date.slice(8)} ${esc(x.topic||'')}</button>`).join('')||'<span class="mut">No other days this month.</span>'}</div>`})()}</section>`:'<section class="mut">Create a session to take attendance.</section>'}`};
-V.Quiz=()=>`<section data-cf="quiz"><div class="row"><h2 style="margin:0;flex:1">NEW QUIZ</h2>${DA('allquiz','Delete all quizzes')}</div><div class="row"><input id="at" placeholder="Title"><input type="date" id="ad" value="${today()}"><input id="am" type="number" placeholder="Max score" style="width:110px" data-enter="1" onkeydown="if(event.key==='Enter')addAs()"><button class="btn pri" onclick="addAs()">Create</button></div></section>
+ <section><h2>Other days</h2>${(()=>{const mons=[...new Set(ss.map(x=>x.date.slice(0,7)))],mo=attMon&&mons.includes(attMon)?attMon:cs.date.slice(0,7);return `<div class="row"><select aria-label="Month" onchange="attMon=this.value;go()">${mons.map(m=>`<option ${m===mo?'selected':''}>${m}</option>`).join('')}</select><span class="lb">${ss.filter(x=>x.date.slice(0,7)===mo).length} days</span></div><div class="row" style="flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px">${ss.filter(x=>x.id!==sid&&x.date.slice(0,7)===mo).map(x=>`<button class="btn" style="flex:none" onclick="attSid='${x.id}';go()">${x.date.slice(8)} ${esc(x.topic||'')}</button>`).join('')||'<span class="mut">No other days this month.</span>'}</div>`})()}${DIALL('allsessions',L('Delete all days','حذف كل الأيام'))}</section>`:'<section class="mut">Create a session to take attendance.</section>'}`};
+V.Quiz=()=>`<section data-cf="quiz"><div class="row"><h2 style="margin:0;flex:1">NEW QUIZ</h2></div><div class="row"><input id="at" placeholder="Title"><input type="date" id="ad" value="${today()}"><input id="am" type="number" placeholder="Max score" style="width:110px" data-enter="1" onkeydown="if(event.key==='Enter')addAs()"><button class="btn pri" onclick="addAs()">Create</button></div></section>
  ${D.assess.filter(a=>a.cls===D.curClass).slice().reverse().map((a,i)=>{const op=qOpen===null?i===0:qOpen===a.id;const v=Object.values(a.scores).filter(x=>x!==''&&x!=null).map(Number),sd=v.slice().sort((x,y)=>x-y),med=v.length?(sd[Math.floor((v.length-1)/2)]+sd[Math.ceil((v.length-1)/2)])/2:null,dis=a.closed?'disabled':'';
- return `<section><div class="row"><button class="qt" aria-expanded="${op}" onclick="qOpen=${op}?'':'${a.id}';go()">${op?'▾':'▸'} ${esc(a.title)} <span class="lb">${dt(a.date)} · MAX ${a.max} · ${a.closed?'CLOSED':'OPEN'} · ${v.length} graded</span></button><button class="btn ${a.closed?'':'pri'}" onclick="togQ('${a.id}')">${a.closed?'Edit':'End'}</button><button class="btn" onclick="del('quiz','${a.id}',this)">Delete</button></div>
+ return `<section><div class="row"><button class="qt" aria-expanded="${op}" onclick="qOpen=${op}?'':'${a.id}';go()">${op?'▾':'▸'} ${esc(a.title)} <span class="lb">${dt(a.date)} · MAX ${a.max} · ${a.closed?'CLOSED':'OPEN'} · ${v.length} graded</span></button><button class="btn ${a.closed?'':'pri'}" onclick="togQ('${a.id}')">${a.closed?'Edit':'End'}</button>${DI('quiz',a.id)}</div>
  ${op?`<p class="lb">GRADED ${v.length}/${act().length} · MEAN ${v.length?(v.reduce((x,y)=>x+y,0)/v.length).toFixed(1):'—'} · MEDIAN ${med??'—'} · HIGH ${v.length?Math.max(...v):'—'} · LOW ${v.length?Math.min(...v):'—'} · PASS ${v.length?(100*v.filter(x=>100*x/a.max>=D.set.mid).length/v.length).toFixed(0)+'%':'—'}</p>
- <div class="list">${act().map(s=>`<div class="li"><span class="n">${esc(s.name)}</span><input type="number" step="any" style="width:80px" ${dis} value="${a.scores[s.id]??''}" placeholder="—" onchange="setSc('${a.id}','${s.id}',this)"></div>`).join('')}</div>`:''}</section>`}).join('')||'<section class="mut">No quizzes yet. Blank scores stay missing, never zero.</section>'}`;
+ <div class="list">${act().map(s=>`<div class="li"><span class="n">${esc(s.name)}</span><input type="number" step="any" style="width:80px" ${dis} value="${a.scores[s.id]??''}" placeholder="—" onchange="setSc('${a.id}','${s.id}',this)"></div>`).join('')}</div>`:''}</section>`}).join('')||'<section class="mut">No quizzes yet. Blank scores stay missing, never zero.</section>'}${D.assess.some(a=>a.cls===D.curClass)?DIALL('allquiz',L('Delete all quizzes','حذف كل الكويزات')):''}`;
 V.Behavior=()=>{const S=act(),mx=+D.set.behMax||10;
  return `<section><div class="row"><h2 style="margin:0;flex:1">BEHAVIOR</h2><label class="lb">Max <input type="number" min="1" style="width:80px" value="${mx}" onchange="D.set.behMax=+this.value||10;save();go()"></label></div><p class="lb">Blank = not recorded. Bonus given in the Bonus tab is added to the total.</p>
  <div class="list" style="max-width:640px">${S.map(s=>`<div class="li"><span class="n">${esc(s.name)}</span><input type="number" step="any" style="width:80px" value="${behRaw(s.id)??''}" placeholder="—" aria-label="Behavior" onchange="setNum('behavior','${s.id}',this)"><span class="lb" style="min-width:100px;text-align:end">Total: <b id="tt${s.id}">${behTxt(s.id)}</b></span></div>`).join('')||'<span class="mut">Add students first.</span>'}</div></section>`};
 const bxg=(k,id,cls,lab)=>`<span class="bx ${cls}"><span class="bl">${lab}</span><button aria-label="${lab} −" onclick="bonStep('${k}','${id}',-1)">−</button><input type="number" step="any" id="bi_${k}_${id}" value="${nv((D[k]||{})[id])??''}" placeholder="0" aria-label="${lab}" onchange="setNum('${k}','${id}',this)"><button aria-label="${lab} +" onclick="bonStep('${k}','${id}',1)">+</button></span>`;
-V.Bonus=()=>{const S=act(),st=+D.set.bonStep||1;
- return `<section><div class="row"><h2 style="margin:0;flex:1">BONUS</h2><label class="lb">Step <input type="number" step="any" min="0" style="width:80px" value="${st}" onchange="D.set.bonStep=+this.value||1;save()"></label></div><p class="lb">Give each student bonus on Behavior, on Quiz grade, or both. Use − / + or type a number.</p>
- <div class="list" style="max-width:860px">${S.map(s=>`<div class="li bonrow"><span class="n">${esc(s.name)}</span>${bxg('bonusB',s.id,'bb','Behavior')}${bxg('bonusQ',s.id,'bq','Quiz grade')}<input class="bnote" placeholder="Reason / note" aria-label="Bonus note" style="flex:1;min-width:180px" value="${esc((D.bonusNote||{})[s.id]||'')}" onchange="setBonNote('${s.id}',this.value)"><span class="lb bot">Behavior: <b id="tb${s.id}">${behTxt(s.id)}</b> · Quiz: <b id="tq${s.id}">${qGradeTxt(s.id)}</b></span></div>`).join('')||'<span class="mut">Add students first.</span>'}</div></section>`};
+V.Bonus=()=>{const S=act(),st=+D.set.bonStep||1,tg=D.set.bonTgt==='bonusQ'?'bonusQ':'bonusB';
+ const stp=(k,id)=>`<span class="bx"><button type="button" aria-label="− ${id}" onclick="bonStep('${k}','${id}',-1)">−</button><input type="number" step="any" id="bi_${k}_${id}" value="${nv((D[k]||{})[id])??''}" placeholder="0" aria-label="${k==='bonusQ'?'Quiz grade':'Behavior'}" onchange="setNum('${k}','${id}',this)"><button type="button" aria-label="+ ${id}" onclick="bonStep('${k}','${id}',1)">+</button></span>`;
+ return `<section><div class="row"><h2 style="margin:0;flex:1">BONUS</h2><label class="lb">Step <input type="number" step="any" min="0" style="width:80px" value="${st}" onchange="D.set.bonStep=+this.value||1;save()"></label></div>
+ <div class="bontg"><span class="lb">${L('Give bonus to','إعطاء بونص على')}</span><div class="seg2" role="group"><button type="button" class="${tg==='bonusB'?'on':''}" aria-pressed="${tg==='bonusB'}" onclick="setBonTgt('bonusB')">Behavior</button><button type="button" class="${tg==='bonusQ'?'on':''}" aria-pressed="${tg==='bonusQ'}" onclick="setBonTgt('bonusQ')">Quiz grade</button></div></div>
+ <div class="list" style="max-width:860px">${S.map(s=>`<div class="li bonrow"><span class="n">${esc(s.name)}</span>${stp(tg,s.id)}<span class="lb bot">Behavior: <b id="tb${s.id}">${behTxt(s.id)}</b> · Quiz: <b id="tq${s.id}">${qGradeTxt(s.id)}</b></span><input class="bnote" placeholder="Reason / note" aria-label="Bonus note" value="${esc((D.bonusNote||{})[s.id]||'')}" onchange="setBonNote('${s.id}',this.value)"></div>`).join('')||'<span class="mut">Add students first.</span>'}</div></section>`};
+function setBonTgt(k){D.set.bonTgt=k;save();go(true)}
+if(typeof TRD==='object'){TRD['Give bonus to']='إعطاء بونص على';}
 function refTot(id){const a=document.getElementById('tb'+id),b=document.getElementById('tq'+id),c=document.getElementById('tt'+id);if(a)a.textContent=behTxt(id);if(b)b.textContent=qGradeTxt(id);if(c)c.textContent=behTxt(id)}
 function setNum(k,id,el){D[k]=D[k]||{};const v=el.value.trim().replace(',','.');if(v===''){delete D[k][id]}else{const x=parseFloat(v);if(!isFinite(x)){alert('Enter a number');el.value=D[k][id]??'';return}D[k][id]=x}save();refTot(id)}
 function bonStep(k,id,d){const st=+D.set.bonStep||1;D[k]=D[k]||{};const v=Math.round(((nv(D[k][id])||0)+d*st)*100)/100;if(v===0)delete D[k][id];else D[k][id]=v;save();const i=document.getElementById('bi_'+k+'_'+id);if(i)i.value=v===0?'':v;refTot(id)}
 function setBonNote(id,v){D.bonusNote=D.bonusNote||{};v=v.trim();if(v)D.bonusNote[id]=v;else delete D.bonusNote[id];save()}
 V.Live=()=>{const cur=D.sessions.find(x=>x.id===D.cur&&x.cls===D.curClass);
- if(!cur||cur.status==='Ended')return `<section><div class="row"><h2 style="margin:0;flex:1">LIVE CLASSROOM TRACKER</h2>${DA('allsessions','Delete all sessions')}</div><div class="row"><input type="date" id="sd" value="${today()}"><input id="st" data-enter="1" onkeydown="if(event.key==='Enter')newSess()" placeholder="Topic (optional)"><button class="btn pri" onclick="newSess()">Start session</button></div>
- ${D.sessions.filter(x=>x.cls===D.curClass).reverse().map(s=>`<div class="li"><span class="n">${dt(s.date)} ${esc(s.topic||'')} <span class="lb">${s.status}</span></span><button class="btn" onclick="D.cur='${s.id}';save();go()">Open</button><button class="btn" onclick="del('session','${s.id}',this)">Delete</button></div>`).join('')||'<span class="mut">No sessions yet.</span>'}</section>`+(cur?logView(cur):'');
- return `<section><div class="row"><b>SESSION ${cur.date} ${esc(cur.topic||'')}</b><input data-enter="1" placeholder="Search" value="${esc(q)}" oninput="q=this.value;go(true)"><button class="btn" onclick="undo()">Undo last</button><select aria-label="Columns" onchange="D.set.liveCols=this.value;save();go()">${['auto','1','2','3'].map(o=>`<option value="${o}" ${(D.set.liveCols||'auto')===o?'selected':''}>${o==='auto'?'Columns: auto':'Columns: '+o}</option>`).join('')}</select><button class="btn" onclick="endS()">End session</button></div>
+ if(!cur||cur.status==='Ended')return `<section><div class="row"><h2 style="margin:0;flex:1">LIVE CLASSROOM TRACKER</h2></div><div class="row"><input type="date" id="sd" value="${today()}"><input id="st" data-enter="1" onkeydown="if(event.key==='Enter')newSess()" placeholder="Topic (optional)"><button class="btn pri" onclick="newSess()">Start session</button></div>
+ ${D.sessions.filter(x=>x.cls===D.curClass).reverse().map(s=>`<div class="li"><span class="n">${dt(s.date)} ${esc(s.topic||'')} <span class="lb">${s.status}</span></span><button class="btn" onclick="D.cur='${s.id}';save();go()">Open</button>${DI('session',s.id)}</div>`).join('')||'<span class="mut">No sessions yet.</span>'}${D.sessions.some(x=>x.cls===D.curClass)?DIALL('allsessions',L('Delete all sessions','حذف كل الحصص')):''}</section>`+(cur?logView(cur):'');
+ return `<section><div class="row livebar"><b>SESSION ${cur.date} ${esc(cur.topic||'')}</b><input data-enter="1" placeholder="Search" value="${esc(q)}" oninput="q=this.value;go(true)"><button class="btn" onclick="undo()">Undo last</button><select aria-label="Columns" onchange="D.set.liveCols=this.value;save();go()">${['auto','1','2','3'].map(o=>`<option value="${o}" ${(D.set.liveCols||'auto')===o?'selected':''}>${o==='auto'?'Columns: auto':'Columns: '+o}</option>`).join('')}</select><button class="btn" onclick="endS()">End session</button></div>
  <div class="lg" style="grid-template-columns:${!D.set.liveCols||D.set.liveCols==='auto'?'repeat(auto-fill,minmax(300px,1fr))':`repeat(${D.set.liveCols},1fr)`}">${act().filter(s=>s.name.toLowerCase().includes(q.toLowerCase())).map(s=>`<div class="li" id="st${s.id}"><span class="n">${esc(s.name)}</span><button class="pm minus" aria-label="Penalty for ${esc(s.name)}" onclick="ev('${s.id}',-1)">−</button><span class="sc" id="sc${s.id}">${sessScore(cur.id,s.id)}</span><button class="pm plus" aria-label="Bonus for ${esc(s.name)}" onclick="ev('${s.id}',1)">+</button></div>`).join('')||'<span class="mut">Add students first.</span>'}</div></section>`+logView(cur)};
 function logView(cur){return '';const L=D.events.filter(e=>e.sess===cur.id).slice().reverse();
  return `<section id="log"><h2>EVENT LOG</h2><table>${L.slice(0,40).map(e=>`<tr class="${e.reversed?'mut':''}"><td class="mono">${new Date(e.ts).toLocaleTimeString('en-GB',{timeZone:'Africa/Cairo'})}</td><td>${esc((D.students.find(s=>s.id===e.stu)||{}).name)}</td><td>${e.pts>0?'Bonus +':'Penalty '}${e.pts}</td><td>${e.reversed?'reversed':''}</td></tr>`).join('')||'<tr><td class="mut">No events yet.</td></tr>'}</table></section>`}
@@ -620,7 +660,7 @@ function liveBoard(){const ss=D.sessions.filter(x=>x.cls===D.curClass).sort((a,b
  <section><h2>No interaction at all (${N.length})</h2>${N.map(r=>`<div class="li"><span class="n">${nm(r.s)}</span></div>`).join('')||'<span class="mut">Everyone has at least one event.</span>'}</section></div>
  <section><h2>Full ranking</h2><div class="wrap"><table><tr><th>#</th><th>NAME</th><th>BONUS</th><th>PENALTY</th><th>NET</th></tr>${R.map(r=>`<tr><td>${r.n?r.rk:'—'}</td><td>${nm(r.s)}</td><td>${r.b}</td><td>${r.p}</td><td><b>${r.net}</b></td></tr>`).join('')||'<tr><td class="mut">No students.</td></tr>'}</table></div></section>`}
 V.Alerts=()=>{const A=alerts();window.alv=A;const I=A.map((a,i)=>[a,i]);
- const row=([a,i])=>`<div class="al ${a.k}"><div class="row" style="margin:0 0 4px"><b>${nm(a.s)}</b> <span class="tg">${a.sev}</span>${a.st==='ack'?'<span class="tg">Acknowledged</span>':''}${a.st==='resolved'?'<span class="tg">Resolved</span>':''}<span style="flex:1"></span>${a.st==='new'?`<button class="btn" onclick="setAl(${i},'ack')">Acknowledge</button>`:''}${a.st==='resolved'?`<button class="btn" onclick="setAl(${i},'')">Reopen</button>`:`<button class="btn" onclick="setAl(${i},'resolved')">${a.k==='pos'?'Dismiss':'Resolve'}</button>`}</div>${esc(a.m)}</div>`;
+ const row=([a,i])=>`<div class="al ${a.k}"><div class="al-h"><b>${nm(a.s)}</b><span class="al-t"><span class="tg ${a.sev==='High'?'hi':a.sev==='Medium'?'med':''}">${a.sev}</span>${a.st==='ack'?'<span class="tg">Acknowledged</span>':''}${a.st==='resolved'?'<span class="tg">Resolved</span>':''}</span></div><div class="al-m">${esc(a.m)}</div><div class="al-a">${a.st==='new'?`<button class="btn" onclick="setAl(${i},'ack')">Acknowledge</button>`:''}${a.st==='resolved'?`<button class="btn" onclick="setAl(${i},'')">Reopen</button>`:`<button class="btn" onclick="setAl(${i},'resolved')">${a.k==='pos'?'Dismiss':'Resolve'}</button>`}</div></div>`;
  const live_=x=>x[0].st!=='resolved',so={High:0,Medium:1},
  pr=I.filter(x=>live_(x)&&x[0].k!=='pos').sort((x,y)=>(so[x[0].sev]??1)-(so[y[0].sev]??1)),im=I.filter(x=>live_(x)&&x[0].k==='pos'),rs=I.filter(x=>x[0].st==='resolved');
  return `<section style="border-inline-start:8px solid var(--bad)"><h2>NEEDS ATTENTION (${pr.length})</h2>${pr.map(row).join('')||'<span class="mut">No problems right now.</span>'}</section>
@@ -866,6 +906,7 @@ function del(k,id,b){if(!b.dataset.sure){b.dataset.sure=1;const o=b.textContent;
  if(k==='allsessions')D.sessions.filter(x=>x.cls===D.curClass).forEach(x=>rmSess(x.id));
  if(k==='allstudents')D.students.filter(x=>x.cls===D.curClass).forEach(x=>rmStu(x.id));
  if(k==='allquiz')D.assess=D.assess.filter(a=>a.cls!==D.curClass);
+ if(k==='allexams')D.exams=(D.exams||[]).filter(a=>a.cls!==D.curClass);
  if(k==='allskills')rmSk(D.curClass);
  if(k==='class'){D.sessions.filter(x=>x.cls===id).forEach(x=>rmSess(x.id));D.students.filter(x=>x.cls===id).forEach(x=>rmStu(x.id));D.assess=D.assess.filter(a=>a.cls!==id);D.exams=(D.exams||[]).filter(a=>a.cls!==id);rmSk(id);D.classes=D.classes.filter(c=>c.id!==id);if(D.curClass===id)D.curClass=D.classes[0].id}
  D.audit.push({ts:Date.now(),act:'delete',k,id});save();go()}
@@ -1616,9 +1657,9 @@ V.Exam=()=>{
   const op=exOpen===null?i===0:exOpen===a.id,dis=a.closed||RO,ab=a.absent||{};
   const rows=act().map(s=>{const sc=a.scores[s.id],p=exNum(sc)?100*sc/a.max:null,isA=!!ab[s.id];
    return `<div class="li exr"><span class="n">${esc(s.name)}</span><label class="lb" style="white-space:nowrap;display:inline-flex;align-items:center;gap:4px"><input type="checkbox" ${isA?'checked':''} ${dis?'disabled':''} onchange="setExAbs('${a.id}','${s.id}',this.checked)" aria-label="${L('Absent','غائب')}: ${esc(s.name)}"> ${L('Absent','غائب')}</label><input type="number" step="any" style="width:80px" ${dis||isA?'disabled':''} value="${exNum(sc)?sc:''}" placeholder="—" aria-label="${L('Score','الدرجة')}: ${esc(s.name)}" onchange="setEx('${a.id}','${s.id}',this)"><span id="exp_${a.id}_${s.id}" class="lb ${p==null?'':p>=D.set.mid?'hi':'lo'}" style="min-width:52px;text-align:end">${p==null?'':p.toFixed(0)+'%'}</span></div>`}).join('');
-  return `<section><div class="row"><button class="qt" aria-expanded="${op}" onclick="exOpen=${op}?'':'${a.id}';go()">${op?'▾':'▸'} ${esc(a.title)} <span class="lb">${exKindTxt(a)?exKindTxt(a)+' · ':''}${dt(a.date)} · ${L('MAX','الدرجة')} ${a.max} · ${a.closed?L('CLOSED','مقفول'):L('OPEN','مفتوح')}</span></button>${RO?'':`<button class="btn ${a.closed?'':'pri'}" onclick="togEx('${a.id}')">${a.closed?L('Edit','تعديل'):L('End','إنهاء')}</button><button class="btn" onclick="del('exam','${a.id}',this)">${L('Delete','حذف')}</button>`}</div>
+  return `<section><div class="row"><button class="qt" aria-expanded="${op}" onclick="exOpen=${op}?'':'${a.id}';go()">${op?'▾':'▸'} ${esc(a.title)} <span class="lb">${exKindTxt(a)?exKindTxt(a)+' · ':''}${dt(a.date)} · ${L('MAX','الدرجة')} ${a.max} · ${a.closed?L('CLOSED','مقفول'):L('OPEN','مفتوح')}</span></button>${RO?'':`<button class="btn ${a.closed?'':'pri'}" onclick="togEx('${a.id}')">${a.closed?L('Edit','تعديل'):L('End','إنهاء')}</button>${DI('exam',a.id)}`}</div>
   ${op?`<p class="lb" id="exs_${a.id}">${exStat(a)}</p><div class="list">${rows||`<span class="mut">${L('Add students first.','ضيف طلاب الأول.')}</span>`}</div>`:''}</section>`}).join('')||`<section class="mut">${L('No exams yet. A blank score stays missing, never zero.','لسه مفيش امتحانات. الدرجة الفاضية بتفضل غير مسجّلة، مش صفر.')}</section>`;
- return form+cards};
+ return form+cards+(!RO&&list.length?DIALL('allexams',L('Delete all exams','حذف كل الامتحانات')):'')};
 function addEx(){
  if(RO)return;const g=id=>document.getElementById(id),t=g('exT').value.trim(),m=+g('exM').value;
  if(!t||!(m>0)){alert(L('An exam name and a positive max score are required','اسم الامتحان ودرجة نهائية أكبر من صفر مطلوبين'));return}
@@ -1762,6 +1803,10 @@ function cfInit(){if(innerWidth>700)return;const app=document.getElementById('ap
 {const go2=go;go=function(){const r=go2.apply(this,arguments);try{cfInit()}catch(e){}return r}}
 try{cfInit()}catch(e){}
 if(typeof TRD==='object')TRD['All present']='الكل حاضر';
+// icon-only delete: first tap arms it (turns white + message), second tap within 3 s deletes
+const DI=(k,id,lab)=>`<button type="button" class="ico-del" aria-label="${lab||L('Delete','حذف')}" title="${lab||L('Delete','حذف')}" onclick="delI('${k}','${id}',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>`;
+const DIALL=(k,lab)=>`<div class="dall">${DI(k,'',lab)}</div>`;
+function delI(k,id,b){if(!b.dataset.sure){b.dataset.sure=1;b.classList.add('sure');toast(L('Tap the bin again to confirm','دوس على السلة تاني للتأكيد'),'err');setTimeout(()=>{if(b.isConnected){delete b.dataset.sure;b.classList.remove('sure')}},3000);return}del(k,id,b)}
 function exProfHTML(id){
  const s=D.students.find(x=>x.id===id);if(!s)return '';
  const ex=(D.exams||[]).filter(a=>a.cls===s.cls).sort((a,b)=>String(a.date).localeCompare(String(b.date)));if(!ex.length)return '';

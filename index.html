@@ -184,7 +184,8 @@ header .tool.out:hover:not(:disabled){background:color-mix(in srgb,var(--bad) 60
 .cf-b{margin-top:12px}.cf-b[hidden]{display:none}
 .ico-del{flex:none;width:44px;height:44px;padding:0;border-radius:50%;border:2px solid var(--bad);background:var(--bad);color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s ease,color .15s ease,transform .1s ease}
 .ico-del svg{width:20px;height:20px}.ico-del:active{transform:scale(.92)}
-.ico-del.sure{background:#fff;color:var(--bad);animation:pulse 1s ease-in-out infinite}
+.ico-del.sure{width:auto;max-width:100%;padding:0 16px 0 12px;gap:8px;border-radius:999px;background:#fff;color:var(--bad);font:700 14px "Archivo","Noto Sans Arabic",sans-serif;white-space:nowrap}
+.row:has(>.ico-del.sure){flex-wrap:wrap!important}.row>.ico-del.sure{margin-inline-start:auto}
 .ico-del:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 /* alerts: same layout for every name */
 .al-h{display:flex;align-items:center;gap:8px;margin-bottom:4px}
@@ -231,6 +232,8 @@ header .tool.out:hover:not(:disabled){background:color-mix(in srgb,var(--bad) 60
  main .row.livebar>.btn{width:100%}
  main .lg{grid-template-columns:minmax(0,1fr)!important;gap:0}
  .al-a .btn{flex:1 1 auto}
+ main .row.row.row:has(>.ico-del.sure)>h2{flex:1 1 100%!important}
+ main .row:has(>.ico-del.sure)>.btn[onclick^="allP("]{flex:1 1 auto}
  main .row:has(>.btn[onclick^="allP("]){flex-wrap:nowrap;align-items:center}
  main .row:has(>.btn[onclick^="allP("])>h2{flex:1 1 0!important;min-width:0;margin:0!important}
  main .row>.btn[onclick^="allP("]{flex:0 0 auto;padding:10px 16px}
@@ -1809,7 +1812,7 @@ if(typeof TRD==='object')TRD['All present']='الكل حاضر';
 const DI=(k,id,lab)=>`<button type="button" class="ico-del" aria-label="${lab||L('Delete','حذف')}" title="${lab||L('Delete','حذف')}" onclick="delI('${k}','${id}',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>`;
 const DIALL=(k,lab)=>`<div class="dall">${DI(k,'',lab)}</div>`;
 const DEL_MSG={session:['Delete this day','حذف اليوم'],allsessions:['Delete all days','حذف كل الأيام'],quiz:['Delete this quiz','حذف الكويز'],allquiz:['Delete all quizzes','حذف كل الكويزات'],exam:['Delete this exam','حذف الامتحان'],allexams:['Delete all exams','حذف كل الامتحانات']};
-function delI(k,id,b){if(!b.dataset.sure){b.dataset.sure=1;b.classList.add('sure');const m=DEL_MSG[k]||['Delete','حذف'];toast(L(m[0],m[1])+' — '+L('tap again to confirm','دوس تاني للتأكيد'),'err');setTimeout(()=>{if(b.isConnected){delete b.dataset.sure;b.classList.remove('sure')}},3000);return}del(k,id,b)}
+function delI(k,id,b){if(!b.dataset.sure){b.dataset.sure=1;b.dataset.h=b.innerHTML;const m=DEL_MSG[k]||['Delete','حذف'];b.classList.add('sure');b.innerHTML=b.dataset.h+'<span>'+L(m[0],m[1])+'</span>';setTimeout(()=>{if(b.isConnected){delete b.dataset.sure;b.classList.remove('sure');b.innerHTML=b.dataset.h}},3000);return}del(k,id,b)}
 function exProfHTML(id){
  const s=D.students.find(x=>x.id===id);if(!s)return '';
  const ex=(D.exams||[]).filter(a=>a.cls===s.cls).sort((a,b)=>String(a.date).localeCompare(String(b.date)));if(!ex.length)return '';

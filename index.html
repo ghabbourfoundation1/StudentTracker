@@ -200,7 +200,9 @@ header .tool.out:hover:not(:disabled){background:color-mix(in srgb,var(--bad) 60
 .dall .ico-del.sure{background:var(--bad);color:#fff}
 .li.exr>span[id^=exp_]{flex:1;text-align:end}
 /* bonus: one - / + per name + a switch for what it is given to */
-.bontg{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0 10px}
+.bontg{display:flex;flex-direction:column;align-items:stretch;gap:6px;margin:8px 0 12px}
+.bontg .row{width:100%;flex:none!important;min-width:0!important}
+.bontg .btn{flex:1 1 130px;justify-content:center;text-align:center}
 .seg2{display:inline-flex;border:2px solid var(--ink);border-radius:999px;overflow:hidden;background:#fff}
 .seg2 button{border:0;background:none;color:var(--ink);padding:0 18px;min-height:44px;font:700 14px "Archivo","Noto Sans Arabic",sans-serif;cursor:pointer}
 .seg2 button.on{background:var(--lime)}
@@ -629,7 +631,7 @@ const bxg=(k,id,cls,lab)=>`<span class="bx ${cls}"><span class="bl">${lab}</span
 V.Bonus=()=>{const S=act(),st=+D.set.bonStep||1,tg=D.set.bonTgt==='bonusQ'?'bonusQ':'bonusB';
  const stp=(k,id)=>`<span class="bx"><button type="button" aria-label="− ${id}" onclick="bonStep('${k}','${id}',-1)">−</button><input type="number" step="any" id="bi_${k}_${id}" value="${nv((D[k]||{})[id])??''}" placeholder="0" aria-label="${k==='bonusQ'?'Quiz grade':'Behavior'}" onchange="setNum('${k}','${id}',this)"><button type="button" aria-label="+ ${id}" onclick="bonStep('${k}','${id}',1)">+</button></span>`;
  return `<section><div class="row"><h2 style="margin:0;flex:1">BONUS</h2><label class="lb">Step <input type="number" step="any" min="0" style="width:80px" value="${st}" onchange="D.set.bonStep=+this.value||1;save()"></label></div>
- <div class="bontg"><span class="lb">${L('Give bonus to','إعطاء بونص على')}</span><div class="seg2" role="group"><button type="button" class="${tg==='bonusB'?'on':''}" aria-pressed="${tg==='bonusB'}" onclick="setBonTgt('bonusB')">Behavior</button><button type="button" class="${tg==='bonusQ'?'on':''}" aria-pressed="${tg==='bonusQ'}" onclick="setBonTgt('bonusQ')">Quiz grade</button></div></div>
+ <div class="bontg"><span class="lb">${L('Give bonus to','إعطاء بونص على')}</span><div class="row" style="flex:1;min-width:220px"><button type="button" class="btn${tg==='bonusB'?' pri':''}" aria-pressed="${tg==='bonusB'}" onclick="setBonTgt('bonusB')">Behavior</button><button type="button" class="btn${tg==='bonusQ'?' pri':''}" aria-pressed="${tg==='bonusQ'}" onclick="setBonTgt('bonusQ')">Quiz grade</button></div></div>
  <div class="list" style="max-width:860px">${S.map(s=>`<div class="li bonrow"><span class="n">${esc(s.name)}</span>${stp(tg,s.id)}<span class="lb bot">Behavior: <b id="tb${s.id}">${behTxt(s.id)}</b> · Quiz: <b id="tq${s.id}">${qGradeTxt(s.id)}</b></span><input class="bnote" placeholder="Reason / note" aria-label="Bonus note" value="${esc((D.bonusNote||{})[s.id]||'')}" onchange="setBonNote('${s.id}',this.value)"></div>`).join('')||'<span class="mut">Add students first.</span>'}</div></section>`};
 function setBonTgt(k){D.set.bonTgt=k;save();go(true)}
 if(typeof TRD==='object'){TRD['Give bonus to']='إعطاء بونص على';}
@@ -893,7 +895,7 @@ function fhSoon(){if(!FH)return;clearTimeout(fhTimer);fhTimer=setTimeout(()=>wri
 async function linkFile(){try{if(!window.showSaveFilePicker)throw 0;FH=await showSaveFilePicker({suggestedName:'workshop-data.xlsx',types:[{description:'Excel',accept:{'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':['.xlsx']}}]});await writeFH();alert('Linked. The file updates automatically a few seconds after every change while this page is open. After reopening the page, link it again.')}
  catch(e){FH=null;if(e&&e.name==='AbortError')return;alert('This browser does not allow linking a file here. It works on Chrome or Edge on a laptop. Use "Export to Excel" instead.')}}
 function togQ(id){const a=D.assess.find(x=>x.id===id);a.closed=!a.closed;save();go();if(a.closed&&D.set.autoXls!==false)exportXlsx(true)}
-function del(k,id,b){if(!b.dataset.sure){b.dataset.sure=1;const o=b.textContent;b.textContent='Click again to confirm';b.style.color='var(--bad)';setTimeout(()=>{if(b.isConnected){delete b.dataset.sure;b.textContent=o;b.style.color=''}},3000);return}
+function del(k,id,b){if(!b.dataset.sure){b.dataset.sure=1;const o=b.textContent;b.textContent=o+' — '+L('tap again to confirm','دوس تاني للتأكيد');b.style.color='var(--bad)';setTimeout(()=>{if(b.isConnected){delete b.dataset.sure;b.textContent=o;b.style.color=''}},3000);return}
  if(k==='session'){D.sessions=D.sessions.filter(x=>x.id!==id);delete D.att[id];D.events=D.events.filter(e=>e.sess!==id);if(D.cur===id)D.cur=null;if(attSid===id)attSid=null}
  if(k==='quiz')D.assess=D.assess.filter(x=>x.id!==id);
  if(k==='exam')D.exams=(D.exams||[]).filter(x=>x.id!==id);
@@ -1806,7 +1808,8 @@ if(typeof TRD==='object')TRD['All present']='الكل حاضر';
 // icon-only delete: first tap arms it (turns white + message), second tap within 3 s deletes
 const DI=(k,id,lab)=>`<button type="button" class="ico-del" aria-label="${lab||L('Delete','حذف')}" title="${lab||L('Delete','حذف')}" onclick="delI('${k}','${id}',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>`;
 const DIALL=(k,lab)=>`<div class="dall">${DI(k,'',lab)}</div>`;
-function delI(k,id,b){if(!b.dataset.sure){b.dataset.sure=1;b.classList.add('sure');toast(L('Tap the bin again to confirm','دوس على السلة تاني للتأكيد'),'err');setTimeout(()=>{if(b.isConnected){delete b.dataset.sure;b.classList.remove('sure')}},3000);return}del(k,id,b)}
+const DEL_MSG={session:['Delete this day','حذف اليوم'],allsessions:['Delete all days','حذف كل الأيام'],quiz:['Delete this quiz','حذف الكويز'],allquiz:['Delete all quizzes','حذف كل الكويزات'],exam:['Delete this exam','حذف الامتحان'],allexams:['Delete all exams','حذف كل الامتحانات']};
+function delI(k,id,b){if(!b.dataset.sure){b.dataset.sure=1;b.classList.add('sure');const m=DEL_MSG[k]||['Delete','حذف'];toast(L(m[0],m[1])+' — '+L('tap again to confirm','دوس تاني للتأكيد'),'err');setTimeout(()=>{if(b.isConnected){delete b.dataset.sure;b.classList.remove('sure')}},3000);return}del(k,id,b)}
 function exProfHTML(id){
  const s=D.students.find(x=>x.id===id);if(!s)return '';
  const ex=(D.exams||[]).filter(a=>a.cls===s.cls).sort((a,b)=>String(a.date).localeCompare(String(b.date)));if(!ex.length)return '';

@@ -3,12 +3,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Workshop Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Archivo+Black&family=Noto+Sans+Arabic:wght@500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Noto+Sans+Arabic:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{--blue:#193129;--lime:#b8f200;--bg:#f3f3f3;--paper:#f3f3f3;--ink:#0d0d0d;--olive:#2c5a47;--tan:#e1e1e1;--line:#dcdcdc;--mut:#505050;--bad:#d92d20;--good:#16803c;--warn:#8a5a00;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;color:var(--ink);font:500 16px/1.45 "Archivo","Noto Sans Arabic",Tahoma,sans-serif;background-color:var(--blue);background-image:linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.07) 1px,transparent 1px);background-size:44px 44px;min-height:100vh}
-.hv,h1,h2,.big,.sc,.ht,nav button,th{font-family:"Archivo Black","Noto Sans Arabic",Impact,sans-serif;font-weight:900}
+body{margin:0;color:var(--ink);font:500 16px/1.45 "Montserrat","Noto Sans Arabic",Tahoma,sans-serif;background-color:var(--blue);background-image:linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.07) 1px,transparent 1px);background-size:44px 44px;min-height:100vh}
+.hv,h1,h2,.big,.sc,.ht,nav button,th{font-family:"Montserrat","Noto Sans Arabic",Impact,sans-serif;font-weight:900}
 .mono{font-family:Consolas,monospace}.lb{font-size:13px;color:var(--mut)}
 header{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;padding:12px 18px;background:var(--blue);color:#fff;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
 header h1{font-size:14px;margin:0 8px 0 0;background:#fff;color:#000;border:2px solid var(--lime);border-radius:999px;padding:5px 14px;text-transform:uppercase}
@@ -17,7 +17,7 @@ nav{display:flex;gap:6px;flex-wrap:wrap;width:100%;order:9}
 nav button{border:1.5px solid rgba(255,255,255,.75);background:none;color:#fff;padding:6px 14px;border-radius:999px;cursor:pointer;font-size:12.5px}
 nav button[aria-current=true]{background:var(--lime);border-color:var(--lime);color:#000}
 #save{margin-inline-start:auto;color:#eae4d6;font-size:12px}
-header .tb,header select,header input{border:1.5px solid rgba(255,255,255,.75);background:none;color:#fff;padding:6px 14px;border-radius:999px;cursor:pointer;font:600 14px "Archivo","Noto Sans Arabic",sans-serif}
+header .tb,header select,header input{border:1.5px solid rgba(255,255,255,.75);background:none;color:#fff;padding:6px 14px;border-radius:999px;cursor:pointer;font:600 14px "Montserrat","Noto Sans Arabic",sans-serif}
 header select option{color:#000}header input{cursor:text}header input::placeholder{color:#eae4d6}
 .tb:disabled{opacity:.4;cursor:default}
 #hero{max-width:1100px;margin:6px auto 0;padding:6px 18px 18px;color:#fff}
@@ -25,14 +25,14 @@ header select option{color:#000}header input{cursor:text}header input::placehold
 .ht{font-size:clamp(36px,7.5vw,88px);line-height:.95;text-transform:uppercase;letter-spacing:-.02em;overflow-wrap:anywhere}
 .sq{width:clamp(50px,8vw,100px);flex:none}
 .gl{display:inline-flex;gap:8px;align-items:baseline;margin-top:12px;padding:8px 16px;border-radius:20px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-size:14px}
-.gl b{font:900 20px "Archivo Black",sans-serif}
+.gl b{font:900 20px "Montserrat",sans-serif}
 main{padding:18px;max-width:1100px;margin:0 auto 24px;background:#fff;border-radius:32px}
 @media(max-width:700px){main{border-radius:24px;padding:12px;margin-inline:8px}}
 section{background:var(--paper);border-radius:22px;padding:16px;margin-bottom:12px}
 h2{font-size:15px;margin:0 0 10px;text-transform:uppercase;letter-spacing:.01em}
 input,select,textarea{font:inherit;padding:7px 12px;border:2px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);max-width:100%}
 input:disabled{background:#ececec;color:#777}
-.btn{border:2px solid var(--ink);background:#fff;color:var(--ink);padding:6px 16px;border-radius:999px;cursor:pointer;font:700 14px "Archivo","Noto Sans Arabic",sans-serif}
+.btn{border:2px solid var(--ink);background:#fff;color:var(--ink);padding:6px 16px;border-radius:999px;cursor:pointer;font:700 14px "Montserrat","Noto Sans Arabic",sans-serif}
 .btn.pri{background:var(--lime);border-color:var(--lime)}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
 table{width:100%;border-collapse:collapse}th{text-align:start;padding:6px 8px;border-bottom:2px solid var(--ink);color:var(--ink);font-size:12px;text-transform:uppercase}
@@ -59,19 +59,19 @@ a.nm{color:var(--olive);text-decoration:none;cursor:pointer;font-weight:700}
 .al{border-inline-start:6px solid var(--warn);padding:8px 12px;margin-bottom:8px;background:#fff;border-radius:12px}
 .al.neg{border-color:var(--bad)}.al.pos{border-color:var(--good)}
 .ch{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
-svg text{font:11px "Archivo",sans-serif;fill:var(--ink)}
+svg text{font:11px "Montserrat",sans-serif;fill:var(--ink)}
 input[type=checkbox]{width:22px;height:22px;accent-color:var(--olive)}
 .abar{display:flex;gap:8px;align-items:flex-start;background:#fff;border:5px solid #ff1f0f;color:#000;font-weight:600;border-radius:18px;padding:10px 16px;margin:4px 18px 10px}
 .dh{display:inline-block;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;font-size:22px;line-height:1;padding:6px 8px;border-radius:8px;color:var(--mut)}.dh:hover,.dh:focus-visible{background:var(--tan);color:var(--ink)}.dh:active{cursor:grabbing}
 tr.dragging{opacity:.45}tr.dt-top td{box-shadow:inset 0 3px 0 var(--olive)}tr.dt-bot td{box-shadow:inset 0 -3px 0 var(--olive)}
 .dghost{position:fixed;z-index:80;pointer-events:none;background:var(--lime);color:#000;border:2px solid #000;border-radius:12px;padding:6px 14px;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.35);max-width:70vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bx{display:inline-flex;align-items:center;gap:4px;border:2px solid var(--line);border-radius:999px;padding:3px 5px;background:#fff}.bx .bl{font-size:11px;font-weight:700;color:var(--mut);padding:0 6px;text-transform:uppercase}.bx button{width:34px;height:34px;border-radius:50%;border:2px solid #000;font:900 18px/1 Archivo,sans-serif;cursor:pointer;padding:0;background:#fff}.bx.bb button:last-of-type{background:var(--olive);color:#fff;border-color:var(--olive)}.bx.bq button:last-of-type{background:var(--lime)}.bx input{width:60px;text-align:center;border:0;padding:4px;font-weight:700}.bonrow{flex-wrap:wrap;gap:8px}.bonrow .bot{flex-basis:100%;padding-inline-start:2px}
+.bx{display:inline-flex;align-items:center;gap:4px;border:2px solid var(--line);border-radius:999px;padding:3px 5px;background:#fff}.bx .bl{font-size:11px;font-weight:700;color:var(--mut);padding:0 6px;text-transform:uppercase}.bx button{width:34px;height:34px;border-radius:50%;border:2px solid #000;font:900 18px/1 "Montserrat",sans-serif;cursor:pointer;padding:0;background:#fff}.bx.bb button:last-of-type{background:var(--olive);color:#fff;border-color:var(--olive)}.bx.bq button:last-of-type{background:var(--lime)}.bx input{width:60px;text-align:center;border:0;padding:4px;font-weight:700}.bonrow{flex-wrap:wrap;gap:8px}.bonrow .bot{flex-basis:100%;padding-inline-start:2px}
 
 footer{text-align:center;font-size:12px;color:#eae4d6;padding:0 0 18px}
 .lg{display:grid;gap:0 24px}
-.qt{flex:1;min-width:200px;background:none;border:0;text-align:start;font:900 15px "Archivo Black","Noto Sans Arabic",sans-serif;color:var(--ink);cursor:pointer;padding:4px 0}
-.qt .lb{font:500 13px "Archivo",sans-serif}
-.abar.bk{border:3px solid #193129}
+.qt{flex:1;min-width:200px;background:none;border:0;text-align:start;font:900 15px "Montserrat","Noto Sans Arabic",sans-serif;color:var(--ink);cursor:pointer;padding:4px 0}
+.qt .lb{font:500 13px "Montserrat",sans-serif}
+.abar.bk{border:3px solid #0d0d0d}
 #alertbar{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 12px);width:min(560px,calc(100% - 24px));z-index:50}
 #alertbar .abar{margin:0;box-shadow:0 10px 32px rgba(0,0,0,.4)}
 #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 18px);z-index:60;max-width:min(560px,calc(100% - 24px));padding:10px 18px;border-radius:18px;background:#fff;border:3px solid var(--olive);color:#000;font-weight:600;box-shadow:0 10px 32px rgba(0,0,0,.4);display:none}#toast.t-err{border-color:var(--bad)}#toast.t-busy{border-color:var(--lime)}
@@ -129,7 +129,7 @@ header .tool.out:hover:not(:disabled){background:color-mix(in srgb,var(--bad) 60
 @media(max-width:700px){
  body.bnav{padding-bottom:calc(66px + env(safe-area-inset-bottom,0px))}
  body.bnav nav{position:fixed;inset-inline:0;bottom:0;width:auto;z-index:20;display:flex;flex-wrap:nowrap;overflow:visible;justify-content:space-around;gap:0;background:#fff;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);box-shadow:0 -2px 12px rgba(0,0,0,.18)}
- body.bnav nav .nb{flex:1 1 0;min-width:0;min-height:48px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:2px;padding:0;border:0;border-radius:0;background:none;color:var(--ink);font:600 11px/14px "Archivo","Noto Sans Arabic",sans-serif;white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent}
+ body.bnav nav .nb{flex:1 1 0;min-width:0;min-height:48px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:2px;padding:0;border:0;border-radius:0;background:none;color:var(--ink);font:600 11px/14px "Montserrat","Noto Sans Arabic",sans-serif;white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent}
  body.bnav nav .nb .ni{width:56px;height:28px;border-radius:14px;display:flex;align-items:center;justify-content:center;transition:background .2s ease,transform .1s ease}
  body.bnav nav .nb svg{width:22px;height:22px;flex:none}
  body.bnav nav .nb .nl{max-width:100%;overflow:hidden;text-overflow:ellipsis}
@@ -184,7 +184,7 @@ header .tool.out:hover:not(:disabled){background:color-mix(in srgb,var(--bad) 60
 .cf-b{margin-top:12px}.cf-b[hidden]{display:none}
 .ico-del{flex:none;width:44px;height:44px;padding:0;border-radius:50%;border:2px solid var(--bad);background:var(--bad);color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s ease,color .15s ease,transform .1s ease}
 .ico-del svg{width:20px;height:20px}.ico-del:active{transform:scale(.92)}
-.ico-del.sure{width:auto;max-width:100%;padding:0 16px 0 12px;gap:8px;border-radius:999px;background:#fff;color:var(--bad);font:700 14px "Archivo","Noto Sans Arabic",sans-serif;white-space:nowrap}
+.ico-del.sure{width:auto;max-width:100%;padding:0 16px 0 12px;gap:8px;border-radius:999px;background:#fff;color:var(--bad);font:700 14px "Montserrat","Noto Sans Arabic",sans-serif;white-space:nowrap}
 .row:has(>.ico-del.sure){flex-wrap:wrap!important}.row>.ico-del.sure{margin-inline-start:auto}
 .ico-del:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 /* alerts: same layout for every name */
@@ -205,7 +205,7 @@ header .tool.out:hover:not(:disabled){background:color-mix(in srgb,var(--bad) 60
 .bontg .row{width:100%;flex:none!important;min-width:0!important}
 .bontg .btn{flex:1 1 130px;justify-content:center;text-align:center}
 .seg2{display:inline-flex;border:2px solid var(--ink);border-radius:999px;overflow:hidden;background:#fff}
-.seg2 button{border:0;background:none;color:var(--ink);padding:0 18px;min-height:44px;font:700 14px "Archivo","Noto Sans Arabic",sans-serif;cursor:pointer}
+.seg2 button{border:0;background:none;color:var(--ink);padding:0 18px;min-height:44px;font:700 14px "Montserrat","Noto Sans Arabic",sans-serif;cursor:pointer}
 .seg2 button.on{background:var(--lime)}
 .seg2 button:focus-visible{outline:3px solid var(--blue);outline-offset:-3px}
 .bonrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;align-items:center;padding:10px 0}
@@ -265,12 +265,12 @@ body.ui-open{overflow:hidden}
 .onb li.done .n{background:var(--good)}.onb li.done .t{text-decoration:line-through;opacity:.6}.onb li .t{flex:1;min-width:140px;font-weight:700}
 .ui-sheet{width:100%;max-height:80vh;overflow:auto;background:#fff;color:var(--ink);border-radius:24px 24px 0 0;padding:10px 12px calc(14px + env(safe-area-inset-bottom,0px));box-shadow:0 -12px 40px rgba(0,0,0,.3);outline:0}
 .ui-sheet .grab{width:42px;height:4px;border-radius:2px;background:var(--line);margin:2px auto 8px}
-.ui-sheet .sh-i{display:flex;width:100%;align-items:center;justify-content:space-between;min-height:50px;padding:0 14px;border:0;background:none;color:#000;font:700 16px "Archivo","Noto Sans Arabic",sans-serif;text-align:start;border-radius:14px;cursor:pointer}
+.ui-sheet .sh-i{display:flex;width:100%;align-items:center;justify-content:space-between;min-height:50px;padding:0 14px;border:0;background:none;color:#000;font:700 16px "Montserrat","Noto Sans Arabic",sans-serif;text-align:start;border-radius:14px;cursor:pointer}
 .ui-sheet .sh-i[aria-current=true]{background:var(--lime)}
 .ui-sheet .sh-i:focus-visible{outline:3px solid var(--blue);outline-offset:-2px}
 .ui-ov.out{pointer-events:none}
 .moreBtn{display:none}
-.lnk{background:none;border:0;padding:4px 0;color:var(--blue);text-decoration:underline;font:600 13px "Archivo","Noto Sans Arabic",sans-serif;cursor:pointer;align-self:flex-start}
+.lnk{background:none;border:0;padding:4px 0;color:var(--blue);text-decoration:underline;font:600 13px "Montserrat","Noto Sans Arabic",sans-serif;cursor:pointer;align-self:flex-start}
 .spin{width:30px;height:30px;box-sizing:border-box;border:3px solid color-mix(in srgb,var(--ink) 14%,transparent);border-top-color:var(--olive);border-radius:50%;margin:8px auto;animation:spin .8s linear infinite}
 .spin[hidden]{display:none}
 .ahead{display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -350,12 +350,12 @@ body.ui-open{overflow:hidden}
 #clsMenu[hidden]{display:none}
 #clsMenu .cr{display:flex;align-items:center;gap:2px;padding:1px 2px;border-radius:12px}
 #clsMenu .cr.cur{background:color-mix(in srgb,var(--lime) 45%,#fff)}
-#clsMenu .cn{flex:1;min-width:0;text-align:start;background:none;border:0;padding:9px 10px;border-radius:10px;font:700 14px "Archivo","Noto Sans Arabic",sans-serif;color:#000;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#clsMenu .cn{flex:1;min-width:0;text-align:start;background:none;border:0;padding:9px 10px;border-radius:10px;font:700 14px "Montserrat","Noto Sans Arabic",sans-serif;color:#000;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #clsMenu .cn:hover{background:var(--tan)}
 #clsMenu .ci{flex:none;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;border:0;background:none;color:#4a4a4a;cursor:pointer;padding:0}
 #clsMenu .ci:hover,#clsMenu .ci:focus-visible{background:var(--tan);color:#000}
 #clsMenu .ci.del:hover,#clsMenu .ci.del:focus-visible{background:#fde8e6;color:var(--bad)}
-#clsMenu .cadd{display:block;width:100%;text-align:start;margin-top:4px;padding:10px 12px;border:0;border-top:1px solid var(--line);background:none;color:#000;font:700 14px "Archivo","Noto Sans Arabic",sans-serif;cursor:pointer;border-radius:0 0 12px 12px}
+#clsMenu .cadd{display:block;width:100%;text-align:start;margin-top:4px;padding:10px 12px;border:0;border-top:1px solid var(--line);background:none;color:#000;font:700 14px "Montserrat","Noto Sans Arabic",sans-serif;cursor:pointer;border-radius:0 0 12px 12px}
 #clsMenu .cadd:hover{background:var(--tan)}
 #clsMenu .cedit{display:flex;flex-direction:column;gap:4px;padding:6px}
 #clsMenu .cedit input{width:100%;box-sizing:border-box;color:#000;border:2px solid var(--blue);background:#fff;border-radius:12px;padding:8px 12px}
@@ -363,6 +363,114 @@ body.ui-open{overflow:hidden}
 #clsMenu button:focus-visible{outline:3px solid var(--blue);outline-offset:-2px}
 .rpf{margin:0 0 4px}.rpf .rq{display:block;font-weight:800;margin:14px 0 6px}.rpf textarea{width:100%;box-sizing:border-box;min-height:104px;padding:10px 12px;border:2px solid #000;border-radius:14px;font:inherit;resize:vertical}.rpf select{max-width:100%}.rpf.bad textarea{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 6%,#fff)}.rpf .rr{color:var(--bad);font-size:12px;font-weight:700;margin-top:4px}
 nav button.rpt{background:#fff;border-color:#fff;color:var(--blue);font-weight:800}nav button.rpt[aria-current=true]{background:var(--lime);border-color:var(--lime);color:#000}
+
+/* =====================================================================
+   RESTYLE — black stage, light rounded sheet, outlined pills, Montserrat
+   (appended last so it wins over the earlier rules; app logic untouched)
+   ===================================================================== */
+:root{
+ --blue:#0d0d0d;--lime:#f6c744;--bg:#ececec;--paper:#f4f4f4;--ink:#0d0d0d;--olive:#0f7f70;--teal:#35c4ad;
+ --tan:#e2e2e2;--line:#d6d6d6;--mut:#5c5c5c;--good:#0f7f70;--sheet:#ececec;--rule:#cdcdcd;
+ --ast:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d0d0d' stroke-width='2.8' stroke-linecap='round'%3E%3Cpath d='M12 2v20M2 12h20M5 5l14 14M19 5L5 19'/%3E%3C/svg%3E");
+ --spk:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230d0d0d'%3E%3Cpath d='M12 1c.6 5.6 5.4 10.4 11 11-5.6.6-10.4 5.4-11 11-.6-5.6-5.4-10.4-11-11 5.6-.6 10.4-5.4 11-11z'/%3E%3C/svg%3E");
+}
+::selection{background:var(--ink);color:#fff}
+body{
+ background-color:#070707;
+ background-image:radial-gradient(60% 38% at 14% 6%,rgba(255,255,255,.11),transparent 70%),radial-gradient(48% 34% at 92% 58%,rgba(255,255,255,.07),transparent 70%),radial-gradient(44% 30% at 8% 96%,rgba(255,255,255,.06),transparent 70%);
+ background-size:auto;background-attachment:fixed;padding:clamp(8px,2vw,24px);
+}
+
+/* the light rounded sheet that holds everything */
+.sheet{position:relative;isolation:isolate;max-width:1100px;margin:0 auto;background:var(--sheet);border-radius:clamp(26px,4vw,40px);overflow:clip}
+.orn{position:absolute;z-index:-1;pointer-events:none;border-radius:50%;aspect-ratio:1;border:clamp(14px,2.4vw,26px) solid #c4c4c4}
+.orn-a{width:clamp(220px,34vw,380px);top:clamp(110px,17vw,200px);inset-inline-end:calc(clamp(220px,34vw,380px) / -2.3)}
+.orn-b{width:clamp(150px,22vw,250px);top:64%;inset-inline-start:calc(clamp(150px,22vw,250px) / -2.2)}
+
+/* header: wordmark, outlined pills, grey rule underneath */
+header{background:var(--sheet);color:var(--ink);margin:0;padding:clamp(16px,2.4vw,24px) clamp(16px,4vw,48px) 16px;gap:10px 12px}
+header::after{content:"";position:absolute;inset-inline:clamp(16px,4vw,48px);bottom:0;height:3px;border-radius:2px;background:var(--rule)}
+header h1{display:inline-flex;align-items:center;gap:8px;font:800 clamp(15px,1.8vw,18px)/1 "Montserrat","Noto Sans Arabic",sans-serif;letter-spacing:-.02em;text-transform:none;background:none;border:0;border-radius:0;color:var(--ink);padding:0 10px 0 0;margin:0}
+header h1::before{content:"";width:22px;height:22px;flex:none;background:var(--ast) center/contain no-repeat}
+header .tb,header select,header input{border:1.5px solid var(--ink);background:transparent;color:var(--ink)}
+header input::placeholder{color:var(--mut)}
+header .tool{background:transparent;border-color:transparent;color:var(--ink)}
+header .tool.wide{border-color:var(--ink);background:transparent}
+header .tool:hover:not(:disabled){background:rgba(0,0,0,.08)}
+header .tool.out:hover:not(:disabled){background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)}
+.hact .sep{background:var(--rule)}
+#save,header .hact #save{color:var(--mut);font-weight:600}
+#save::before{background:var(--teal)}
+#clsBtn{border-radius:999px;background:transparent;border:1.5px solid var(--ink);color:var(--ink);font-weight:600}
+
+/* nav: plain text tabs, black pill for the current one */
+nav button{border:1.5px solid transparent;background:transparent;color:var(--ink);font-weight:600;font-size:13px;letter-spacing:0;text-transform:none;padding:6px 11px}
+nav button:hover{border-color:var(--ink)}
+nav button[aria-current=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+nav button.rpt{background:var(--lime);border-color:var(--ink);color:var(--ink)}
+nav button.rpt[aria-current=true]{background:var(--ink);color:#fff}
+body.bnav nav{background:var(--sheet);border-top:1.5px solid var(--ink);box-shadow:none}
+body.bnav nav .nb[aria-current=true] .ni{background:var(--ink);color:#fff}
+
+/* hero: centred, big, tight headline */
+#hero{max-width:none;margin:0;padding:clamp(36px,6vw,66px) clamp(18px,5vw,64px) clamp(16px,3vw,28px);color:var(--ink);text-align:center;position:relative}
+#hero::before{content:"";position:absolute;inset-inline-start:clamp(16px,6vw,72px);top:clamp(16px,3.4vw,38px);width:clamp(26px,4vw,40px);aspect-ratio:1;background:var(--ast) center/contain no-repeat}
+.hw{justify-content:center}
+.ht{font-size:clamp(34px,6.4vw,76px);line-height:1.03;text-transform:none;letter-spacing:-.035em;font-weight:800}
+.gl{margin-top:22px;gap:10px;align-items:center;padding:6px;padding-inline-start:18px;border-radius:999px;background:transparent;border:1.5px solid var(--ink);-webkit-backdrop-filter:none;backdrop-filter:none;font-size:14px;font-weight:600}
+.gl b{font-size:18px}
+.gl::after{content:"\2197";display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:var(--ink);color:#fff;font-size:16px;line-height:1}
+
+/* main: the big outlined box; sections are outlined cards inside it */
+main{max-width:none;margin:clamp(6px,1.5vw,14px) clamp(14px,4vw,48px) 0;padding:clamp(14px,2.4vw,24px);background:transparent;border:2px solid var(--ink);border-radius:clamp(24px,3.4vw,38px)}
+section{background:var(--paper);border:1.5px solid var(--ink);border-radius:26px;padding:18px}
+h2{font-size:clamp(15px,1.6vw,18px);letter-spacing:-.01em;font-weight:800;margin:0 0 12px}
+th{text-transform:none;font-size:12.5px;font-weight:700;border-bottom-width:1.5px}
+.big{font-size:clamp(30px,4vw,38px);letter-spacing:-.03em;font-weight:800}
+.stats>div{background:transparent;border:1.5px solid var(--ink);border-radius:26px}
+.stats>div:nth-child(1){background:var(--ink);color:#fff}.stats>div:nth-child(1) .lb{color:#cfcfcf}
+.stats>div:nth-child(3){background:var(--lime)}.stats>div:nth-child(3) .lb{color:#3a2d00}
+.onb{border-inline-start:1.5px solid var(--ink)}
+
+/* controls */
+input,select,textarea{border:1.5px solid #b9b9b9;border-radius:14px}
+input:focus-visible,select:focus-visible,textarea:focus-visible{border-color:var(--ink)}
+.btn{border:1.5px solid var(--ink);background:transparent;padding:7px 18px;font-weight:700}
+.btn:hover{box-shadow:0 0 0 1px var(--ink)}
+.btn.pri{background:var(--ink);border-color:var(--ink);color:#fff}
+.cf-plus{background:var(--ink);color:#fff;border-color:var(--ink)}
+.cf-plus[aria-expanded=true]{color:var(--ink)}
+.seg2{border-width:1.5px}.seg2 button.on{background:var(--ink);color:#fff}
+.ui-sheet .sh-i[aria-current=true]{background:var(--ink);color:#fff}
+.lnk{color:var(--ink)}
+
+/* footer carries the sparkle + asterisk, like the reference's footer row */
+footer{position:relative;color:var(--mut);font-weight:600;font-size:12px;padding:26px clamp(52px,9vw,96px) 30px}
+footer::before,footer::after{content:"";position:absolute;top:50%;width:22px;height:22px;margin-top:-8px;background:center/contain no-repeat}
+footer::before{inset-inline-start:clamp(18px,5vw,56px);background-image:var(--spk)}
+footer::after{inset-inline-end:clamp(18px,5vw,56px);background-image:var(--ast)}
+
+/* sign-in screen */
+#auth{background-color:#070707;background-image:radial-gradient(60% 40% at 15% 8%,rgba(255,255,255,.11),transparent 70%),radial-gradient(50% 36% at 90% 90%,rgba(255,255,255,.07),transparent 70%)}
+#auth .acard{background:var(--sheet);color:var(--ink);border-radius:32px;box-shadow:none;padding:30px 24px}
+#auth .achip{display:inline-flex;align-items:center;gap:8px;font-weight:800;letter-spacing:-.02em}
+#auth .achip::before{content:"";width:20px;height:20px;background:var(--ast) center/contain no-repeat}
+#auth input{border:1.5px solid var(--ink);background:#fff}
+
+@media(max-width:700px){
+ header{padding:12px 16px 12px}
+ header::after{inset-inline:16px}
+ header h1{flex:1 1 0;min-width:0;font-size:16px;color:var(--ink)}
+ #hero{padding:34px 16px 14px}
+ .ht{font-size:clamp(30px,9.5vw,46px)}
+ main{margin-inline:10px;padding:12px;border-radius:26px}
+ section{padding:14px;border-radius:22px}
+ h2{font-size:16px;margin-bottom:12px}
+ header .tool,header .tool.wide{background:transparent}
+ header .tool.wide{border-color:var(--ink)}
+ header #lang.tool.wide{border-color:transparent}
+ #clsBtn{border-radius:999px;background:transparent;border:1.5px solid var(--ink)}
+}
 </style><script>
 window.addEventListener('error',function(e){var b=document.getElementById('app');if(b&&!b.getAttribute('data-ok')){b.innerHTML='<section style="padding:16px"><b>The page hit an error:</b><br>'+String(e.message).replace(/</g,'&lt;')+' (line '+e.lineno+')<br><br>Please send this message to the developer.</section>'}});
 try{new Function('a','return a??1;')}catch(e){document.addEventListener('DOMContentLoaded',function(){var b=document.getElementById('app');if(b)b.innerHTML='<section style="padding:16px">This browser is too old for the app. Please update iOS / Safari, or open the link in Chrome.</section>'})}
@@ -386,6 +494,7 @@ try{new Function('a','return a??1;')}catch(e){document.addEventListener('DOMCont
 <button class="btn" id="auSwitch" type="button" onclick="authSwitch()"></button>
 <button class="btn" id="auOut" type="button" onclick="logout()" hidden></button>
 </div></div>
+<div class="sheet"><span class="orn orn-a" aria-hidden="true"></span><span class="orn orn-b" aria-hidden="true"></span>
 <header><h1>Workshop Tracker</h1><div id="clsBox"><button type="button" class="tb" id="clsBtn" aria-haspopup="true" aria-expanded="false" aria-controls="clsMenu" onclick="clsToggle(event)"><span id="clsName"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="6 9 12 15 18 9"/></svg></button><div id="clsMenu" role="group" aria-label="Classes" hidden></div></div><select id="cls" aria-hidden="true" tabindex="-1" style="display:none"></select><input id="newcls" data-enter="1" placeholder="New class name, then Enter" hidden style="width:210px"><span class="lb">AUTOMOTIVE ELECTRICAL · TRAINING RECORD</span><div class="hact"><span id="save" class="lb"></span><button type="button" class="tb tool wide" id="lang"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span class="tl">عربي</span></button><button type="button" class="tb tool wide" id="modeBtn" onclick="switchMode()" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg><span class="tl"></span></button><button type="button" class="tb tool" id="undoAll" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5 5.5 5.5 0 0 1-5.5 5.5H11"/></svg></button><span class="sep" aria-hidden="true"></span><button type="button" class="tb tool" id="xlBtn" onclick="exportXlsx()" aria-label="Download class Excel" title="Download class Excel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button><button type="button" class="tb tool out" id="outBtn" onclick="logout()" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button></div><nav id="nav"></nav></header>
 <div id="alertbar"></div>
 <div id="bkbar"></div>
@@ -393,6 +502,7 @@ try{new Function('a','return a??1;')}catch(e){document.addEventListener('DOMCont
 <div id="hero"></div>
 <main id="app"></main>
 <footer>Made by mostafa saeed</footer>
+</div>
 <script>
 // ===== Supabase settings: paste your project values here (Project Settings -> API) =====
 const SUPABASE_URL='https://otmqevveuqbmnjqioeew.supabase.co';        // e.g. https://abcdxyz.supabase.co
@@ -586,7 +696,7 @@ V.Dashboard=()=>{const S=act(),rows=S.map(s=>({s,m:avg(results(s.id)),tr:trend(s
  const eng=ss.filter(s=>s.status==='Ended').slice(-8).map(s=>{const v=S.reduce((a,x)=>a+sessScore(s.id,x.id),0);return{l:s.date,v,t:v}});
  const li=a=>a.map((x,i)=>`<div class="li"><span class="mono mut">${i+1}</span><span class="n">${nm(x.s)}</span><b>${x.m.toFixed(1)}%</b></div>`).join('')||'<span class="mut">No graded students yet.</span>';
  return `<div class="row noexp"><button class="btn" onclick="clsReport()">Class report</button><button class="btn" onclick="exportXlsx()">Export Excel</button><button class="btn pri" onclick="exportView('dash','pdf',null,this)">Dashboard PDF</button><button class="btn" onclick="exportView('dash','png',null,this)">Dashboard PNG</button><span class="lb">Opens as a file — print it or save as PDF</span></div><div class="stats"><div><div class="lb">ACTIVE STUDENTS</div><div class="big">${S.length}</div></div><div><div class="lb">CLASS AVERAGE</div><div class="big">${all.length?(all.reduce((a,b)=>a+b,0)/all.length).toFixed(0)+'%':'—'}</div></div><div><div class="lb">ATTENDANCE</div><div class="big">${ats.length?(ats.reduce((a,b)=>a+b,0)/ats.length).toFixed(0)+'%':'—'}</div></div><div><div class="lb">OPEN ALERTS</div><div class="big">${alerts().filter(a=>a.k!=='pos'&&a.st!=='resolved').length}</div></div></div>
- <div class="ch"><section><h2>Performance levels</h2>${donut([{l:'High',col:'#2c5a47'},{l:'Medium',col:'#b8f200'},{l:'Low',col:'#111111'}].map(x=>({...x,v:tiers[x.l].length,c:`dTier='${x.l}';go()`})))}
+ <div class="ch"><section><h2>Performance levels</h2>${donut([{l:'High',col:'#1fae98'},{l:'Medium',col:'#f6c744'},{l:'Low',col:'#111111'}].map(x=>({...x,v:tiers[x.l].length,c:`dTier='${x.l}';go()`})))}
  <p class="lb">High ≥ ${D.set.hi}% · Medium ≥ ${D.set.mid}% · Low below. Click a slice for names.</p></section>
  <section><h2>Quiz average over time (%)</h2>${line(qa)}</section>
  <section><h2>Attendance per session (%)</h2>${cols(att.slice(-8),0,100)}</section>
@@ -1128,7 +1238,7 @@ function buildHold(stu){const cs=getComputedStyle(document.body),h=document.crea
 function fixSvgs(root){const rs=getComputedStyle(document.documentElement),v=n=>rs.getPropertyValue(n).trim()||'#000',sub=x=>x.replace(/var\((--[\w-]+)\)/g,(_,n)=>v(n));
  root.querySelectorAll('svg').forEach(sv=>{const r=sv.getBoundingClientRect();if(r.width)sv.setAttribute('width',r.width);if(r.height)sv.setAttribute('height',r.height);
   sv.querySelectorAll('*').forEach(e=>{['fill','stroke','stop-color'].forEach(a=>{const x=e.getAttribute(a);if(x&&x.includes('var('))e.setAttribute(a,sub(x))});const st=e.getAttribute('style');if(st&&st.includes('var('))e.setAttribute('style',sub(st))});
-  sv.querySelectorAll('text').forEach(e=>{if(!e.getAttribute('fill'))e.setAttribute('fill',v('--ink'));e.setAttribute('font-size',parseFloat(e.style.fontSize)||11);if(e.style.fontWeight)e.setAttribute('font-weight',e.style.fontWeight);e.setAttribute('font-family','Archivo, Noto Sans Arabic, Arial, sans-serif')})})}
+  sv.querySelectorAll('text').forEach(e=>{if(!e.getAttribute('fill'))e.setAttribute('fill',v('--ink'));e.setAttribute('font-size',parseFloat(e.style.fontSize)||11);if(e.style.fontWeight)e.setAttribute('font-weight',e.style.fontWeight);e.setAttribute('font-family','Montserrat, Noto Sans Arabic, Arial, sans-serif')})})}
 // choose page cuts between cards / table rows instead of through them
 function pickBreaks(hold,k,pageH,H){const t0=hold.getBoundingClientRect().top,R=e=>{const r=e.getBoundingClientRect();return[(r.top-t0)*k,(r.bottom-t0)*k]};
  const blocks=[...hold.querySelectorAll('section,.stats,.al')].map(R).filter(([a,b])=>b-a<=pageH*.95),cands=[...hold.querySelectorAll('section,.stats,.al,tr,.li')].map(e=>R(e)[1]).sort((a,b)=>a-b),ok=y=>!blocks.some(([a,b])=>a+3<y&&y<b-3),out=[];let s=0;
@@ -1136,7 +1246,7 @@ function pickBreaks(hold,k,pageH,H){const t0=hold.getBoundingClientRect().top,R=
  return out}
 function pdfFromCanvas(cv,hold,sc){const pdf=new window.jspdf.jsPDF({unit:'mm',format:'a4',orientation:'portrait'}),PW=210,PH=297,pageH=Math.floor(cv.width*PH/PW);
  pickBreaks(hold,sc,pageH,cv.height).forEach(([a,b],i)=>{if(i)pdf.addPage();pdf.setFillColor(25,49,41);pdf.rect(0,0,PW,PH,'F');
-  const t=document.createElement('canvas');t.width=cv.width;t.height=b-a;const x=t.getContext('2d');x.fillStyle='#193129';x.fillRect(0,0,t.width,t.height);x.drawImage(cv,0,a,cv.width,b-a,0,0,cv.width,b-a);
+  const t=document.createElement('canvas');t.width=cv.width;t.height=b-a;const x=t.getContext('2d');x.fillStyle='#0d0d0d';x.fillRect(0,0,t.width,t.height);x.drawImage(cv,0,a,cv.width,b-a,0,0,cv.width,b-a);
   pdf.addImage(t.toDataURL('image/jpeg',.92),'JPEG',0,0,PW,(b-a)*PW/cv.width)});
  return pdf.output('blob')}
 async function exportView(kind,fmt,id,btn){const stu=kind==='stu'?D.students.find(x=>x.id===id):null;if(kind==='stu'&&!stu){toast('Student not found','err');return}
@@ -1144,7 +1254,7 @@ async function exportView(kind,fmt,id,btn){const stu=kind==='stu'?D.students.fin
  if(btn){btn.disabled=true;btn.textContent='Working…'}toast('Preparing '+fmt.toUpperCase()+'… this can take a few seconds','busy');
  try{await loadLib('h2c');if(fmt==='pdf')await loadLib('pdf');try{if(document.fonts&&document.fonts.ready)await document.fonts.ready}catch(e){}
   hold=buildHold(stu);document.body.appendChild(hold);fixSvgs(hold);await new Promise(r=>setTimeout(r,80));
-  const w=hold.offsetWidth,h=hold.offsetHeight,sc=Math.max(1,Math.min(2,Math.sqrt(14e6/(w*h)))),cv=await window.html2canvas(hold,{scale:sc,backgroundColor:'#193129',useCORS:true,logging:false});
+  const w=hold.offsetWidth,h=hold.offsetHeight,sc=Math.max(1,Math.min(2,Math.sqrt(14e6/(w*h)))),cv=await window.html2canvas(hold,{scale:sc,backgroundColor:'#0d0d0d',useCORS:true,logging:false});
   if(!cv.width||!cv.height)throw new Error('the page rendered empty');
   const blob=fmt==='png'?await new Promise((res,rej)=>cv.toBlob(b=>b?res(b):rej(new Error('PNG encoding failed (the dashboard may be too large for this browser)')),'image/png')):pdfFromCanvas(cv,hold,sc);
   const ok=await dl(file,blob,'');toast(ok?'Saved '+file:'Export was cancelled','ok')}

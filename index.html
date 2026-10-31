@@ -477,6 +477,34 @@ footer::after{inset-inline-end:clamp(18px,5vw,56px);background-image:var(--ast)}
 h2,header h1{text-transform:uppercase}
 a.nm{color:var(--ink);font-weight:800;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px;text-decoration-thickness:2px;transition:text-decoration-color .15s}
 a.nm:hover,a.nm:focus-visible{text-decoration-color:var(--ink)}
+
+/* list panels: black background, white/grey text — separates the lists from the rest of the page */
+section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]){background:#0d0d0d;color:#ececec;border-color:#0d0d0d}
+section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) h2{color:#fff}
+section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) .lb,section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) .mut{color:#a8a8a8}
+section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) a.nm{color:#fff;text-decoration-color:transparent}
+section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) a.nm:hover,section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) a.nm:focus-visible{text-decoration-color:#fff}
+section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) th{color:#bdbdbd;border-bottom-color:#555}
+section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) td{border-bottom-color:#2e2e2e;color:#ececec}
+section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) .li{border-bottom-color:#2e2e2e}
+section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) .qt{color:#fff}
+section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) .qt .lb{color:#a8a8a8}
+section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) input,section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) select,section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) textarea{background:#1a1a1a;border-color:#4a4a4a;color:#fff}
+section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) input:focus-visible,section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) select:focus-visible,section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) textarea:focus-visible{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.25)}
+section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) input::placeholder{color:#8a8a8a}
+section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) .btn:not(.pri):not([onclick^="del("]):not([onclick^="rmDemo"]):not([onclick*="wipe"]):not([onclick^="clrConflict"]){color:#fff;border-color:#8a8a8a}
+section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) .btn.pri,section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) .cf-plus{background:#fff;color:#0d0d0d;border-color:#fff}
+section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) .cf-plus[aria-expanded=true]{background:#0d0d0d;color:#fff}
+section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) .dh{color:#a8a8a8}
+section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) .dh:hover,section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) .dh:focus-visible{background:#2a2a2a;color:#fff}
+section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) .hi{color:#35c4ad}
+section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) .md{color:#f6c744}
+section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) .lo{color:#ff7a6b}
+section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) .bar i{background:#35c4ad}
+section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) svg text{fill:#ececec}
+section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) .set-d>summary:focus-visible,section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) .qt:focus-visible,section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) a:focus-visible,section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) button:focus-visible{outline-color:#fff}
+@media(max-width:700px){section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) .wrap table th:first-child,section:has(a.nm,.wrap table,.list,.qt,details[data-k^="lv_"],details[data-k^="d_"]) .wrap table td:first-child{background:#0d0d0d;box-shadow:1px 0 0 #2e2e2e}
+}
 </style><script>
 window.addEventListener('error',function(e){var b=document.getElementById('app');if(b&&!b.getAttribute('data-ok')){b.innerHTML='<section style="padding:16px"><b>The page hit an error:</b><br>'+String(e.message).replace(/</g,'&lt;')+' (line '+e.lineno+')<br><br>Please send this message to the developer.</section>'}});
 try{new Function('a','return a??1;')}catch(e){document.addEventListener('DOMContentLoaded',function(){var b=document.getElementById('app');if(b)b.innerHTML='<section style="padding:16px">This browser is too old for the app. Please update iOS / Safari, or open the link in Chrome.</section>'})}

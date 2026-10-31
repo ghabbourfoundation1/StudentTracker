@@ -471,6 +471,12 @@ footer::after{inset-inline-end:clamp(18px,5vw,56px);background-image:var(--ast)}
  header #lang.tool.wide{border-color:transparent}
  #clsBtn{border-radius:999px;background:transparent;border:1.5px solid var(--ink)}
 }
+
+/* titles back to the original uppercase look; student names in ink */
+.ht{text-transform:uppercase;letter-spacing:-.03em;font-weight:900;line-height:.98}
+h2,header h1{text-transform:uppercase}
+a.nm{color:var(--ink);font-weight:800;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px;text-decoration-thickness:2px;transition:text-decoration-color .15s}
+a.nm:hover,a.nm:focus-visible{text-decoration-color:var(--ink)}
 </style><script>
 window.addEventListener('error',function(e){var b=document.getElementById('app');if(b&&!b.getAttribute('data-ok')){b.innerHTML='<section style="padding:16px"><b>The page hit an error:</b><br>'+String(e.message).replace(/</g,'&lt;')+' (line '+e.lineno+')<br><br>Please send this message to the developer.</section>'}});
 try{new Function('a','return a??1;')}catch(e){document.addEventListener('DOMContentLoaded',function(){var b=document.getElementById('app');if(b)b.innerHTML='<section style="padding:16px">This browser is too old for the app. Please update iOS / Safari, or open the link in Chrome.</section>'})}
